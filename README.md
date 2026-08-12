@@ -66,8 +66,3 @@ python run_all.py --continue-on-error
 
 幂等：已存在的非空文件直接跳过；404 友好跳过，不中断流程。
 
-## 其他
-
-- `.gitignore` 已忽略 `__pycache__/`、`.venv`、`.workbuddy`、`*.zip` 等。
-- `.workbuddy/` 为 WorkBuddy 内部数据，不提交。
-- `main.py` 仅为示例 / 占位文件，不参与流水线。
