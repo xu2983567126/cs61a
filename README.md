@@ -2,7 +2,7 @@
 
 CS61A 课程材料的本地镜像：Lab / Discussion / Homework / Project 的**题目页与解答页**已翻译为中文，并附带可直接运行的解压代码。仓库仅依赖 Python 标准库，无第三方包（环境由 uv 管理）。
 
-材料从 [https://cs61a.org/](https://cs61a.org/) 下载，当前对应 **2026 Summer** 学期。
+材料从 [https://cs61a.org/](https://cs61a.org/) 下载，当前对应 **2026 Summer** 学期。使用的在线教材为[https://composingprograms.netlify.app/](https://composingprograms.netlify.app/)。
 
 ## 目录结构
 
