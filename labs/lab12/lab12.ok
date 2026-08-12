@@ -1,0 +1,29 @@
+{
+    "name": "Lab 12",
+    "endpoint": "cal/cs61a/su26/lab12",
+    "src": [
+        "lab12.scm",
+        "lab12.py"
+    ],
+    "tests": {
+        "lab*.py": "doctest",
+        "tests/*.py": "ok_test"
+    },
+    "default_tests": [
+        "delete",
+        "subseqs",
+        "common_players",
+        "stair_ways",
+        "Player",
+        "Game",
+        "two_list",
+        "accumulate"
+    ],
+    "protocols": [
+        "restore",
+        "file_contents",
+        "unlock",
+        "grading",
+        "analytics"
+    ]
+}

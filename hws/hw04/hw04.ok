@@ -1,0 +1,25 @@
+{
+    "name": "Homework 4",
+    "endpoint": "cal/cs61a/su26/hw04",
+    "src": [
+        "hw04.py"
+    ],
+    "tests": {
+        "hw*.py": "doctest",
+        "tests/*.py": "ok_test"
+    },
+    "default_tests": [
+        "VendingMachine",
+        "cumulative_mul",
+        "prune_small",
+        "Cat"
+    ],
+    "protocols": [
+        "restore",
+        "file_contents",
+        "analytics",
+        "help",
+        "unlock",
+        "grading"
+    ]
+}

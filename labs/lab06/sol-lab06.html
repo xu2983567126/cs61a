@@ -1,0 +1,894 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta name="description" content="CS 61A: Structure and Interpretation of Computer Programs"/>
+    <meta name="keywords" content="Computer Science, Programming, Berkeley, EECS"/>
+    <meta name="author" content="Rebecca Dang"/>
+    <!-- CHANGED CAREFUL -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/assets/js/hl.js"></script>
+    <script src="/assets/js/toggledarkmode.js"></script>
+    <script>
+        // we aren't registering builtins since
+        //      (1) they don't render differently in the current CSS from other names
+        //      (2) it's a mess to list all of them. You can extract from the site but that takes effort
+        // if (1) ceases to be true, (2) might be worth the effort. For now, we're leaving as is
+        hljsRegister({
+            'keyword': "define if cond and or let begin lambda mu quote delay cons-stream set! quasiquote unquote unquote-splicing define-macro"
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <script src="/assets/js/dark-mode.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata|Roboto:300,400,500|Work+Sans:400,700">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/mono-blue.css">
+    <link rel="icon" href="/assets/images/favicon.ico">
+
+    
+
+<link rel="stylesheet" type="text/css" href="/assets/css/lab.css">
+
+
+    <title>
+Lab 6 解答 | CS 61A Summer 2026
+</title>
+  </head>
+
+  <body id="index" class="home">
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container noselect">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-section" aria-label="切换导航栏">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">
+            CS 61A
+            <!-- <img style="max-width:60px; margin-top: -20px;" class="logo" src="/assets/images/logo.png"/> -->
+          </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse-section">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+            <li><a href="/">课程讲座</a></li>
+            
+            <li><a href="/articles/about-61a/">教学大纲</a></li>
+            
+            <li><a href="https://edstem.org/us/courses/99538/discussion">Ed</a></li>
+            
+            <li><a href="/office-hours/">答疑时间</a></li>
+            
+            <li><a href="/articles/contact-61a/">联系方式</a></li>
+            
+
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Links
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://go.cs61a.org/extensions">申请延期</a></li>
+                
+                <li><a href="https://go.cs61a.org/regrades">申请重新评分</a></li>
+                
+                <li><a href="https://oh.cs61a.org/">答疑排队</a></li>
+                
+                <li><a href="https://www.gradescope.com/courses/1324284">Gradescope</a></li>
+                
+                <li><a href="https://sections.cs61a.org">添加/更改讨论班</a></li>
+                
+                <li><a href="https://bcourses.berkeley.edu/courses/1555178/pages">课程录像</a></li>
+                
+                <li><a href="https://pythontutor.com/cp/composingprograms.html">Python Tutor</a></li>
+                
+                <li><a href="https://code.cs61a.org/">代码编辑器</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Resources
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/resources/">往年考试与网站</a></li>
+                
+                <li><a href="https://www.composingprograms.com">教材</a></li>
+                
+                <li><a href="/articles/campus-res/">校园资源</a></li>
+                
+                <li><a href="/articles/advice/">往届学生建议</a></li>
+                
+                <li><a href="/articles/scheme-spec/">Scheme 规范</a></li>
+                
+                <li><a href="/articles/scheme-builtins/">Scheme 内置过程</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Guides
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://drive.google.com/file/d/1O72u0ml65pibcjz-PXKpqeJDKaVqQ3D8/view">调试指南</a></li>
+                
+                <li><a href="/articles/studying/">学习指南</a></li>
+                
+                <li><a href="/articles/type-hints/">类型提示</a></li>
+                
+                <li><a href="/articles/composition/">写作指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt1-study-guide.pdf">MT1 学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt2-study-guide.pdf">MT2 学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-final-study-guide.pdf">期末学习指南</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Staff
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/instructor">授课教师</a></li>
+                
+                <li><a href="/staff">助教与辅导员</a></li>
+                
+              </ul>
+            </li>
+            
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main id="content" class="container">
+      
+<div class="row">
+  <div class="col-md-9">
+    <header>
+      <h1>
+        
+Lab 6 解答
+
+        
+        
+        <ul class="inline-block list-inline">
+          <li><a href="lab06.zip" class="label label-outline">lab06.zip</a></li>
+        </ul>
+        
+        
+      </h1>
+    </header>
+    
+<h2>解答文件</h2>
+<h2 id="lab-checkoff-questions">Lab 签退问题</h2>
+
+
+<ul>
+  <li><strong>面向对象编程的主要目标是什么？</strong></li>
+  <li>类在使用与数据实现之间建立了抽象屏障。类作为所有该类型对象的模板，你可以创建多个对象来存储不同的数据。</li>
+  <li><strong>实例变量与类变量的区别是什么？</strong></li>
+  <li>实例变量是特定于某个对象、且在不同对象之间不同的，而类变量属于整个类。</li>
+  <li><strong>调用方法时我们必须显式传入“self”吗？</strong></li>
+  <li>不需要，当对象的某个方法被调用时，该对象会隐式作为 self 的参数传入。</li>
+</ul>
+
+    
+<h1 id="attendance">出勤</h1>
+
+
+<p>要获得本 lab 的学分，除了出勤外你还需要提交 lab 题目。</p>
+
+<p>如果你因正当理由（如生病或时间冲突）缺勤，或因某种原因未被签到，请在一周内发邮件至 <a href="mailto:cs61a@berkeley.edu">cs61a@berkeley.edu</a> 以在一周内获得出勤学分。</p>
+
+
+<h1 id="required-questions">必做问题</h1>
+
+
+<!-- 
+        <button id='toggle-1' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        Getting Started Videos<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-1">
+
+
+<h2 id="getting-started-videos" class="no-toc">Getting Started Videos</h2>
+
+
+<p>These videos may provide some helpful direction for tackling the coding problems on this assignment.</p>
+
+<blockquote><p>To see these videos, you should be logged into your berkeley.edu email.</p></blockquote>
+
+
+            <iframe width="560" height="315" src="https://youtube.com/embed/videoseries?list=PLx38hZJ5RLZfrzyQvcEjb9j4RWMJRVbUB"
+                frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" aria-label = "lab6-getstarted"
+                allowfullscreen></iframe><p><a href='https://youtu.be/playlist?list=PLx38hZJ5RLZfrzyQvcEjb9j4RWMJRVbUB'> YouTube link </a></p>
+</div> -->
+
+<!-- > <strong>Note:</strong>
+
+<blockquote><p>If you are facing issues with <strong>types</strong> in your code, add the following line <strong>at the very top</strong> of your <code>lab06.py</code> file:</p>
+
+<pre><code class="python">from __future__ import annotations</code></pre>
+
+
+<p>Alternatively, you can <strong>redownload the lab06 folder</strong> from the course website to ensure you have the latest files. --></p></blockquote>
+
+
+<h2 id="object-oriented-programming">面向对象编程</h2>
+
+
+<p>这里有一段面向对象编程的复习。如果你卡住了，可以直接跳到问题，需要时再回来参考。</p>
+
+
+        <button id="toggle-2" class="btn btn-outline btn-lg alwaystoggle toggle">
+        Object-Oriented Programming<noscript>（启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-2">
+
+<p><strong>面向对象编程</strong>（OOP）使用对象和类来组织程序。下面是一个类的例子：</p>
+
+<pre><code>class Car:
+    max_tires = 4
+
+    def __init__(self, color):
+        self.tires = Car.max_tires
+        self.color = color
+
+    def drive(self):
+        if self.tires &lt; Car.max_tires:
+            return self.color + &#x27; car cannot drive!&#x27;
+        return self.color + &#x27; car goes vroom!&#x27;
+
+    def pop_tire(self):
+        if self.tires &gt; 0:
+            self.tires &#x2d;= 1</code></pre>
+
+<p><strong>类</strong>：一个对象的类型。<code>Car</code> 类（如上所示）描述了所有 <code>Car</code>
+  对象。</p>
+
+<p><strong>对象</strong>：类的一个单一实例。在 Python 中，新对象通过调用一个类来创建。</p>
+
+<pre><code>&gt;&gt;&gt; ferrari = Car(&#x27;red&#x27;)</code></pre>
+
+<p>这里，<code>ferrari</code> 是一个绑定到 <code>Car</code> 对象的名字。</p>
+
+<p><strong>类属性</strong>：属于一个类并通过点号访问的变量。<code>Car</code> 类有一个 <code>max_tires</code> 属性。</p>
+
+<pre><code>&gt;&gt;&gt; Car.max_tires
+4</code></pre>
+
+<page-break>
+
+<p><strong>实例属性</strong>：属于某个特定对象的变量。每个 <code>Car</code> 对象有一个 <code>tires</code> 属性和一个 <code>color</code> 属性。与类属性一样，实例属性通过点号访问。</p>
+
+<pre><code>&gt;&gt;&gt; ferrari.color
+&#x27;red&#x27;
+&gt;&gt;&gt; ferrari.tires
+4
+&gt;&gt;&gt; ferrari.color = &#x27;green&#x27;
+&gt;&gt;&gt; ferrari.color
+&#x27;green&#x27;</code></pre>
+
+<p><strong>方法</strong>：属于一个对象并通过点号调用的函数。按照惯例，方法的第一个参数是 <code>self</code>.</p>
+
+<p>当对象的某个方法被调用时，该对象会隐式作为 <code>self</code> 的参数传入。例如，<code>drive</code> 类的 <code>ferrari</code> 对象以空括号被调用，因为 <code>self</code> 被隐式绑定到 <code>ferrari</code> 对象的名字。</p>
+
+<pre><code>&gt;&gt;&gt; ferrari = Car(&#x27;red&#x27;)
+&gt;&gt;&gt; ferrari.drive()
+&#x27;red car goes vroom!&#x27;</code></pre>
+
+<p>我们也可以调用原始的 <code>Car.drive</code> 函数。原始函数不属于任何特定的 <code>Car</code> 对象，因此我们必须为 <code>self</code>.</p>
+
+<pre><code>&gt;&gt;&gt; ferrari = Car(&#x27;red&#x27;)
+&gt;&gt;&gt; Car.drive(ferrari)
+&#x27;red car goes vroom!&#x27;</code></pre>
+
+<p><strong>__init__</strong>：当创建类的新实例时自动调用的特殊函数。</p>
+
+<p>注意 <code>drive</code> 方法接收 <code>self</code> 作为参数，但我们好像没有传入！这是因为点号
+  <em>隐式地</em> 传入了 <code>ferrari</code> 作为 <code>self</code> 给我们。所以在这个例子中，<code>self</code> 被绑定到全局帧中名为
+  <code>ferrari</code> 的对象。</p>
+
+<p>要计算表达式 <code>Car(&#x27;red&#x27;)</code>，Python 会创建一个新的 <code>Car</code> 对象。然后，Python 调用 <code>__init__</code> 的 <code>Car</code> 类的 <code>self</code>，其中 <code>color</code> 绑定到新对象，<code>&#x27;red&#x27;</code>.</p>
+
+</div>
+
+
+<h3 id="q1-bank-account">Q1：银行账户</h3>
+
+
+<p>扩展 <code>BankAccount</code> 类以包含一个 <code>transactions</code> 属性。该属性应是一个列表，用于记录该账户上的每笔交易。每当 <code>deposit</code> 或 <code>withdraw</code> 方法被调用时，应创建一个新的 <code>Transaction</code> 实例并加入列表，<strong>即使操作未成功</strong>.</p>
+
+<p>一个 <code>Transaction</code> 类的实例应具有以下属性：</p>
+
+<ul>
+  <li><code>before</code>：交易前的账户余额。</li>
+  <li><code>after</code>：交易后的账户余额。</li>
+  <li><code>id</code>：交易 ID，即该账户上之前发生的交易（存款或取款）数量。某个特定 <code>BankAccount</code> 实例的交易 ID 必须唯一，但此 <code>id</code> 不必在所有账户间唯一。换句话说，你只需确保同一个 <code>Transaction</code> 创建的 <code>BankAccount</code> 对象不会拥有相同的 <code>id</code>.</li>
+</ul>
+
+<p>此外，<code>Transaction</code> 类应具有以下方法：</p>
+
+<ul>
+  <li><code>changed()</code>：返回 <code>True</code>，如果余额发生变化（即 <code>before</code> 与 <code>after</code> 不同），否则返回 <code>False</code>.</li>
+  <li><code>report()</code>：返回一个描述该交易的字符串。该字符串应以交易 ID 开头，并描述余额的变化。请查看 doctests 以了解预期输出。</li>
+</ul>
+
+<solution>
+
+<pre><code>class Transaction:
+    def __init__(self, id: int, before: int, after: int):
+        self.id = id
+        self.before = before
+        self.after = after
+
+    def changed(self) &#x2d;&gt; bool:
+        &quot;&quot;&quot;Return whether the transaction resulted in a changed balance.&quot;&quot;&quot;
+<div class="sol-highlight">        return self.before != self.after</div>
+    def report(self) &#x2d;&gt; str:
+        &quot;&quot;&quot;Return a string describing the transaction.
+
+        &gt;&gt;&gt; Transaction(3, 20, 10).report()
+        &#x27;3: decreased 20&#x2d;&gt;10&#x27;
+        &gt;&gt;&gt; Transaction(4, 20, 50).report()
+        &#x27;4: increased 20&#x2d;&gt;50&#x27;
+        &gt;&gt;&gt; Transaction(5, 50, 50).report()
+        &#x27;5: no change&#x27;
+        &quot;&quot;&quot;
+        msg: str = &#x27;no change&#x27;
+        if self.changed():
+<div class="sol-highlight">            if self.after &lt; self.before:
+                verb = &#x27;decreased&#x27;
+            else:
+                verb = &#x27;increased&#x27;
+            msg = verb + &#x27; &#x27; + str(self.before) + &#x27;&#x2d;&gt;&#x27; + str(self.after)</div>        return str(self.id) + &#x27;: &#x27; + msg
+
+class BankAccount:
+    &quot;&quot;&quot;A bank account that tracks its transaction history.
+
+    &gt;&gt;&gt; a = BankAccount(&#x27;Eric&#x27;)
+    &gt;&gt;&gt; a.deposit(100)    # Transaction 0 for a
+    100
+    &gt;&gt;&gt; b = BankAccount(&#x27;Erica&#x27;)
+    &gt;&gt;&gt; a.withdraw(30)    # Transaction 1 for a
+    70
+    &gt;&gt;&gt; a.deposit(10)     # Transaction 2 for a
+    80
+    &gt;&gt;&gt; b.deposit(50)     # Transaction 0 for b
+    50
+    &gt;&gt;&gt; b.withdraw(10)    # Transaction 1 for b
+    40
+    &gt;&gt;&gt; a.withdraw(100)   # Transaction 3 for a
+    &#x27;Insufficient funds&#x27;
+    &gt;&gt;&gt; len(a.transactions)
+    4
+    &gt;&gt;&gt; len([t for t in a.transactions if t.changed()])
+    3
+    &gt;&gt;&gt; for t in a.transactions:
+    ...     print(t.report())
+    0: increased 0&#x2d;&gt;100
+    1: decreased 100&#x2d;&gt;70
+    2: increased 70&#x2d;&gt;80
+    3: no change
+    &gt;&gt;&gt; b.withdraw(100)   # Transaction 2 for b
+    &#x27;Insufficient funds&#x27;
+    &gt;&gt;&gt; b.withdraw(30)    # Transaction 3 for b
+    10
+    &gt;&gt;&gt; for t in b.transactions:
+    ...     print(t.report())
+    0: increased 0&#x2d;&gt;50
+    1: decreased 50&#x2d;&gt;40
+    2: no change
+    3: decreased 40&#x2d;&gt;10
+    &quot;&quot;&quot;
+
+    # *** 你需要在该类的多个地方进行修改 ***
+<div class="sol-highlight">    def next_id(self) &#x2d;&gt; int:
+        # 实现这个计数器有很多种方式，例如使用一个实例
+        # 属性来跟踪下一个 ID。
+        return len(self.transactions)</div>
+    def __init__(self, account_holder: str):
+        self.balance: int = 0
+        self.holder = account_holder
+<div class="sol-highlight">        self.transactions = []</div>
+    def deposit(self, amount: int) &#x2d;&gt; int:
+        &quot;&quot;&quot;Increase the account balance by amount, add the deposit
+        to the transaction history, and return the new balance.
+        &quot;&quot;&quot;
+<div class="sol-highlight">        self.transactions.append(Transaction(self.next_id(), self.balance, self.balance + amount))</div>        self.balance = self.balance + amount
+        return self.balance
+
+    def withdraw(self, amount: int) &#x2d;&gt; int | str:
+        &quot;&quot;&quot;Decrease the account balance by amount, add the withdraw
+        to the transaction history, and return the new balance.
+        &quot;&quot;&quot;
+        if amount &gt; self.balance:
+<div class="sol-highlight">            self.transactions.append(Transaction(self.next_id(), self.balance, self.balance))</div>            return &#x27;Insufficient funds&#x27;
+<div class="sol-highlight">        self.transactions.append(Transaction(self.next_id(), self.balance, self.balance &#x2d; amount))</div>        self.balance = self.balance &#x2d; amount
+        return self.balance</code></pre>
+
+</solution>
+
+<p>使用 Ok 来测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q BankAccount<button id="copy-code-python3ok-qBankAccount" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qBankAccount").onclick = () => copyCode('python3 ok -q BankAccount', "copy-code-python3ok-qBankAccount");
+        </script>
+        <br/>
+
+
+<h3 id="q2-email">Q2：电子邮件</h3>
+
+
+<p>一个电子邮件系统包含三个类：<code>Email</code>、<code>Server</code>，否则返回 <code>Client</code>。一个 <code>Client</code> 可以
+<code>compose</code> 一封电子邮件，并将其 <code>send</code> 的名字映射到对应的 <code>Server</code>。<code>Server</code> 随后将其投递到
+<code>inbox</code> 的另一个 <code>Client</code>。为此，一个 <code>Server</code> 拥有一个名为
+<code>clients</code> 的字典，它将 <code>Client</code> 的名字映射到对应的 <code>Client</code> 实例。</p>
+
+<p>假设一个 <code>Client</code> 从不改变它所使用的 <code>Server</code>，并且它只能使用该 <code>Email</code> 来撰写一封 <code>Server</code>.</p>
+
+<p>填写下面的定义以完成实现！<code>Email</code> 类已经为你完成。</p>
+
+<blockquote><p><strong>重要</strong>：在开始之前，请确保阅读整个代码片段，以理解各类之间的关系，并注意方法的参数类型。思考在每个方法中你可以访问哪些变量，以及如何利用它们来访问其他类及其方法。</p></blockquote>
+
+<!-- separate block quotes -->
+
+<blockquote><p><strong>注意：</strong></p>
+
+<ul>
+  <li>该<code>sender</code> 参数来自 <code>__init__(self, msg, sender, recipient_name)</code> 类的 <code>Email</code> 方法，它是一个 <code>Client</code> 实例。</li>
+  <li>该<code>client</code> 参数来自 <code>register_client(self, client)</code> 类的 <code>Server</code> 方法，它是一个 <code>Client</code> 实例。</li>
+  <li>该<code>email</code> 参数来自 <code>send(self, email)</code> 类的 <code>Server</code> class is an <code>Email</code> 实例。</li>
+</ul></blockquote>
+
+<solution>
+
+<pre><code>class Email:
+    &quot;&quot;&quot;An email has the following instance attributes:
+
+        msg (str): the contents of the message
+        sender (Client): the client that sent the email
+        recipient_name (str): the name of the recipient (another client)
+    &quot;&quot;&quot;
+    def __init__(self, msg: str, sender, recipient_name: str):
+        self.msg = msg
+        self.sender = sender
+        self.recipient_name = recipient_name
+
+class Server:
+    &quot;&quot;&quot;Each Server has one instance attribute called clients that is a
+    dictionary from client names to client objects.
+
+    &gt;&gt;&gt; s = Server()
+    &gt;&gt;&gt; # Dummy client class implementation for testing only
+    &gt;&gt;&gt; class Client:
+    ...     def __init__(self, server, name):
+    ...         self.inbox = []
+    ...         self.server = server
+    ...         self.name = name
+    &gt;&gt;&gt; a = Client(s, &#x27;Alice&#x27;)
+    &gt;&gt;&gt; b = Client(s, &#x27;Bob&#x27;)
+    &gt;&gt;&gt; s.register_client(a) 
+    &gt;&gt;&gt; s.register_client(b)
+    &gt;&gt;&gt; len(s.clients)  # we have registered 2 clients
+    2
+    &gt;&gt;&gt; all([type(c) == str for c in s.clients.keys()])  # The keys in self.clients should be strings
+    True
+    &gt;&gt;&gt; all([type(c) == Client for c in s.clients.values()])  # The values in self.clients should be Client instances
+    True
+    &gt;&gt;&gt; new_a = Client(s, &#x27;Alice&#x27;)  # a new client with the same name as an existing client
+    &gt;&gt;&gt; s.register_client(new_a)
+    &gt;&gt;&gt; len(s.clients)  # the key of a dictionary must be unique
+    2
+    &gt;&gt;&gt; s.clients[&#x27;Alice&#x27;] is new_a  # the value for key &#x27;Alice&#x27; should now be updated to the new client new_a
+    True
+    &gt;&gt;&gt; e = Email(&quot;I love 61A&quot;, b, &#x27;Alice&#x27;)
+    &gt;&gt;&gt; s.send(e)
+    &gt;&gt;&gt; len(new_a.inbox)  # one email has been sent to new Alice
+    1
+    &gt;&gt;&gt; type(new_a.inbox[0]) == Email  # a Client&#x27;s inbox is a list of Email instances
+    True
+    &quot;&quot;&quot;
+    def __init__(self):
+        self.clients = {}
+
+    def send(self, email: Email):
+        &quot;&quot;&quot;Append the email to the inbox of the client it is addressed to.
+            email is an instance of the Email class.
+        &quot;&quot;&quot;
+<div class="sol-highlight">        self.clients[email.recipient_name].inbox.append(email)</div>
+    def register_client(self, client):
+        &quot;&quot;&quot;Add a client to the clients mapping (which is a 
+        dictionary from client names to client instances).
+            client is an instance of the Client class.
+        &quot;&quot;&quot;
+<div class="sol-highlight">        self.clients[client.name] = client</div>
+class Client:
+    &quot;&quot;&quot;A client has a server, a name (str), and an inbox (list).
+
+    &gt;&gt;&gt; s = Server()
+    &gt;&gt;&gt; a = Client(s, &#x27;Alice&#x27;)
+    &gt;&gt;&gt; b = Client(s, &#x27;Bob&#x27;)
+    &gt;&gt;&gt; a.compose(&#x27;Hello, World!&#x27;, &#x27;Bob&#x27;)
+    &gt;&gt;&gt; b.inbox[0].msg
+    &#x27;Hello, World!&#x27;
+    &gt;&gt;&gt; a.compose(&#x27;CS 61A Rocks!&#x27;, &#x27;Bob&#x27;)
+    &gt;&gt;&gt; len(b.inbox)
+    2
+    &gt;&gt;&gt; b.inbox[1].msg
+    &#x27;CS 61A Rocks!&#x27;
+    &gt;&gt;&gt; b.inbox[1].sender.name
+    &#x27;Alice&#x27;
+    &quot;&quot;&quot;
+    def __init__(self, server: Server, name: str):
+        self.inbox: list = []
+        self.server = server
+        self.name = name
+<div class="sol-highlight">        server.register_client(self)</div>
+    def compose(self, message: str, recipient_name: str):
+        &quot;&quot;&quot;Send an email with the given message to the recipient.&quot;&quot;&quot;
+<div class="sol-highlight">        email = Email(message, self, recipient_name)</div>        self.server.send(email)</code></pre>
+
+</solution>
+
+<blockquote><p>有两<code>ok</code> 个针对本问题的测试。要获得满分，两个测试都必须通过。
+你应该按照给出的顺序运行它们。
+<code>python3 ok &#x2d;q Server</code> 测试将测试 <code>Server</code> 类的实现，并且它不需要 <code>Client</code> 类的正确实现。
+<code>python3 ok &#x2d;q Client</code> 测试将同时测试 <code>Server</code> 和 <code>Client</code> 类的实现。
+因此，请务必先测试你的 <code>Server</code> 类实现，再测试 <code>Client</code> 类的年份减去硬币的年份来确定。</p></blockquote>
+
+<p>使用 Ok 来测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q Server
+python3 ok -q Client<button id="copy-code-python3ok-qServerpython3ok-qClient" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qServerpython3ok-qClient").onclick = () => copyCode('python3 ok -q Server\npython3 ok -q Client', "copy-code-python3ok-qServerpython3ok-qClient");
+        </script>
+        <br/>
+
+
+<h2 id="inheritance">继承</h2>
+
+
+<p>两个类可能具有相似的属性，但其中一个是另一个的特殊情况。例如，一个 <code>Nickel</code> 是 <code>Coin</code> 的特殊情况。我们说 <code>Nickel</code> 是 <code>Coin</code>，否则返回 <code>Coin</code> 是 <code>Nickel</code> 的基类（或超类）。在 Python 中，<code>class Nickel(Coin):</code> 这一行建立了这种关系。</p>
+
+<pre><code>class Coin:
+    cents = None  # This will be provided by subclasses, but not by Coin itself
+
+    def __init__(self, year):
+        self.year = year
+
+class Nickel(Coin):
+    cents = 5</code></pre>
+
+
+
+<p>（例如 <code>Coin</code><code>__init__</code>) are also methods for <code>Nickel</code>。例如，每个 <code>Nickel</code> 实例有一个 <code>year</code> 属性。但在 <code>Nickel</code> 类中定义的类属性或方法会先被找到。</p>
+
+<pre><code>&gt;&gt;&gt; c = Nickel(1990)
+&gt;&gt;&gt; c.year
+1990
+&gt;&gt;&gt; c.cents
+5</code></pre>
+
+
+
+
+<h3 id="q3-mint">Q3：铸币厂</h3>
+
+
+<p>铸币厂是制造硬币的地方。在这个问题中，你将实现一个 <code>Mint</code> 类，它可以输出一个带有正确年份和价值的 <code>Coin</code>。</p>
+
+<ul>
+  <li>每个 <code>Mint</code> 实例有一个 <code>year</code> 印记。该 <code>update</code> 方法将
+  <code>year</code> 实例的印记设置为 <code>present_year</code> 类的 <code>Mint</code> <em>类</em>.</li>
+  <li>该<code>create</code> 方法接收一个 <code>Coin</code>（<em>不是</em> 实例！），然后
+  创建并返回一个带有 <code>Mint</code> 的年份（如果尚未更新，可能不同于
+  <code>Mint.present_year</code>）的该子类的实例。</li>
+  <li>一个 <code>Coin</code> 的 <code>worth</code> 方法返回 <code>cents</code> 硬币的价值，再加上超过 50 年后每多一年加一
+  分。硬币的年龄可以通过用 <code>present_year</code> 类的
+  <code>Mint</code> 类的年份减去硬币的年份来确定。</li>
+</ul>
+
+<solution>
+
+<pre><code>class Mint:
+    &quot;&quot;&quot;A mint creates coins by stamping on years.
+
+    The update method sets the mint&#x27;s stamp to Mint.present_year.
+
+    &gt;&gt;&gt; mint = Mint()
+    &gt;&gt;&gt; mint.year
+    2025
+    &gt;&gt;&gt; dime = mint.create(Dime)
+    &gt;&gt;&gt; dime.year
+    2025
+    &gt;&gt;&gt; Mint.present_year = 2105  # Time passes
+    &gt;&gt;&gt; nickel = mint.create(Nickel)
+    &gt;&gt;&gt; nickel.year     # The mint has not updated its stamp yet
+    2025
+    &gt;&gt;&gt; nickel.worth()  # 5 cents + (80 &#x2d; 50 years)
+    35
+    &gt;&gt;&gt; mint.update()   # The mint&#x27;s year is updated to 2105
+    &gt;&gt;&gt; Mint.present_year = 2180     # More time passes
+    &gt;&gt;&gt; mint.create(Dime).worth()    # 10 cents + (75 &#x2d; 50 years)
+    35
+    &gt;&gt;&gt; Mint().create(Dime).worth()  # A new mint has the current year
+    10
+    &gt;&gt;&gt; dime.worth()     # 10 cents + (155 &#x2d; 50 years)
+    115
+    &gt;&gt;&gt; Dime.cents = 20  # Upgrade all dimes!
+    &gt;&gt;&gt; dime.worth()     # 20 cents + (155 &#x2d; 50 years)
+    125
+    &quot;&quot;&quot;
+    present_year = 2025
+
+    def __init__(self):
+        self.update()
+
+    def create(self, coin):
+<div class="sol-highlight">        return coin(self.year)</div>
+    def update(self) &#x2d;&gt; None:
+<div class="sol-highlight">        self.year = Mint.present_year</div>
+class Coin:
+    cents = None # will be provided by subclasses, but not by Coin itself
+
+    def __init__(self, year: int):
+        self.year = year
+
+    def worth(self) &#x2d;&gt; int:
+<div class="sol-highlight">        return self.cents + max(0, Mint.present_year &#x2d; self.year &#x2d; 50)</div>
+class Nickel(Coin):
+    cents = 5
+
+class Dime(Coin):
+    cents = 10</code></pre>
+
+</solution>
+
+<p>使用 Ok 来测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q Mint<button id="copy-code-python3ok-qMint" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qMint").onclick = () => copyCode('python3 ok -q Mint', "copy-code-python3ok-qMint");
+        </script>
+        <br/>
+
+
+<h2 id="check-your-score-locally">在本地查看你的得分</h2>
+
+<p>You can locally check your score on each question of this assignment by running</p>
+
+<pre><code>python3 ok &#x2d;&#x2d;score</code></pre>
+
+<p><strong>这不会提交作业！</strong> When you are satisfied with your score, submit the assignment to Gradescope to receive credit for it.</p>
+
+
+<h1 id="submit-assignment">提交作业</h1>
+
+
+<p>通过上传你修改过的任何文件来提交本次作业 <strong>到对应的 Gradescope 作业。</strong> <a href="../lab00/#submitting-the-assignment">Lab 00</a> 中有详细说明。</p>
+
+<p>正确完成所有问题计一分。
+<!-- If you are in the regular lab, you will need your attendance from your TA to receive that one point. -->
+Please ensure your TA has taken your attendance before leaving.</p>
+
+
+<h1 id="optional-questions">选做问题</h1>
+
+
+<blockquote><p>这些问题是选做的。如果你没有完成它们，仍然可以获得本次作业的学分。它们是很好的练习，所以无论如何都做一下吧！</p></blockquote>
+
+
+<h3 id="q4-next-virahanka-fibonacci-object">Q4：下一个 Virahanka 斐波那契对象</h3>
+
+
+<p>实现 <code>next</code> 类的 <code>VirFib</code> 方法。对于这个类，其 <code>value</code>
+属性是一个斐波那契数。该 <code>next</code> 方法返回一个 <code>VirFib</code> 实例，
+其 <code>value</code> 是下一个斐波那契数。该 <code>next</code> 方法应只花费
+常数时间。</p>
+
+<p>注意在 doctests 中，并没有打印任何内容。相反，每次对
+<code>.next()</code> 的调用都会返回一个 <code>VirFib</code> 实例。每个 <code>VirFib</code> 实例的显示方式由它的 <code>__repr__</code> 方法之外也可以。</p>
+
+<blockquote><p><em>提示</em>：通过在 <code>next</code> 内部设置一个新的实例属性来记录前一个数字，
+。你可以在任何时候为对象创建新的实例属性，
+即使在 <code>__init__</code> 方法之外也可以。</p></blockquote>
+
+<solution>
+
+<pre><code>class VirFib():
+    &quot;&quot;&quot;A Virahanka Fibonacci number.
+
+    &gt;&gt;&gt; start = VirFib()
+    &gt;&gt;&gt; start
+    VirFib object, value 0
+    &gt;&gt;&gt; start.next()
+    VirFib object, value 1
+    &gt;&gt;&gt; start.next().next()
+    VirFib object, value 1
+    &gt;&gt;&gt; start.next().next().next()
+    VirFib object, value 2
+    &gt;&gt;&gt; start.next().next().next().next()
+    VirFib object, value 3
+    &gt;&gt;&gt; start.next().next().next().next().next()
+    VirFib object, value 5
+    &gt;&gt;&gt; start.next().next().next().next().next().next()
+    VirFib object, value 8
+    &gt;&gt;&gt; start.next().next().next().next().next().next() # Ensure start isn&#x27;t changed
+    VirFib object, value 8
+    &quot;&quot;&quot;
+
+    def __init__(self, value: int = 0):
+        self.value = value
+
+    def next(self):
+<div class="sol-highlight">        if self.value == 0:
+            result = VirFib(1)
+        else:
+            result = VirFib(self.value + self.previous)
+        result.previous = self.value
+        return result</div>
+    def __repr__(self) &#x2d;&gt; str:
+        return &quot;VirFib object, value &quot; + str(self.value)</code></pre>
+
+</solution>
+
+<p>使用 Ok 来测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q VirFib<button id="copy-code-python3ok-qVirFib" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qVirFib").onclick = () => copyCode('python3 ok -q VirFib', "copy-code-python3ok-qVirFib");
+        </script>
+        <br/>
+
+<div class="sol-highlight">
+
+<p>请记住 <code>next</code> 必须返回一个 <code>VirFib</code> 对象！基于此，我们的
+首要目标是计算出下一个 <code>VirFib</code> 对象并将其返回。一种
+方法是先确定基准情形（<code>self.value == 0</code>），然后决定
+下一次调用 <code>next</code>.</p>
+
+<p>你可能还会注意到，存储当前值使这个解决方案看起来非常
+类似于 <code>virfib</code> 需要哪些信息。</p>
+
+</div>
+
+  </div>
+
+  <div class="col-md-3 sticky">
+    <nav class="hidden-print hidden-sm hidden-xs sidebar">
+      <ul>
+  <li><a href="#lab-checkoff-questions">Lab 签退问题</a></li>
+  <li><a href="#attendance">出勤</a></li>
+  <li><a href="#required-questions">必做问题</a></li>
+  <ul>
+    <li><a href="#object-oriented-programming">面向对象编程</a></li>
+    <ul>
+      <li><a href="#q1-bank-account">Q1：银行账户</a></li>
+      <li><a href="#q2-email">Q2：电子邮件</a></li>
+    </ul>
+    <li><a href="#inheritance">继承</a></li>
+    <ul>
+      <li><a href="#q3-mint">Q3：铸币厂</a></li>
+    </ul>
+    <li><a href="#check-your-score-locally">在本地查看你的得分</a></li>
+  </ul>
+  <li><a href="#submit-assignment">提交作业</a></li>
+  <li><a href="#optional-questions">选做问题</a></li>
+  <ul>
+    <li><a href="#q4-next-virahanka-fibonacci-object">Q4：下一个 Virahanka 斐波那契对象</a></li>
+  </ul>
+</ul>
+    </nav>
+  </div>
+</div>
+
+    </main>
+
+    <!-- <footer class="container">
+      <div class="row text-center">
+        <div class="col col-sm-4">
+          <h3><a href="/">CS 61A</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/weekly">Weekly Schedule</a></li>
+            <li><a href="/office-hours">Office Hours</a></li>
+            <li><a href="/staff">Staff</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/resources">Resources</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/studying">Studying Guide</a></li>
+            <li><a href="/articles/debugging">Debugging Guide</a></li>
+            <li><a href="/articles/composition">Composition Guide</a></li>
+            <li><a href="/articles/pair-programming">Pair Programming</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/articles/about">Policies</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/about#assignments">Assignments</a></li>
+            <li><a href="/articles/about#exams">Exams</a></li>
+            <li><a href="/articles/about#grading">Grading</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer> -->
+
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+  <script>
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+      window.MonacoEnvironment = { getWorkerUrl: () => URL.createObjectURL(new Blob([`
+      self.MonacoEnvironment = {
+          baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min'
+      };
+      importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/base/worker/workerMain.min.js');
+  `], { type: 'text/javascript' }))
+  };
+  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.5/js/jsplumb.min.js"></script>
+    <script src="/assets/js/network_storage.js"></script>
+    <script src="/assets/js/code_tabindex.js"></script>
+    <script src="/assets/js/storable.js"></script>
+    <script src="/assets/js/editor.js"></script>
+    <script src="/assets/js/copy-button.js"></script>
+    <script src="/assets/js/env-diagram.js"></script>
+    
+<!-- <script src="/assets/js/sketchy.js"></script> -->
+<script>
+  $('.sidebar ul').addClass('nav nav-stacked noselect');
+  $('body').scrollspy({
+    target: '.sidebar',
+    offset: 40
+  });
+
+  function goToId(id) {
+    var target = $(id);
+    target.parent().show();
+    $('html,body').animate({
+      scrollTop: target.offset().top,
+    }, 100);
+    $("body").scrollspy('refresh');
+  }
+
+  if (location.hash) {
+    setTimeout(function() {
+      if (location.hash) {
+        goToId(location.hash);
+      }
+    }, 1);
+  }
+
+  $("a").click(function(event) {
+    var urlBeforeHashRegEx = new RegExp("^"+window.location.href.split("#")[0]);
+    if (/^#/.test(this.hash) && urlBeforeHashRegEx.test(this.href)) {
+      event.preventDefault();
+      goToId(this.hash);
+      document.location.hash = this.hash;
+    }
+  });
+</script>
+
+  </body>
+</html>

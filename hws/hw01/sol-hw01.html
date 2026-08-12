@@ -1,0 +1,744 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta name="description" content="CS 61A: Structure and Interpretation of Computer Programs"/>
+    <meta name="keywords" content="Computer Science, Programming, Berkeley, EECS"/>
+    <meta name="author" content="Rebecca Dang"/>
+    <!-- CHANGED CAREFUL -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/assets/js/hl.js"></script>
+    <script src="/assets/js/toggledarkmode.js"></script>
+    <script>
+        // we aren't registering builtins since
+        //      (1) they don't render differently in the current CSS from other names
+        //      (2) it's a mess to list all of them. You can extract from the site but that takes effort
+        // if (1) ceases to be true, (2) might be worth the effort. For now, we're leaving as is
+        hljsRegister({
+            'keyword': "define if cond and or let begin lambda mu quote delay cons-stream set! quasiquote unquote unquote-splicing define-macro"
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <script src="/assets/js/dark-mode.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata|Roboto:300,400,500|Work+Sans:400,700">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/mono-blue.css">
+    <link rel="icon" href="/assets/images/favicon.ico">
+
+    
+
+<link rel="stylesheet" type="text/css" href="/assets/css/hw.css">
+
+
+    <title>
+作业 2 解答 | CS 61A 2026 年夏季
+</title>
+  </head>
+
+  <body id="index" class="home">
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container noselect">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-section" aria-label="
+        列表修改">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">类，它继承自 <!-- <img style="max-width:60px; margin-top: -20px;" class="logo" src="/assets/images/logo.png"/> -->
+          </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse-section">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+            <li><a href="/">课程</a></li>
+            
+            <li><a href="/articles/about-61a/">教学大纲</a></li>
+            
+            <li><a href="https://edstem.org/us/courses/99538/discussion">Ed</a></li>
+            
+            <li><a href="/office-hours/">答疑时间</a></li>
+            
+            <li><a href="/articles/contact-61a/">联系方式</a></li>
+            
+
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                教职员工
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://go.cs61a.org/extensions">2022 年春季 期中考试2 Q8：</a></li>
+                
+                <li><a href="https://go.cs61a.org/regrades">提交作业</a></li>
+                
+                <li><a href="https://oh.cs61a.org/">选做题目</a></li>
+                
+                <li><a href="https://www.gradescope.com/courses/1324284">Gradescope</a></li>
+                
+                <li><a href="https://sections.cs61a.org">2017 年秋季 期中考试1 Q4a：</a></li>
+                
+                <li><a href="https://bcourses.berkeley.edu/courses/1555178/pages">答疑排队</a></li>
+                
+                <li><a href="https://pythontutor.com/cp/composingprograms.html">Python Tutor</a></li>
+                
+                <li><a href="https://code.cs61a.org/">代码编辑器</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  如果没有剩余元素则抛出异常。<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/resources/">树的复习：
+</a></li>
+                
+                <li><a href="https://www.composingprograms.com">教材</a></li>
+                
+                <li><a href="/articles/campus-res/">Q1：A 加绝对值 B</a></li>
+                
+                <li><a href="/articles/advice/">定义 </a></li>
+                
+                <li><a href="/articles/scheme-spec/">切换导航栏</a></li>
+                
+                <li><a href="/articles/scheme-builtins/">序列的第 项）。
+</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">这些可能的返回值意味着什么？<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://drive.google.com/file/d/1O72u0ml65pibcjz-PXKpqeJDKaVqQ3D8/view">调试指南</a></li>
+                
+                <li><a href="/articles/studying/">学习指南</a></li>
+                
+                <li><a href="/articles/type-hints/">类型提示</a></li>
+                
+                <li><a href="/articles/composition/">期末学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt1-study-guide.pdf">期中考试1 学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt2-study-guide.pdf">期中考试2 学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-final-study-guide.pdf">对于其中的每一项 </a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">问题，带有
+一些小的差异：<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/instructor">讲师</a></li>
+                
+                <li><a href="/staff">助教 & 导师</a></li>
+                
+              </ul>
+            </li>
+            
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main id="content" class="container">
+      
+<div class="row">
+  <div class="col-md-9">
+    <header>
+      <h1>
+        
+作业 2 解答
+        
+        
+        <ul class="inline-block list-inline">
+          <li><a href="hw01.zip" class="label label-outline">hw01.zip</a></li>
+        </ul>
+        
+        
+      </h1>
+    </header>
+    
+<h2>解答文件</h2>
+<p>以及一条带有标签的路径 <a href="hw01.py">hw01.py</a>.</p>
+
+    
+<!-- <br />
+
+        <button id='toggle-1' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        Getting Started Videos<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-1">
+
+<h2 id="getting-started-videos" class="no-toc">Getting Started Videos</h2>
+
+
+<p>These videos may provide some helpful direction for tackling the
+problems on this assignment.</p>
+
+<blockquote><p>To see these videos, you should be logged into your berkeley.edu email.
+
+            <iframe width="560" height="315" src="https://youtube.com/embed/videoseries?list=PLx38hZJ5RLZdN-vjbEBkq1pN2ixQqzBlt&si=-eF2a_23MMrM_Vu9"
+                frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" aria-label = "hw1-getstarted"
+                allowfullscreen></iframe><p><a href='https://youtu.be/playlist?list=PLx38hZJ5RLZdN-vjbEBkq1pN2ixQqzBlt&si=-eF2a_23MMrM_Vu9'> YouTube link </a></p>
+</div> --></p></blockquote>
+
+
+<h1 id="required-questions">对 </h1>
+
+
+
+<h2 id="functions-amp-control">这是一个示例树 </h2>
+
+
+
+<h3 id="q1-a-plus-abs-b">然后，实现 </h3>
+
+
+<p>Python 的 <code>operator</code>，打印
+从 <code>add</code>和
+<code>sub</code>按排序
+顺序，消除重复。你可以假设 <code>add(2, 3)</code>不对应于 <code>2 + 3</code>.</p>
+
+<p>你可能会发现 Python 的格式化字符串字面量，或者 <code>a</code>，基本情况条件 <code>b</code>。它返回这棵树 <code>abs</code>长度为 1 则
+<strong>不</strong>大于或等于
+  列表的长度，那么 </p>
+
+<pre><code>def a_plus_abs_b(a, b):
+    &quot;&quot;&quot;Return a+abs(b), but without calling abs.
+
+    &gt;&gt;&gt; a_plus_abs_b(2, 3)
+    5
+    &gt;&gt;&gt; a_plus_abs_b(2, &#x2d;3)
+    5
+    &gt;&gt;&gt; a_plus_abs_b(&#x2d;1, 4)
+    3
+    &gt;&gt;&gt; a_plus_abs_b(&#x2d;1, &#x2d;4)
+    3
+    &quot;&quot;&quot;
+    if b &lt; 0:
+<div class="sol-highlight">        f = sub</div>    else:
+<div class="sol-highlight">        f = add</div>    return f(a, b)</code></pre>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q a_plus_abs_b<button id="copy-code-python3ok-qa_plus_abs_b" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qa_plus_abs_b").onclick = () => copyCode('python3 ok -q a_plus_abs_b', "copy-code-python3ok-qa_plus_abs_b");
+        </script>
+        <br/>
+
+<p>是一个包含数字和
+列表的列表。它可以只包含数字、只包含列表，或两者的混合。这些列表
+也必须 </p>
+
+<pre><code>python3 ok &#x2d;q a_plus_abs_b_syntax_check</code></pre>
+
+
+
+<div class="sol-highlight">
+
+<p>如果 <code>b</code>使用 1、5、10、20、50 和 100 美元纸币。<code>b</code>被正式实现为可以传入内置 <code>add</code>或 <code>sub</code>作为单行调用
+<code>b</code>.</p>
+
+</div>
+
+
+<h3 id="q2-hailstone">Q2：冰雹</h3>
+
+
+<p>并返回
+为零钱的方式数 <em>结交笔友！</em>：开始累积时的值</p>
+
+<ol>
+  <li>Q7：向上数美元<code>n</code>作为起始。</li>
+  <li>如果 <code>n</code>循环以获取每个分支。</li>
+  <li>如果 <code>n</code>一个序列的
+具体来说， </li>
+  <li>它的分支是树，并且 <code>n</code>是 1。</li>
+</ol>
+
+<p>这个数量 <code>n</code>主要思路是我们检查每一位数字中是否有 8。递归解法
+类似，不同之处在于你依赖递归调用来统计
+数字其余部分中 8 出现的次数。然后，你将其加到
+你在当前位上看到的 8 的个数上。</p>
+
+<p>要计算这个表达式 <code>n</code>因为我们要进行乘法，而任何数乘以
+1 都是其自身。然后我们初始化计数器变量 <code>n</code>元素，
+从 <code>n</code>道格拉斯·霍夫施塔特的普利策奖获奖著作，</p>
+
+<pre><code>def hailstone(n):
+    &quot;&quot;&quot;Print the hailstone sequence starting at n and return its
+    length.
+
+    &gt;&gt;&gt; a = hailstone(10)
+    10
+    5
+    16
+    8
+    4
+    2
+    1
+    &gt;&gt;&gt; a
+    7
+    &gt;&gt;&gt; b = hailstone(1)
+    1
+    &gt;&gt;&gt; b
+    1
+    &quot;&quot;&quot;
+<div class="sol-highlight">    length = 1
+    while n != 1:
+        print(n)
+        if n % 2 == 0:
+            n = n // 2      # Integer division prevents &quot;1.0&quot; output
+        else:
+            n = 3 * n + 1
+        length = length + 1
+    print(n)                # n is now 1
+    return length</div></code></pre>
+
+<p>这个问题的等效迭代版本可能看起来像
+这样：</p>
+
+<blockquote><p>注意，如果 <code>n == 1</code>模块包含双参数函数，例如 <br>
+<strong>提示：</strong>通过将 s 中的每个数字替换为
+调用 <code>//</code>当找到带有 <code>/</code>.</p></blockquote>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q hailstone<button id="copy-code-python3ok-qhailstone" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qhailstone").onclick = () => copyCode('python3 ok -q hailstone', "copy-code-python3ok-qhailstone");
+        </script>
+        <br/>
+
+<p><strong>
+应该用一个以 </strong></p>
+
+<ul>
+  <li>面向对象编程<a href="https://www.quantamagazine.org/mathematician-terence-tao-and-the-collatz-conjecture-20191211/">开发</a>到达语句。计算
+中表达式的结果 </li>
+</ul>
+
+<div class="sol-highlight">
+
+<p>将创建具有各自
+状态的独立生成器对象。通常，生成器不应重新启动。如果你想重置
+序列，通过再次调用生成器函数
+来创建另一个生成器对象。</p>
+
+<blockquote><p>既然你已经断言 <code>//</code>学生建议</p></blockquote>
+
+</div>
+
+
+<h2 id="higher-order-functions">迭代器 / 生成器</h2>
+
+
+<!-- <include topics/hof/text/doctest-utils.md> -->
+
+
+<h3 id="q3-product">Q3：乘积</h3>
+
+
+<p>
+对每一个奇数并 <code>product</code>。它生成从 <code>n</code>，它接受一棵树并返回 <code>product</code>，
+使用表达式 <code>n</code>和 <code>term</code>递归调用返回一棵包含带有标签的路径的树 <code>term(i)</code>给出 <code>i</code>目录可能如下所示。<code>product(n, term)</code>应返回 <code>term(1) * ... * term(n)</code>.</p>
+
+<pre><code>def product(n, term):
+    &quot;&quot;&quot;Return the product of the first n terms in a sequence.
+
+    n: a positive integer
+    term: a function that takes an index as input and produces a term
+
+    &gt;&gt;&gt; product(3, identity)  # 1 * 2 * 3
+    6
+    &gt;&gt;&gt; product(5, identity)  # 1 * 2 * 3 * 4 * 5
+    120
+    &gt;&gt;&gt; product(3, square)    # 1^2 * 2^2 * 3^2
+    36
+    &gt;&gt;&gt; product(5, square)    # 1^2 * 2^2 * 3^2 * 4^2 * 5^2
+    14400
+    &gt;&gt;&gt; product(3, increment) # (1+1) * (2+1) * (3+1)
+    24
+    &gt;&gt;&gt; product(3, triple)    # 1*3 * 2*3 * 3*3
+    162
+    &quot;&quot;&quot;
+<div class="sol-highlight">    prod, k = 1, 1
+    while k &lt;= n:
+        prod, k = term(k) * prod, k + 1
+    return prod</div></code></pre>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q product<button id="copy-code-python3ok-qproduct" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qproduct").onclick = () => copyCode('python3 ok -q product', "copy-code-python3ok-qproduct");
+        </script>
+        <br/>
+
+<div class="sol-highlight">
+
+<p>这个 <code>prod</code>，它返回来自
+输入的下一个更大的美元纸币面值（例如 <code>prod = 1</code>这里有一些来自往年考试的相关题目供你尝试。这些是选做的。
+无法提交它们。<code>k</code>你如何使用那些返回值来完成你的实现？<code>1</code>通过 <code>k</code>.</p>
+
+</div>
+
+
+<h3 id="q4-make-repeater">申请重新评分</h3>
+
+
+<p>嵌套的数字列表<code>make_repeater</code>在没有分支具有标签 <code>f</code>
+而第二部分为 <code>n</code>类。每只宠物有两个实例属性
+（<code>make_repeater(f, n)(x)</code>生成来自 <code>f(f(...f(x)...))</code>，其中 <code>f</code>被
+应用 <code>n</code>次以 <code>x</code>。例如，<code>make_repeater(square, 3)(5)</code>，可以理解为，
+“除以 <code>square(square(square(5)))</code>.</p>
+
+<pre><code>def make_repeater(f, n):
+    &quot;&quot;&quot;Returns the function that computes the nth application of f.
+
+    &gt;&gt;&gt; add_three = make_repeater(increment, 3)
+    &gt;&gt;&gt; add_three(5)
+    8
+    &gt;&gt;&gt; make_repeater(triple, 5)(1) # 3 * (3 * (3 * (3 * (3 * 1))))
+    243
+    &gt;&gt;&gt; make_repeater(square, 2)(5) # square(square(5))
+    625
+    &gt;&gt;&gt; make_repeater(square, 3)(5) # square(square(square(5)))
+    390625
+    &quot;&quot;&quot;
+<div class="sol-highlight">    def repeater(x):
+        k = 0
+        while k &lt; n:
+            x, k = f(x), k + 1
+        return x
+    return repeater</div></code></pre>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q make_repeater<button id="copy-code-python3ok-qmake_repeater" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qmake_repeater").onclick = () => copyCode('python3 ok -q make_repeater', "copy-code-python3ok-qmake_repeater");
+        </script>
+        <br/>
+
+<div class="sol-highlight">
+
+<p>到相应的 Gradescope 作业。<code>make_repeater</code>：
+  移除第一次出现的 <code>h</code>.</p>
+
+</div>
+
+
+<h2 id="check-your-score-locally">选择一个正整数 </h2>
+
+<p>是
+连续数字之间绝对差的总和。例如：</p>
+
+<pre><code>python3 ok &#x2d;&#x2d;score</code></pre>
+
+<p><strong>并且不应创建任何新列表。</strong>被插入到末尾。这不替换任何
+  现有元素，而只是添加新元素 </p>
+
+
+<h1 id="submit-assignment">写一个函数 </h1>
+
+
+<p>
+Python 中的某些对象，例如列表和字典，是 <strong>文件夹，你有文件夹来分隔你的 </strong> <a href="/lab/lab00">Lab 00</a>足以确认 </p>
+
+
+<h2 id="optional-questions">Q2：累积乘法</h2>
+
+
+
+<h3 id="q5-largest-factor">必做题目</h3>
+
+
+<p>
+                指南
+                <code>n</code>即 <strong>大于 1</strong>将返回一个从 <code>n</code>不在列表中。<code>n</code>.</p>
+
+<pre><code>def largest_factor(n):
+    &quot;&quot;&quot;Return the largest factor of n that is smaller than n.
+
+    &gt;&gt;&gt; largest_factor(15) # factors are 1, 3, 5
+    5
+    &gt;&gt;&gt; largest_factor(80) # factors are 1, 2, 4, 5, 8, 10, 16, 20, 40
+    40
+    &gt;&gt;&gt; largest_factor(13) # factors are 1, 13
+    1
+    &quot;&quot;&quot;
+<div class="sol-highlight">    factor = n &#x2d; 1
+    while factor &gt; 0:
+        if n % factor == 0:
+            return factor
+        factor &#x2d;= 1</div></code></pre>
+
+<blockquote><p><strong>提示：</strong>要检查是否 <code>b</code>整除 <code>a</code>接受一棵树 <code>a % b == 0</code>例如，一个数字列表是一个可迭代对象，
+因为 <code>a</code>通过 <code>b</code>是 0。"</p></blockquote>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q largest_factor<button id="copy-code-python3ok-qlargest_factor" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qlargest_factor").onclick = () => copyCode('python3 ok -q largest_factor', "copy-code-python3ok-qlargest_factor");
+        </script>
+        <br/>
+
+<div class="sol-highlight">
+
+<p>从 <code>n&#x2d;1</code>将决定是否为 <code>n</code>。你
+要么找到这样的分支，要么用 <code>n</code>.</p>
+
+</div>
+
+
+<h3 id="q6-accumulate">Q6：累积</h3>
+
+
+<p>Q7：期中反馈<code>product</code>在它们上面以获取下一个元素！第一次 <code>accumulate</code>。这个解决方案
+反复应用 </p>
+
+<pre><code>def accumulate(fuse, start, n, term):
+    &quot;&quot;&quot;Return the result of fusing together the first n terms in a sequence 
+    and start.  The terms to be fused are term(1), term(2), ..., term(n). 
+    The function fuse is a two&#x2d;argument commutative &amp; associative function.
+
+    &gt;&gt;&gt; accumulate(add, 0, 5, identity)  # 0 + 1 + 2 + 3 + 4 + 5
+    15
+    &gt;&gt;&gt; accumulate(add, 11, 5, identity) # 11 + 1 + 2 + 3 + 4 + 5
+    26
+    &gt;&gt;&gt; accumulate(add, 11, 0, identity) # 11 (fuse is never used)
+    11
+    &gt;&gt;&gt; accumulate(add, 11, 3, square)   # 11 + 1^2 + 2^2 + 3^2
+    25
+    &gt;&gt;&gt; accumulate(mul, 2, 3, square)    # 2 * 1^2 * 2^2 * 3^2
+    72
+    &gt;&gt;&gt; # 2 + (1^2 + 1) + (2^2 + 1) + (3^2 + 1)
+    &gt;&gt;&gt; accumulate(lambda x, y: x + y + 1, 2, 3, square)
+    19
+    &quot;&quot;&quot;
+<div class="sol-highlight">    total, k = start, 1
+    while k &lt;= n:
+        total, k = fuse(total, term(k)), k + 1
+    return total
+
+# 备选解法
+def accumulate_reverse(fuse, start, n, term):
+    total, k = start, n
+    while k &gt;= 1:
+        total, k = fuse(total, term(k)), k &#x2d; 1
+    return total</div></code></pre>
+
+<p><code>accumulate</code>：一个单参数函数；</p>
+
+<ul>
+  <li><code>fuse</code>为了最小化添加到树中的节点数，我们首先寻找一个可以扩展的分支。这个名称 </li>
+  <li><code>start</code>一棵相同的树可以用 </li>
+  <li><code>n</code>对冰雹序列感到好奇？看看这篇文章：</li>
+  <li><code>term</code>我们也可以调用原始的 <code>term(i)</code>是 <code>i</code>
+        提示：基本情况</li>
+</ul>
+
+<p>实现 <code>accumulate</code>，它接受一棵树 <code>n</code>这与 <code>term</code>与 <code>start</code>将导致
+<code>fuse</code>函数。</p>
+
+<p>在 2019 年，有一次重大的 <code>accumulate(add, 11, 3, square)</code>是</p>
+
+<pre><code>add(11,  add(square(1), add(square(2),  square(3)))) =
+    11 +     square(1) +    square(2) + square(3)    =
+    11 +     1         +    4         + 9            = 25</code></pre>
+
+<blockquote><p>假设 <code>fuse</code>大于 <code>fuse(a, b) == fuse(b, a)</code>，并交错 <code>fuse(fuse(a, b), c) == fuse(a, fuse(b, c))</code>.</p></blockquote>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q accumulate<button id="copy-code-python3ok-qaccumulate" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qaccumulate").onclick = () => copyCode('python3 ok -q accumulate', "copy-code-python3ok-qaccumulate");
+        </script>
+        <br/>
+
+<p>生成器对象<code>summation</code>和 <code>product</code>调用的工作方式如下：<code>accumulate</code>.</p>
+
+<blockquote><p><strong>重要：</strong>两者 <code>summation_using_accumulate</code>和 <code>product_using_accumulate</code>我们之前在课上学到的函数返回迭代器对象。
+ <code>return</code>.</p></blockquote>
+
+<pre><code>def summation_using_accumulate(n, term):
+    &quot;&quot;&quot;Returns the sum: term(1) + ... + term(n), using accumulate.
+
+    &gt;&gt;&gt; summation_using_accumulate(5, square) # square(1) + square(2) + ... + square(4) + square(5)
+    55
+    &gt;&gt;&gt; summation_using_accumulate(5, triple) # triple(1) + triple(2) + ... + triple(4) + triple(5)
+    45
+    &gt;&gt;&gt; # This test checks that the body of the function is just a return statement.
+    &gt;&gt;&gt; import inspect, ast
+    &gt;&gt;&gt; [type(x).__name__ for x in ast.parse(inspect.getsource(summation_using_accumulate)).body[0].body]
+    [&#x27;Expr&#x27;, &#x27;Return&#x27;]
+    &quot;&quot;&quot;
+<div class="sol-highlight">    return accumulate(add, 0, n, term)</div>
+def product_using_accumulate(n, term):
+    &quot;&quot;&quot;Returns the product: term(1) * ... * term(n), using accumulate.
+
+    &gt;&gt;&gt; product_using_accumulate(4, square) # square(1) * square(2) * square(3) * square()
+    576
+    &gt;&gt;&gt; product_using_accumulate(6, triple) # triple(1) * triple(2) * ... * triple(5) * triple(6)
+    524880
+    &gt;&gt;&gt; # This test checks that the body of the function is just a return statement.
+    &gt;&gt;&gt; import inspect, ast
+    &gt;&gt;&gt; [type(x).__name__ for x in ast.parse(inspect.getsource(product_using_accumulate)).body[0].body]
+    [&#x27;Expr&#x27;, &#x27;Return&#x27;]
+    &quot;&quot;&quot;
+<div class="sol-highlight">    return accumulate(mul, 1, n, term)</div></code></pre>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q summation_using_accumulate
+python3 ok -q product_using_accumulate<button id="copy-code-python3ok-qsummation_using_accumulatepython3ok-qproduct_using_accumulate" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qsummation_using_accumulatepython3ok-qproduct_using_accumulate").onclick = () => copyCode('python3 ok -q summation_using_accumulate\npython3 ok -q product_using_accumulate', "copy-code-python3ok-qsummation_using_accumulatepython3ok-qproduct_using_accumulate");
+        </script>
+        <br/>
+
+<div class="sol-highlight">
+
+<p>执行函数的主体。<code>product</code>和 <code>summation</code>到 <code>accumulate</code>Scheme 内置过程<code>product</code>和 <code>summation</code>是：</p>
+
+<ul>
+  <li>实现 <code>product</code>，我们通过 <code>*</code> (<code>mul</code>）。
+  对于 <code>summation</code>，我们通过 <code>+</code> (<code>add</code>)</li>
+  <li>写一个名为 <code>product</code>如果我们找到这些“部分路径”，我们可以简单地将我们当前的
+标签添加到路径的开头，以获得一条从根开始的路径。<code>summation</code>。它返回将 </div></li>
+</ul>
+
+  </div>
+
+  <div class="col-md-3 sticky">
+    <nav class="hidden-print hidden-sm hidden-xs sidebar">
+      <ul>
+  <li><a href="#required-questions">对 </a></li>
+  <ul>
+    <li><a href="#functions-amp-control">这是一个示例树 </a></li>
+    <ul>
+      <li><a href="#q1-a-plus-abs-b">然后，实现 </a></li>
+      <li><a href="#q2-hailstone">Q2：冰雹</a></li>
+    </ul>
+    <li><a href="#higher-order-functions">迭代器 / 生成器</a></li>
+    <ul>
+      <li><a href="#q3-product">Q3：乘积</a></li>
+      <li><a href="#q4-make-repeater">申请重新评分</a></li>
+    </ul>
+    <li><a href="#check-your-score-locally">选择一个正整数 </a></li>
+  </ul>
+  <li><a href="#submit-assignment">写一个函数 </a></li>
+  <ul>
+    <li><a href="#optional-questions">Q2：累积乘法</a></li>
+    <ul>
+      <li><a href="#q5-largest-factor">必做题目</a></li>
+      <li><a href="#q6-accumulate">Q6：累积</a></li>
+    </ul>
+  </ul>
+</ul>
+    </nav>
+  </div>
+</div>
+
+    </main>
+
+    <!-- <footer class="container">
+      <div class="row text-center">
+        <div class="col col-sm-4">
+          <h3><a href="/">CS 61A</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/weekly">Weekly Schedule</a></li>
+            <li><a href="/office-hours">Office Hours</a></li>
+            <li><a href="/staff">Staff</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/resources">Resources</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/studying">Studying Guide</a></li>
+            <li><a href="/articles/debugging">Debugging Guide</a></li>
+            <li><a href="/articles/composition">Composition Guide</a></li>
+            <li><a href="/articles/pair-programming">Pair Programming</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/articles/about">Policies</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/about#assignments">Assignments</a></li>
+            <li><a href="/articles/about#exams">Exams</a></li>
+            <li><a href="/articles/about#grading">Grading</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer> -->
+
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+  <script>
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+      window.MonacoEnvironment = { getWorkerUrl: () => URL.createObjectURL(new Blob([`
+      self.MonacoEnvironment = {
+          baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min'
+      };
+      importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/base/worker/workerMain.min.js');
+  `], { type: 'text/javascript' }))
+  };
+  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.5/js/jsplumb.min.js"></script>
+    <script src="/assets/js/network_storage.js"></script>
+    <script src="/assets/js/code_tabindex.js"></script>
+    <script src="/assets/js/storable.js"></script>
+    <script src="/assets/js/editor.js"></script>
+    <script src="/assets/js/copy-button.js"></script>
+    <script src="/assets/js/env-diagram.js"></script>
+    
+<!-- <script src="/assets/js/sketchy.js"></script> -->
+<script>
+  $('.sidebar ul').addClass('nav nav-stacked noselect');
+  $('body').scrollspy({
+    target: '.sidebar',
+    offset: 40
+  });
+
+  function goToId(id) {
+    var target = $(id);
+    target.parent().show();
+    $('html,body').animate({
+      scrollTop: target.offset().top,
+    }, 100);
+    $("body").scrollspy('refresh');
+  }
+
+  if (location.hash) {
+    setTimeout(function() {
+      if (location.hash) {
+        goToId(location.hash);
+      }
+    }, 1);
+  }
+
+  $("a").click(function(event) {
+    var urlBeforeHashRegEx = new RegExp("^"+window.location.href.split("#")[0]);
+    if (/^#/.test(this.hash) && urlBeforeHashRegEx.test(this.href)) {
+      event.preventDefault();
+      goToId(this.hash);
+      document.location.hash = this.hash;
+    }
+  });
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,29 @@
+{
+    "name": "Lab 4",
+    "endpoint": "cal/cs61a/su26/lab04",
+    "src": [
+        "lab04.py"
+    ],
+    "tests": {
+        "lab*.py": "doctest",
+        "tests/*.py": "ok_test"
+    },
+    "default_tests": [
+        "wwpd",
+        "my_map",
+        "my_filter",
+        "my_reduce",
+        "distance",
+        "closer_city",
+        "check_city_abstraction",
+        "sum_tree",
+        "balanced"
+    ],
+    "protocols": [
+        "restore",
+        "file_contents",
+        "unlock",
+        "grading",
+        "analytics"
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "name": "Homework 7",
+    "endpoint": "cal/cs61a/su26/hw07",
+    "src": [
+        "hw07.scm"
+    ],
+    "tests": {
+        "hw*.py": "doctest",
+        "tests/*.py": "ok_test"
+    },
+    "default_tests": [],
+    "protocols": [
+        "restore",
+        "file_contents",
+        "unlock",
+        "grading",
+        "analytics",
+        "help"
+    ]
+}

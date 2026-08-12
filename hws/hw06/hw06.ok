@@ -1,0 +1,25 @@
+{
+    "name": "Homework 6",
+    "endpoint": "cal/cs61a/su26/hw06",
+    "src": [
+        "hw06.sql"
+    ],
+    "tests": {
+        "hw*.py": "doctest",
+        "tests/*.py": "ok_test"
+    },
+    "default_tests": [
+        "by_parent_height",
+        "size_of_dogs",
+        "sentences",
+        "low_variance"
+    ],
+    "protocols": [
+        "restore",
+        "file_contents",
+        "help",
+        "grading",
+        "analytics",
+        "unlock"
+    ]
+}

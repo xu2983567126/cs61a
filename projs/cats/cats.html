@@ -1,0 +1,1510 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta name="description" content ="CS 61A: Structure and Interpretation of Computer Programs" />
+    <meta name="keywords" content ="Computer Science, Programming, Berkeley, EECS" />
+    <meta name="author" content ="Rebecca Dang" />
+    <!-- CHANGED CAREFUL -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/assets/js/hl.js"></script>
+    <script src="/assets/js/toggledarkmode.js"></script>
+    <script>
+        // we aren't registering builtins since
+        //      (1) they don't render differently in the current CSS from other names
+        //      (2) it's a mess to list all of them. You can extract from the site but that takes effort
+        // if (1) ceases to be true, (2) might be worth the effort. For now, we're leaving as is
+        hljsRegister({
+            'keyword': "define if cond and or let begin lambda mu quote delay cons-stream set! quasiquote unquote unquote-splicing define-macro"
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <script src="/assets/js/dark-mode.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata|Roboto:300,400,500|Work+Sans:400,700">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/mono-blue.css">
+    <link rel="icon" href="/assets/images/favicon.ico">
+
+
+
+<link href="/assets/css/project.css" rel="stylesheet" type="text/css">
+
+
+    <title>
+计算机辅助打字软件 | CS 61A 2026 年夏季学期
+</title>
+  </head>
+
+  <body id="index" class="home">
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container noselect">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-section" aria-label="切换导航栏">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">
+            CS 61A
+            <!-- <img style="max-width:60px; margin-top: -20px;" class="logo" src="/assets/images/logo.png"/> -->
+          </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse-section">
+          <ul class="nav navbar-nav navbar-right">
+
+
+
+            <li><a href="/">课程视频</a></li>
+
+            <li><a href="/articles/about-61a/">课程大纲</a></li>
+
+            <li><a href="https://edstem.org/us/courses/99538/discussion">Ed</a></li>
+
+            <li><a href="/office-hours/">答疑时间</a></li>
+
+            <li><a href="/articles/contact-61a/">联系方式</a></li>
+
+
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                链接
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                <li><a href="https://go.cs61a.org/extensions">申请延期</a></li>
+
+                <li><a href="https://go.cs61a.org/regrades">申请重新评分</a></li>
+
+                <li><a href="https://oh.cs61a.org/">答疑排队</a></li>
+
+                <li><a href="https://www.gradescope.com/courses/1324284">Gradescope</a></li>
+
+                <li><a href="https://sections.cs61a.org">添加/更换讨论班</a></li>
+
+                <li><a href="https://bcourses.berkeley.edu/courses/1555178/pages">课程录像</a></li>
+
+                <li><a href="https://pythontutor.com/cp/composingprograms.html">Python Tutor</a></li>
+
+                <li><a href="https://code.cs61a.org/">代码编辑器</a></li>
+
+              </ul>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                资源
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                <li><a href="/resources/">往期考试与网站</a></li>
+
+                <li><a href="https://www.composingprograms.com">教材</a></li>
+
+                <li><a href="/articles/campus-res/">校园资源</a></li>
+
+                <li><a href="/articles/advice/">往届学生建议</a></li>
+
+                <li><a href="/articles/scheme-spec/">Scheme 规范</a></li>
+
+                <li><a href="/articles/scheme-builtins/">Scheme 内置过程</a></li>
+
+              </ul>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                指南
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                <li><a href="https://drive.google.com/file/d/1O72u0ml65pibcjz-PXKpqeJDKaVqQ3D8/view">调试指南</a></li>
+
+                <li><a href="/articles/studying/">学习指南</a></li>
+
+                <li><a href="/articles/type-hints/">类型注解</a></li>
+
+                <li><a href="/articles/composition/">写作指南</a></li>
+
+                <li><a href="/assets/pdfs/61a-mt1-study-guide.pdf">MT1 学习指南</a></li>
+
+                <li><a href="/assets/pdfs/61a-mt2-study-guide.pdf">MT2 学习指南</a></li>
+
+                <li><a href="/assets/pdfs/61a-final-study-guide.pdf">期末学习指南</a></li>
+
+              </ul>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                工作人员
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                <li><a href="/instructor">讲师</a></li>
+
+                <li><a href="/staff">助教与辅导员</a></li>
+
+              </ul>
+            </li>
+
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main id="content" class="container">
+
+<div class='row'>
+  <div class='col-md-9'>
+    <header>
+      <h1>
+
+计算机辅助打字软件
+
+
+        <ul class="inline-block list-inline">
+          <li><a href="cats.zip" class="label label-outline">cats.zip</a></li>
+        </ul>
+
+
+      </h1>
+    </header>
+
+<div class="haiku">
+  <img class="img-responsive center-block" id="cats_typing" src="images/cats_typing_still.gif" class="img-responsive center-block"/>
+
+<blockquote><cite>
+程序员梦想着<br/>
+抽象、递归，以及<br/>
+飞快地打字。
+</cite></blockquote>
+</div>
+
+
+<h2 id="introduction">引言</h2>
+
+
+<blockquote><p><strong>重要的提交说明：</strong> 要获得满分：</p>
+
+<ul>
+  <li>在 <strong>07/14（周二）</strong> 前完成并提交第 1、2 阶段，计 1 分。</li>
+  <li>在 <strong>07/17（周五）</strong> 前完成所有阶段并提交。</li>
+</ul>
+
+<p>请尽量按顺序尝试各个问题并运行 <code>ok</code> 测试，因为后面的问题会依赖前面问题的正确实现。</p>
+
+<p>整个项目可以两人组队完成。以下是关于<a href="https://c88c.org/sp25/articles/pair-programming">结对编程</a>以及使用
+<a href="https://c88c.org/sp25/articles/vscode/#pair-programming">VS Code</a>
+进行远程协作的指南。</p>
+
+<p>如果你在 <strong>07/16（周四）</strong> 前提交整个项目，可以获得 1 个奖励分。</p></blockquote>
+
+<p>在这个项目中，你将编写一个用于测量打字速度的程序。此外，你还会实现打字自动纠错功能，它会在用户输入某个单词后尝试纠正其拼写。本项目灵感来自
+<a href="https://play.typeracer.com/">typeracer</a>。</p>
+
+
+<h2 id="final-product">最终成果</h2>
+
+
+<p>你可以在
+<a href="https://cats.cs61a.org">cats.cs61a.org</a>
+体验我们工作人员完成的项目解法。现在就可以去试一试。当你完成这个项目时，你将亲自实现其中相当大的一部分，包括多人模式！</p>
+
+
+<h2 id="download-starter-files">下载初始文件</h2>
+
+
+<p>你可以将所有项目代码下载为一个 <a href="cats.zip">zip 压缩包</a>。
+本项目包含多个文件，<em>但你的修改只需在</em>
+<code>cats.py</code> 中进行。以下是压缩包中包含的文件：</p>
+
+<ul>
+  <li><code>cats.py</code>：打字测试的逻辑。</li>
+  <li><code>utils.py</code>：用于操作文件和字符串的工具函数。</li>
+  <li><code>ucb.py</code>：用于 CS 61A 项目的工具函数。</li>
+  <li><code>data/sample_paragraphs.txt</code>：可供输入的文本样例。
+  这些是从维基百科上<a href="https://github.com/kavigupta/wikivideos/blob/626de521e04ca643751ed85d549faca6ea528b1d/get_corpus.py">爬取</a>
+  的关于各类主题的文章。</li>
+  <li><code>data/common_words.txt</code>：<a href="https://github.com/first20hours/google-10000-english/blob/master/google-10000-english-usa-no-swears.txt">按出现频率排序的常见英文单词</a>。</li>
+  <li><code>data/words.txt</code>：<a href="https://github.com/first20hours/google-10000-english/blob/master/google-10000-english-usa-no-swears.txt">更多按出现频率排序的英文单词</a>。</li>
+  <li><code>data/final_diff_words.txt</code>：还有更多的英文单词！</li>
+  <li><code>data/testcases.out</code>：可选 Final Diff 扩展的测试用例。</li>
+  <li><code>cats_gui.py</code>：支撑网页版图形用户界面（GUI）的 Web 服务器。</li>
+  <li><code>gui_files</code>：网页版图形用户界面（GUI）所需的文件目录。</li>
+  <li><code>multiplayer</code>：支撑多人模式所需的文件目录。</li>
+  <li><code>favicons</code>：图标目录。</li>
+  <li><code>images</code>：图片目录。</li>
+  <li><code>ok</code>、<code>cats.ok</code>、<code>tests</code>：测试文件。</li>
+  <li><code>score.py</code>：可选 Final Diff 扩展的一部分。</li>
+</ul>
+
+
+<h2 id="logistics">项目安排</h2>
+
+
+
+<!-- <p>Remember that you can earn an additional bonus point by submitting the
+  project at least 24 hours before the deadline.</p> -->
+
+
+
+<p>本项目共 10 分。其中 9 分考查正确性，1 分用于在第 1、2 阶段截止日期前提交。</p>
+
+
+<p>你需要提交以下文件：</p>
+
+<!-- * <code>cats.py</code> -->
+
+<ul>
+  <li>Provenance <code>.zip</code> 文件</li>
+</ul>
+
+<p>你无需修改或提交其他任何文件即可完成本项目。提交项目时，请将所需文件提交到对应的 Gradescope 作业中去。</p>
+
+<p>你不得使用人工智能工具来协助完成本项目，也不得参考在互联网上找到的解法。</p>
+
+<p>对于我们要求你实现的函数，我们可能会提供一些初始代码。如果你不想使用这些代码，可以随时将其删掉并从头开始编写。你也可以根据需要自行添加新的函数定义。</p>
+
+<p><b>但是，请不要修改其他任何函数，也不要编辑上面未列出的文件</b>。否则可能导致你的代码无法通过我们的自动评分测试。另外，请不要更改任何函数的签名（名称、参数顺序或参数个数）。</p>
+
+
+
+<p>在整个项目中，你应当不断测试自己代码的正确性。经常测试是一种好习惯，这样可以更容易地定位问题。不过，你也不应测试得过于频繁，要给自己留出思考问题的时间。</p>
+
+<p>我们提供了一个名为 <code>ok</code> 的自动评分器（autograder），帮助你测试代码并跟踪进度。首次运行该评分器时，系统会要求你使用网页浏览器登录你的 Ok 账户。请按提示操作指南登录。每次运行 <code>ok</code> 时，它都会将你的工作和进度备份到我们的服务器上。</p>
+
+<p><code>ok</code> 的主要用途是测试你的实现。</p>
+
+<!-- <p>First, some of the test cases are <i>locked</i>. To unlock tests, run the
+following command from your terminal:</p>
+
+
+<pre><code>python3 ok -u</code></pre>
+
+<p>This command will start an interactive prompt that looks like:</p>
+
+
+<pre>
+=====================================================================
+Assignment: Computer Aided Typing Software
+Ok, version ...
+=====================================================================
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Unlocking tests
+
+At each "? ", type what you would expect the output to be.
+Type exit() to quit
+
+---------------------------------------------------------------------
+Question 0 &gt; Suite 1 &gt; Case 1
+(cases remaining: 1)
+
+&gt;&gt;&gt; Code here
+?
+</pre>
+
+<p>At the <code>?</code>, you can type what you expect the output to be. If you
+are correct, then this test case will be available the next time you run the
+autograder.</p>
+
+<p>The idea is to understand <i>conceptually</i> what your program should do
+first, before you start writing any code.</p>
+
+<p>Once you have unlocked some tests and written some code, you can check the
+correctness of your program using the tests that you have unlocked:</p>
+
+<pre>python3 ok</pre>
+
+<p>Most of the time, you will want to focus on a particular question. Use the
+<code>-q</code> option as directed in the problems below.</p>  -->
+
+<!-- <p>Second, there may be some test cases that are <i>hidden</i>. These test cases are
+<b>not</b> run by the command:</p> -->
+
+<!--<pre>python3 ok</pre>-->
+
+<!-- <p>They are only run when you submit:</p> -->
+
+<!-- <pre>python3 ok --submit</pre> -->
+
+<!-- <p> We keep test cases hidden to ensure that you write your code with the intention
+of solving the question at hand, not purely to pass the given tests. The hidden
+tests will be run when you submit your project. You will receive an email with part of
+the autograder results after submitting. However, the autograder has a 15 minute
+cooldown period. If you submit before 15 minutes have passed, the autograder will
+not run.</p> -->
+
+<!-- <p>We recommend that you submit <b>after you finish each
+problem</b>. Only your last submission will be graded. It is also useful for us
+to have more backups of your code in case you run into a submission issue. <b>If you forget to submit, your last backup will be automatically converted to a submission. </b></p>
+-->
+
+<!--<p>After you run this command, you will receive an email (to the address-->
+<!--that you used to sign up for Ok) that has the output from all <i>failed</i>-->
+<!--unlocked tests, including hidden tests, along with your score at the bottom. You-->
+<!--can continue submitting until you pass all the tests. However, you will receive-->
+<!--<b>at most one email every half hour</b>.</p>-->
+
+<!--<p>This buffer period is meant for you and your partner to try and understand-->
+<!--where your error comes from, and take some time to think through your code. We-->
+<!--encourage you to do this for all projects.</p>-->
+
+<!---
+<p>If you are trying to debug a test failure, you can launch an interactive session
+after the test is run with:</p>
+
+<pre><code>python3 ok &#x2d;q 05 &#x2d;i</code></pre>
+
+<p>This will run the tests and launch an interactive session if a test does not
+pass.</p>
+
+<pre><code>=====================================================================
+Assignment: Project 1: Hog
+Ok, version ....
+=====================================================================
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Running tests
+
+&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;
+Question ... &gt; Suite ... &gt; Case ...
+
+&gt;&gt;&gt; the_test()
+"expected value"
+
+# Error: expected
+#     "expected value"
+# but got
+#     None
+
+# Interactive console. Type exit() to quit
+&gt;&gt;&gt;</code></pre>
+-->
+
+
+<!--- <p>The <code>tests</code> folder is used to store autograder tests, so
+<b>do not modify it</b>. You may lose all your unlocking progress if you
+do. If you need to get a fresh copy, you can download the
+<a href="cats.zip">zip archive</a> and copy it over, but you
+will need to start unlocking from scratch.</p> -->
+
+<!---
+<p>If you do not want us to record a backup of your work or information about
+your progress, you can run
+
+<pre>python3 ok --local</pre>
+
+With this option, no information will be sent to our course
+servers.
+
+-->
+
+<p>如果你想以交互方式测试自己的代码，可以运行
+
+
+<pre> python3 ok -q [question number] -i </pre>
+
+with the appropriate question number (e.g. <code>01</code>) inserted.
+This will run the tests for that question until the first one you failed,
+then give you a chance to test the functions you wrote interactively.</p>
+
+<p>你也可以在 OK 中使用调试打印功能，只需在 print 语句前加上 "DEBUG:" 前缀。
+  例如，如果你想检查变量 <code>x</code> 的值，可以这样写：
+
+
+
+<pre> print(f"DEBUG: x is {x}") </pre>
+
+which will produce an output in your terminal without causing OK tests to fail
+with extra output.
+
+<h2 id="recording-your-work-with-the-provenance-recorder">使用溯源记录器（Provenance Recorder）记录你的工作</h2>
+
+
+<p>在本作业中，你将使用溯源记录器（Provenance Recorder）来记录自己的工作；它是一个 VS Code 扩展，会以防篡改的日志记录你工作过程中代码是如何逐步成型的。完成后，该扩展会把你的作业文件与这份日志打包成一个密封的 <code>.zip</code> —— 这一个文件就是你的提交物，因此你的工作可以被当作一个过程来审查，而不仅仅是最终的文件。</p>
+
+<p>该扩展只在课程授权的作业文件夹内运行。在其他任何文件夹中它都不会有任何动作——不记录、不发网络请求、也不改变 VS Code 的行为。配置只需大约两分钟，而且只需做一次。</p>
+
+<blockquote><p><strong>记录什么？</strong> 仅在作业文件夹内：你的编辑、粘贴、保存、终端命令，以及编辑器焦点。在你自己上传密封的 <code>.zip</code> 之前，一切数据都保留在你的电脑上。完整的逐项清单见该扩展的 <a href="https://marketplace.visualstudio.com/items?itemName=itsgeagle.provenance-recorder#what-it-records">Marketplace 页面</a>。</p></blockquote>
+
+
+<h3 id="before-you-start">开始之前</h3>
+
+
+<p>你需要：</p>
+
+<ul>
+  <li><strong>Visual Studio Code 1.94 或更新版本。</strong> 通过 <strong>Code → About Visual Studio Code</strong>（macOS）或 <strong>Help → About</strong>（Windows/Linux）查看版本。如果版本落后，请从 <https://code.visualstudio.com> 更新。</li>
+  <li><strong>本作业分发的作业文件夹</strong>。其中包含一个隐藏的 <code>provenance&#x2d;manifest</code> 文件——正是它授权了记录。如果它缺失，记录就无法开始；请重新下载初始文件。</li>
+</ul>
+
+
+<h3 id="1-install-the-extension">1. 安装扩展</h3>
+
+
+<p>该扩展位于 Visual Studio Code Marketplace：</p>
+
+<p><strong><https://marketplace.visualstudio.com/items?itemName=itsgeagle.provenance-recorder></strong></p>
+
+<p>在 VS Code 内部安装它：</p>
+
+<ol>
+  <li>打开 VS Code。</li>
+  <li>点击左侧边栏的扩展（Extensions）图标（四个方块），或按下 <strong><code>Command (⌘) + Shift (⇧)  + X</code></strong>（macOS）/ <strong><code>Ctrl + Shift + X</code></strong>（Windows/Linux）。</li>
+  <li>搜索 <strong><code>Provenance Recorder</code></strong>。</li>
+  <li>在由 <strong>Aaryan Mehta (itsgeagle)</strong> 发布的结果上点击 <strong>Install</strong>。你至少需要 1.1.1 版本，但更高版本也可以。</li>
+</ol>
+
+<p><img class="img-responsive center-block" src="https://i.postimg.cc/kGQBZTg2/install-search.png" alt="在 VS Code 扩展面板中搜索 “Provenance Recorder”" width="" height=""></p>
+
+<blockquote><p><strong>一行命令安装：</strong> 按下 <strong><code>Command (⌘) + P</code></strong> / <strong><code>Ctrl + P</code></strong>，粘贴 <code>ext install itsgeagle.provenance&#x2d;recorder</code>，然后按 <strong>Enter</strong>。</p></blockquote>
+
+<p>你无需登录或创建账户。该扩展是免费的，并且在会话期间不会发起任何网络请求。</p>
+
+
+<h3 id="2-open-the-assignment-folder">2. 打开作业文件夹</h3>
+
+
+<p>打开你拿到的<strong>确切的</strong>作业文件夹——既不是父文件夹，也不是子文件夹。</p>
+
+<ul>
+  <li><strong>File → Open Folder…</strong>（文件 → 打开文件夹…），然后选择作业文件夹。</li>
+</ul>
+
+<p>该文件夹必须包含 <code>provenance&#x2d;manifest</code> 文件。当 VS Code 检测到它时，记录器会自动激活。</p>
+
+
+<h3 id="3-confirm-it-s-recording">3. 确认正在记录</h3>
+
+
+<p>查看 VS Code 窗口底部的<strong>状态栏</strong>：</p>
+
+<p><img class="img-responsive center-block" src="https://i.postimg.cc/Y06hVdCh/status-bar.png" alt="状态栏显示 “Provenance: recording”" width="100%" height=""></p>
+
+<p><strong>如果你看到 <code>Provenance: recording</code>，就说明一切就绪。</strong> 这个指示器是唯一的可见变化——没有弹窗、没有工具栏、也没有变慢。像往常一样编写、保存、运行和调试即可；IntelliSense、集成终端、你的键位绑定以及主题都不会受到影响。</p>
+
+<p>如果没看到它，说明你的工作还没有被记录——请参阅下方的<a href="#troubleshooting">故障排除</a>。</p>
+
+<blockquote><p>作业工作区内会出现一个隐藏的 <code>.provenance/</code> 文件夹——日志就存放在那里。不要删除、编辑或提交它。提交步骤会帮你把它打包进去。</p></blockquote>
+
+
+<h3 id="4-work-normally">4. 正常工作</h3>
+
+
+<p>就像平常一样完成作业即可。日志是持续追加的，所以你可以：</p>
+
+<ul>
+
+
+  <li>稍后关闭 VS Code 再回来——重新打开文件夹会开始一个链接到上一次会话的新会话。不会丢失任何内容。</li>
+  <li>使用集成终端、运行和调试代码、安装其他扩展——都可以。</li>
+</ul>
+
+<p>没有什么需要启动或停止的。只要状态栏显示 <code>Provenance: recording</code>，你就受到保护了。</p>
+
+
+        <button id='toggle-1' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        关于溯源的更多内容<noscript> （启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-1">
+
+
+<h3 id="troubleshooting" class="no-toc">故障排除</h3>
+
+
+<p><strong>状态栏没有显示 <code>Provenance: recording</code>。</strong>
+记录器只会在已授权的作业文件夹中激活。请检查：</p>
+
+<ul>
+  <li>你打开的是作业文件夹<em>本身</em>，而不是父文件夹或子文件夹。</li>
+  <li>该文件夹中仍然存在 <code>.provenance&#x2d;manifest</code> 文件。</li>
+  <li>你安装的是课程要求的构建版本。如果清单的签名与你安装的构建版本不匹配，记录将无法开始——请重新安装为本作业发布的版本。</li>
+</ul>
+
+<p><strong>“Prepare Submission Bundle” 命令没有出现在命令面板中。</strong>
+该命令只在扩展处于活动状态时才出现。请先确认 <code>Provenance: recording</code> 指示器（见上）。</p>
+
+<p><strong>我在作业做到一半时关闭了 VS Code——我的日志会丢失吗？</strong>
+不会。日志是持续写入的，而不是等到提交时才保存。重新打开文件夹继续工作即可；新会话会链接到上一次的会话。</p>
+
+<p><strong>封装提交包失败。</strong>
+你会看到一条错误信息。通常的原因是日志文件写入了一半，扩展会在下次启动时自动修复。重新打开文件夹并再次运行 <strong>Prepare Submission Bundle</strong>。</p>
+
+<p><strong>我能看到具体记录了什么吗？</strong>
+可以。隐藏的 <code>.provenance/</code> 文件夹中的文件（<code>session&#x2d;*.slog</code>）是普通的、以换行分隔的 JSON。用任意文本编辑器打开它们，就能按记录时的样子读取每一个事件。记录是完全透明的——没有任何隐藏的信号。</p>
+
+
+<h3 id="privacy-at-a-glance" class="no-toc">隐私一览</h3>
+
+
+<ul>
+  <li>在你自己上传密封的 <code>.zip</code> 之前，日志只存在于你的电脑上。</li>
+  <li>该扩展不会发起任何网络请求，也不会自动向任何地方发送任何内容。</li>
+  <li>它不会记录作业文件夹之外的任何内容——其他项目、你的浏览器、你的剪贴板（总体上）以及其他应用对它来说都是不可见的。</li>
+  <li>它不会记录你的姓名、电子邮件地址或 IP 地址。</li>
+</ul>
+
+<p>有关记录与不记录内容的完整逐项清单，请参阅该扩展的 <a href="https://marketplace.visualstudio.com/items?itemName=itsgeagle.provenance-recorder#what-it-records">Marketplace 页面</a>。</p>
+
+</div>
+
+<!-- # Getting Started Videos
+
+<blockquote><p>To see these videos, you should be logged into your berkeley.edu email.</p></blockquote>
+
+
+        <button id='toggle-2' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        Getting Started Videos<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-2">
+<br>
+
+            <iframe width="560" height="315" src="https://youtube.com/embed/videoseries?list=PLx38hZJ5RLZe87guXM0aEm5VYwY6Mzbdy&si=Nf0ZE0gnGEQ3cljT"
+                frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" aria-label = "cats-getstarted"
+                allowfullscreen></iframe><p><a href='https://youtu.be/playlist?list=PLx38hZJ5RLZe87guXM0aEm5VYwY6Mzbdy&si=Nf0ZE0gnGEQ3cljT'> YouTube link </a></p> -->
+<!-- </div> -->
+
+
+<h1 id="phase-1-typing">阶段 1：打字</h1>
+
+
+<blockquote><p><strong>提醒</strong>：在整个项目中，我们只会对 <code>cats.py</code> 中的函数做修改。</p>
+
+<p><strong>类型检查</strong>
+在开始项目之前，请确保已启用类型检查！参见<a href="/lab/lab03/#type-checking">此处</a>。</p></blockquote>
+
+
+<h3 id="problem-1">问题 1</h3>
+
+
+
+<p>实现 <code>pick</code>。这个函数用于选择用户在打字测试中要输入的段落。它接受三个参数：</p>
+
+<ul>
+  <li><code>paragraphs</code>：一个由候选段落（字符串）组成的列表</li>
+  <li><code>select</code>：一个函数，它评估一个段落，若符合某些条件则返回 <code>True</code>，否则返回 <code>False</code></li>
+  <li><code>k</code>：一个非负整数，表示在符合条件的段落中所需段落的索引</li>
+</ul>
+
+<p><code>pick</code> 函数返回 <code>paragraphs</code> 中第 <code>k</code> 个使 <code>select</code> 函数返回 <code>True</code> 的段落。如果不存在这样的段落（因为 <code>k</code> 大于或等于符合条件的段落数量），则 <code>pick</code> 返回一个空字符串。</p>
+
+<blockquote><p><strong>提示</strong>：
+不用担心 <code>select</code> 函数的具体实现。只需假设它以一个段落作为输入，并返回 <code>True</code> 或 <code>False</code>。
+<strong>提醒</strong>：索引从 0 开始。如果 <code>k</code> 为 0，我们要选取<em>第一个</em>符合条件的段落。</p></blockquote>
+
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 01 -u<button id="copy-code-python3ok-q01-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q01-u").onclick = () => copyCode('python3 ok -q 01 -u', "copy-code-python3ok-q01-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 01<button id="copy-code-python3ok-q01" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q01").onclick = () => copyCode('python3 ok -q 01', "copy-code-python3ok-q01");
+        </script>
+        <br/>
+
+
+<h3 id="problem-2">问题 2</h3>
+
+
+<p>实现 <code>about</code> 函数，它接受一个名为 <code>keywords</code> 的单词列表。它返回一个函数，该函数在给定一个段落时，会检查该段落是否包含 <code>keywords</code> 中的任意单词。如果被检查的段落中包含关键字列表中的任意单词，返回的函数将返回 <code>True</code>，否则返回 <code>False</code>。</p>
+
+<p>一旦实现了 <code>about</code>，我们就可以把它返回的函数作为 <code>select</code> 参数传给 <code>pick</code>。这非常有用，因为它让我们可以根据段落是否包含提供给 <code>about</code> 函数的关键字列表中的单词来筛选段落。随着我们继续开发打字测试，这一功能会很有用。</p>
+
+<p>为了进行准确的比较，你需要：</p>
+
+<ol>
+  <li>忽略大小写（将大写和小写字母视为相同）。</li>
+  <li>忽略段落中的标点符号。</li>
+  <li>只检查 <code>keywords</code> 列表中单词的<em>精确匹配</em>，而不是子串匹配。
+  例如，<code>paragraph</code> 中出现的 "dogs" 不应与 <code>keywords</code> 中的 "dog" 匹配。</li>
+</ol>
+
+<blockquote><p><strong>提示</strong>：
+使用 <code>utils.py</code> 中的 <code>split</code>、<code>lower</code> 和 <code>remove_punctuation</code> 函数。</p></blockquote>
+
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 02 -u<button id="copy-code-python3ok-q02-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q02-u").onclick = () => copyCode('python3 ok -q 02 -u', "copy-code-python3ok-q02-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 02<button id="copy-code-python3ok-q02" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q02").onclick = () => copyCode('python3 ok -q 02', "copy-code-python3ok-q02");
+        </script>
+        <br/>
+
+
+<h3 id="problem-3">问题 3</h3>
+
+
+<p>实现 <code>accuracy</code>，它同时接受一个 <code>entered</code> 段落和一个 <code>source</code> 段落。它返回 <code>entered</code> 中与 <code>source</code> 中对应单词<em>完全匹配</em>的单词所占的百分比。大小写和标点符号也必须匹配。“对应”的意思是：<code>entered</code> 中的每个单词必须出现在 <code>source</code> 中与之匹配的单词的相同位置上。换句话说，<code>entered</code> 中的第一个单词必须匹配 <code>source</code> 中的第一个单词，<code>entered</code> 中的第二个单词必须匹配 <code>source</code> 中的第二个单词，依此类推。</p>
+
+<p>在本文语境下，一个<em>单词</em>是指由空白字符与其他单词分隔开的任意字符序列。因此，像 "dog;" 这样的序列应被视为一个单词。</p>
+
+<p>在真正的打字测试中，<code>entered</code> 表示玩家已经输入的内容，而 <code>source</code> 是他们试图复现的段落。</p>
+
+<ul>
+  <li>如果 <code>entered</code> 比 <code>source</code> 长，那么 <code>entered</code> 中那些在 <code>source</code> 里没有对应单词的多余单词都视为<em>不正确</em>。</li>
+  <li>如果 <code>entered</code> 比 <code>source</code> 短，且 <code>entered</code> 中的所有单词目前都与 <code>source</code> 对应，那么准确率为 100.0。</li>
+  <li>如果 <code>entered</code> 为空且 <code>source</code> 也为空，那么准确率为 100.0。</li>
+  <li>如果 <code>entered</code> 为空但 <code>source</code> 不为空，那么准确率为 0.0。</li>
+  <li>如果 <code>entered</code> 不为空但 <code>source</code> 为空，那么准确率为 0.0。</li>
+</ul>
+
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 03 -u<button id="copy-code-python3ok-q03-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q03-u").onclick = () => copyCode('python3 ok -q 03 -u', "copy-code-python3ok-q03-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 03<button id="copy-code-python3ok-q03" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q03").onclick = () => copyCode('python3 ok -q 03', "copy-code-python3ok-q03");
+        </script>
+        <br/>
+
+
+<h3 id="problem-4">问题 4</h3>
+
+
+<p>实现 <code>wpm</code>，它根据输入的字符串 <code>entered</code> 以及经过的 <code>elapsed</code> 时间（单位为<strong>秒</strong>），计算出“每分钟字数”（words per minute），即一种打字速度的度量。尽管名字如此，“每分钟字数”并不是基于实际输入的单词数量，而是基于每 5 个字符为一组的数量，这样打字测试就不会因单词长度而存在偏差。“每分钟字数”的计算公式为：将输入的总字符数（含空格）除以 5（平均单词长度），再将结果除以经过的时间（单位为<strong>分钟</strong>）。</p>
+
+<p>例如，字符串 <code>&quot;I am glad!&quot;</code> 包含十个字符（不含引号）。每分钟字数的计算将 2 视为输入的单词数（因为 10 / 5 = 2）。如果有人在 30 秒（半分钟）内输入了这个字符串，那么他的速度就是每分钟 4 个字。</p>
+
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 04 -u<button id="copy-code-python3ok-q04-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q04-u").onclick = () => copyCode('python3 ok -q 04 -u', "copy-code-python3ok-q04-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 04<button id="copy-code-python3ok-q04" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q04").onclick = () => copyCode('python3 ok -q 04', "copy-code-python3ok-q04");
+        </script>
+        <br/>
+
+<p><strong>是时候测试你的打字速度了！</strong> 你可以使用命令行，在关于某个特定主题的段落上测试自己的打字速度。例如，下面的命令会加载关于猫或小猫的段落。如果你好奇，可以查看 <code>run_typing_test</code> 函数的实现（但它已经为你定义好了）。</p>
+
+
+<pre><code>python3 cats.py &#x2d;t cats kittens</code></pre>
+
+<p>你也可以使用以下命令试用网页版图形用户界面（GUI）。
+（在你的浏览器中关闭标签页后，你可能需要在终端中使用 <code>Ctrl+C</code> 或 <code>Cmd+C</code> 来退出 GUI。）</p>
+
+
+<pre><code>python3 cats_gui.py</code></pre>
+
+
+<h1 id="phase-2-autocorrect">阶段 2：自动纠错</h1>
+
+
+<p>在网页版 GUI 中，有一个“启用自动纠错”（Enable Auto-Correct）选项，但目前它没有任何作用。让我们来实现自动纠错功能。每当用户按下空格键时，如果他们输入的最后一个单词与字典中的单词不匹配，但又与之接近，那么那个相似的单词就会替换他们所输入的内容。</p>
+
+
+<h3 id="problem-5">问题 5</h3>
+
+
+<p>实现 <code>autocorrect</code>，它接受 <code>entered_word</code>、<code>word_list</code>、<code>diff_function</code> 和 <code>limit</code>。<code>autocorrect</code> 的目标是返回 <code>word_list</code> 中由 <code>diff_function</code> 判定为与所给 <code>entered_word</code> 最接近的那个单词。</p>
+
+<p>具体来说，<code>autocorrect</code> 会执行以下操作：</p>
+
+<ul>
+  <li>如果 <code>entered_word</code> 包含在 <code>word_list</code> 中，<code>autocorrect</code> 就返回该单词。</li>
+  <li>否则，<code>autocorrect</code> 返回 <code>word_list</code> 中与所给 <code>entered_word</code> 差异最小的单词。这个差异就是 <code>diff_function</code> 返回的数值。</li>
+  <li>不过，如果 <code>entered_word</code> 与 <code>word_list</code> 中任意单词的最小差异大于 <code>limit</code>，那么就改为返回 <code>entered_word</code>。换句话说，<code>limit</code> 设定了一个最大阈值，只有错误程度不超过它时才会被纠正。</li>
+</ul>
+
+<p>假设 <code>entered_word</code> 以及 <code>word_list</code> 中的所有元素都是小写字母，且不含标点符号。</p>
+
+<blockquote><p><strong>重要</strong>：
+如果 <code>word_list</code> 中有多个字符串与 <code>entered_word</code> 的差异并列最小，<code>autocorrect</code> 应返回在 <code>word_list</code> 中出现最早（索引最小）的那个字符串。</p></blockquote>
+
+<p>diff 函数接受三个参数。第一个是 <code>entered_word</code>，第二个是源单词（在这里即 <code>word_list</code> 中的一个单词），第三个参数是 <code>limit</code>。diff 函数的输出是一个数字，表示两个字符串之间的差异程度。</p>
+
+<p>下面是一个 diff 函数的例子，它计算 <code>1 + limit</code> 与两个输入字符串长度之差中的较小值：</p>
+
+
+<pre><code>&gt;&gt;&gt; def length_diff(w1, w2, limit):
+...     return min(limit + 1, abs(len(w2) &#x2d; len(w1)))
+&gt;&gt;&gt; length_diff(&#x27;mellow&#x27;, &#x27;cello&#x27;, 10)
+1
+&gt;&gt;&gt; length_diff(&#x27;hippo&#x27;, &#x27;hippopotamus&#x27;, 5)
+6</code></pre>
+
+<blockquote><p><strong>注意</strong>：
+为了简洁，一些解锁测试在定义 lambda 函数时会使用三元运算符。三元运算符就是 <code>if</code> 语句的单行版本。</p>
+
+<p>例如，在其中一个 ok 测试中，我们将 diff 函数定义为 <code>first_diff = lambda w1, w2, limit: 1 if w1[0] != w2[0] else 0</code>。这里，如果 <code>w1</code> 和 <code>w2</code> 的首字符不同，lambda 函数返回 1，否则返回 0。</p></blockquote>
+
+<p>下面是实现 <code>autocorrect</code> 的一个有用提示：</p>
+
+<blockquote><p><strong>注意</strong>：
+可选地，若想用一行代码解决，可以尝试将 <code>max</code> 或 <code>min</code> 与可选的 <code>key</code> 参数（它接受一个单参数函数）配合使用。例如，<code>max([&#x2d;7, 2, &#x2d;1], key=abs)</code> 会返回 <code>&#x2d;7</code>，因为 <code>abs(&#x2d;7)</code> 大于 <code>abs(2)</code> 和 <code>abs(&#x2d;1)</code>。</p></blockquote>
+
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 05 -u<button id="copy-code-python3ok-q05-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q05-u").onclick = () => copyCode('python3 ok -q 05 -u', "copy-code-python3ok-q05-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 05<button id="copy-code-python3ok-q05" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q05").onclick = () => copyCode('python3 ok -q 05', "copy-code-python3ok-q05");
+        </script>
+        <br/>
+
+
+<h3 id="problem-6">问题 6</h3>
+
+
+<p>实现 <code>furry_fixes</code>，它是一个可以作为 <code>diff_function</code> 参数传给 <code>autocorrect</code> 的 diff 函数。这个函数接受两个字符串，并返回为了把 <code>entered</code> 单词转换成 <code>source</code> 单词而必须修改的最少字符数。如果两个字符串长度不相等，则长度之差会被计入总的修改次数。</p>
+
+<p>下面是一些例子：</p>
+
+
+<pre><code>&gt;&gt;&gt; big_limit = 10
+&gt;&gt;&gt; furry_fixes(&quot;nice&quot;, &quot;rice&quot;, big_limit)    # Substitute: n &#x2d;&gt; r
+1
+&gt;&gt;&gt; furry_fixes(&quot;range&quot;, &quot;rungs&quot;, big_limit)  # Substitute: a &#x2d;&gt; u, e &#x2d;&gt; s
+2
+&gt;&gt;&gt; furry_fixes(&quot;pill&quot;, &quot;pillage&quot;, big_limit) # Don&#x27;t substitute anything, length difference of 3.
+3
+&gt;&gt;&gt; furry_fixes(&quot;goodbye&quot;, &quot;good&quot;, big_limit) # Don&#x27;t substitute anything, length difference of 3.
+3
+&gt;&gt;&gt; furry_fixes(&quot;roses&quot;, &quot;arose&quot;, big_limit)  # Substitute: r &#x2d;&gt; a, o &#x2d;&gt; r, s &#x2d;&gt; o, e &#x2d;&gt; s, s &#x2d;&gt; e
+5
+&gt;&gt;&gt; furry_fixes(&quot;rose&quot;, &quot;hello&quot;, big_limit)   # Substitute: r&#x2d;&gt;h, o&#x2d;&gt;e, s&#x2d;&gt;l, e&#x2d;&gt;l, length difference of 1.
+5</code></pre>
+
+<blockquote><p><strong>重要</strong>：
+你的实现中不得使用 <code>while</code>、<code>for</code> 或列表推导式。请使用递归。</p></blockquote>
+
+<p>如果要修改的字符数大于 <code>limit</code>，那么 <code>furry_fixes</code> 应该返回一个大于 <code>limit</code> 的任意数字，并且应当尽量减少为此所需的计算量。</p>
+
+<blockquote><p>为什么要有 <code>limit</code>？从问题 5 我们知道，<code>autocorrect</code> 会拒绝任何与 <code>entered</code> 单词差异大于 <code>limit</code> 的 <code>source</code> 单词。差异是比 <code>limit</code> 大 1 还是大 100 都无所谓；<code>autocorrect</code> 都会同样地拒绝它。因此，一旦我们知道差异超过了 <code>limit</code>，就应当停止进行递归调用以节省时间，即使返回的差异并不精确也无妨。</p>
+
+<p>对 <code>furry_fixes</code> 的这两次调用，求值所花的时间应当大致相同：</p>
+
+
+<pre><code>&gt;&gt;&gt; limit = 4
+&gt;&gt;&gt; furry_fixes(&quot;roses&quot;, &quot;arose&quot;, limit) &gt; limit
+True
+&gt;&gt;&gt; furry_fixes(&quot;rosesabcdefghijklm&quot;, &quot;arosenopqrstuvwxyz&quot;, limit) &gt; limit
+True</code></pre></blockquote>
+
+<p>为了确保你在达到 <code>limit</code> 后通过停止递归正确地节省时间，有一个自动评分测试会根据你的解法所进行函数调用的数量来衡量其性能。如果你没通过该测试，可以考虑添加一个与 <code>limit</code> 相关的基准情形（base case）。</p>
+
+<blockquote><p><strong>提示</strong>：你需要不止一个基准情形才能解决这道题。</p></blockquote>
+
+
+        <button id='toggle-3' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        字符串切片<noscript> （启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-3">
+字符串是一串字符。（字母、数字和标点符号都是字符。）字符串的切片是另一个字符串，它包含原始字符串中的部分字符。下面是一些例子：
+
+
+<pre><code>&gt;&gt;&gt; a = &#x27;strap&#x27;
+&gt;&gt;&gt; a[0]
+&#x27;s&#x27;
+&gt;&gt;&gt; a[1:]
+&#x27;trap&#x27;
+&gt;&gt;&gt; a[2:]
+&#x27;rap&#x27;
+&gt;&gt;&gt; a[1:][1:]
+&#x27;rap&#x27;</code></pre>
+
+
+</div>
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 06 -u<button id="copy-code-python3ok-q06-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q06-u").onclick = () => copyCode('python3 ok -q 06 -u', "copy-code-python3ok-q06-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 06<button id="copy-code-python3ok-q06" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q06").onclick = () => copyCode('python3 ok -q 06', "copy-code-python3ok-q06");
+        </script>
+        <br/>
+
+<p>试着在 GUI 中启用自动纠错。它能帮你打得更快吗？纠错准确吗？</p>
+
+
+<h3 id="problem-7">问题 7</h3>
+
+
+<p>实现 <code>minimum_mewtations</code>，这是一个可在 <code>autocorrect</code> 中使用的更高级的 diff 函数，它返回将 <code>entered</code> 单词转换成 <code>source</code> 单词所需的最少编辑操作次数。</p>
+
+<p>编辑操作共有三种，下面是一些例子：</p>
+
+<ol>
+  <li><p>在 <code>entered</code> 中添加一个字母。</p>
+
+  <ul>
+    <li>在 <code>&quot;itten&quot;</code> 中添加 <code>&quot;k&quot;</code> 得到 <code>&quot;kitten&quot;</code>。</li>
+  </ul></li>
+  <li><p>从 <code>entered</code> 中删除一个字母。</p>
+
+  <ul>
+    <li>从 <code>&quot;scat&quot;</code> 中删除 <code>&quot;s&quot;</code> 得到 <code>&quot;cat&quot;</code>。</li>
+  </ul></li>
+  <li><p>将 <code>entered</code> 中的一个字母替换为另一个字母。</p>
+
+  <ul>
+    <li>在 <code>&quot;zaguar&quot;</code> 中将 <code>&quot;z&quot;</code> 替换为 <code>&quot;j&quot;</code> 得到 <code>&quot;jaguar&quot;</code>。</li>
+  </ul></li>
+</ol>
+
+<p>每一次编辑操作都会使两个单词之间的差异增加 1。</p>
+
+
+<pre><code>&gt;&gt;&gt; big_limit = 10
+&gt;&gt;&gt; minimum_mewtations(&quot;cats&quot;, &quot;scat&quot;, big_limit)       # cats &#x2d;&gt; scats &#x2d;&gt; scat
+2
+&gt;&gt;&gt; minimum_mewtations(&quot;purng&quot;, &quot;purring&quot;, big_limit)   # purng &#x2d;&gt; purrng &#x2d;&gt; purring
+2
+&gt;&gt;&gt; minimum_mewtations(&quot;ckiteus&quot;, &quot;kittens&quot;, big_limit) # ckiteus &#x2d;&gt; kiteus &#x2d;&gt; kitteus &#x2d;&gt; kittens
+3</code></pre>
+
+<p>我们已在 <code>cats.py</code> 中提供了一个实现模板。你可以按需随意修改该模板，或将其完全删除。</p>
+
+<blockquote><p><strong>提示：</strong>
+<code>minimum_mewtations</code> 中的某一次递归调用会与 <code>furry_fixes</code> 类似。
+不过，由于 <code>minimum_mewtations</code> 考虑了三种<em>特定</em>的编辑类型（添加、删除、替换），
+你需要额外的递归调用来分别处理这些情况。</p></blockquote>
+
+<p>如果所需的编辑次数大于 <code>limit</code>，那么 <code>minimum_mewtations</code> 应该返回<strong>任意一个</strong>大于 <code>limit</code> 的数字（例如 <code>limit + 1</code>），并且一旦达到 <code>limit</code> 就应停止递归调用以节省时间。</p>
+
+<blockquote><p>对 <code>minimum_mewtations</code> 的这两次调用，求值所花的时间应当大致相同：</p>
+
+
+<pre><code>&gt;&gt;&gt; limit = 2
+&gt;&gt;&gt; minimum_mewtations(&quot;ckiteus&quot;, &quot;kittens&quot;, limit) &gt; limit
+True
+&gt;&gt;&gt; minimum_mewtations(&quot;ckiteusabcdefghijklm&quot;, &quot;kittensnopqrstuvwxyz&quot;, limit) &gt; limit
+True</code></pre></blockquote>
+
+<p>为了确保你的代码在达到 <code>limit</code> 后停止递归调用，有一个自动评分测试会根据你的解法所进行函数调用的数量来衡量其性能。</p>
+
+<blockquote><p><strong>重要</strong>：
+你<em>不应</em>在 <code>minimum_mewtations</code> 的实现中使用任何辅助函数。否则自动评分测试可能会失败。</p>
+
+<p><strong>重要</strong>：
+当你准备测试自己的实现时，记得删除下面这行代码：</p>
+
+
+<pre><code>assert False, &#x27;Remove this line&#x27;</code></pre></blockquote>
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 07 -u<button id="copy-code-python3ok-q07-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q07-u").onclick = () => copyCode('python3 ok -q 07 -u', "copy-code-python3ok-q07-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 07<button id="copy-code-python3ok-q07" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q07").onclick = () => copyCode('python3 ok -q 07', "copy-code-python3ok-q07");
+        </script>
+        <br/>
+
+<p>试着再次启用自动纠错并输入。这次纠错更准确了吗？</p>
+
+
+<pre><code>python3 cats_gui.py</code></pre>
+
+
+<h3 id="optional-extension-final-diff">（可选）扩展：Final Diff</h3>
+
+
+<p>你可以选择设计自己的 diff 函数，名为 <code>final_diff</code>。下面是一些让纠错更准确的思路：</p>
+
+<ul>
+  <li>考虑哪些添加和删除比其他情况更可能发生。例如，如果一个字母连续出现两次，你更有可能不小心漏掉其中一个。</li>
+  <li>将位置互换的两个相邻字母视为一次改动，而不是两次。</li>
+  <li>尝试纳入常见的拼写错误。</li>
+  <li>键盘上彼此相邻的字母更容易被互相替换。</li>
+</ul>
+
+<p>你还可以通过修改 <code>cats.py</code> 中变量 <code>FINAL_DIFF_LIMIT</code> 的值，来设置你希望 diff 函数使用的 limit。</p>
+
+<p>你可以在我们提供的一组常见拼写错误数据集上检查你的 <code>final_diff</code> 成功率，运行：</p>
+
+
+<pre><code> python3 score.py</code></pre>
+
+<p>如果你不知道从何入手，试着把你在 <code>furry_fixes</code>
+和 <code>minimum_mewtations</code> 中的代码复制粘贴到 <code>final_diff</code> 中并为其打分。看看
+它们纠正了（以及没纠正）哪些拼写错误，可能会给你一些灵感！</p>
+
+
+<h1 id="checkpoint-submission">检查点提交</h1>
+
+
+<p>请确认你已经完成了阶段 1 和阶段 2 中的所有问题：</p>
+
+
+<pre><code>python3 ok &#x2d;&#x2d;score</code></pre>
+
+<p>当你运行 <code>ok</code> 命令时，仍然会看到一些测试处于锁定状态，因为你还没有完成整个项目。如果你正确完成了到目前为止的所有问题，就能获得检查点的满分。</p>
+
+
+<h3 id="provenance-prepare-your-submission-bundle">溯源记录器：准备你的提交包</h3>
+
+
+<p>当你完成本次作业后：</p>
+
+<ol>
+  <li>打开命令面板：<strong><code>Command(⌘) + Shift(⇧) + P</code></strong>（macOS）/ <strong><code>Ctrl + Shift + P</code></strong>（Windows/Linux）。</li>
+  <li>输入 <strong><code>Prepare Submission Bundle</code></strong> 并选择 <strong>Provenance: Prepare Submission Bundle</strong>。</li>
+</ol>
+
+<p><img class="img-responsive center-block" src="https://i.postimg.cc/gjVn5g2J/command-palette.png" alt="从命令面板运行 “Provenance: Prepare Submission Bundle”" width="100%" height=""></p>
+
+<p>一个密封的 <strong><code>.zip</code></strong> 文件会保存在你的作业文件夹旁边。VS Code 会告诉你保存位置。这个包同时包含你的作业文件和过程日志。</p>
+
+
+<h3 id="submit">提交</h3>
+
+
+<p>只把那个 <strong><code>.zip</code></strong> 上传到 Gradescope——不要上传其他内容。该包已经包含了你的作业文件，因此你无需单独提交代码。</p>
+
+<p>当你满意后，将 Provenance 的 zip 文件上传到 Gradescope 上的 Cats Checkpoint 作业来提交检查点。请务必在 <strong>07/14（周二）</strong> 的检查点截止日期前提交。如需复习如何提交到 Gradescope，请参阅 <a href="/lab/lab00/#3-running-tests">Lab 00</a>。</p>
+
+<p>你可以通过点击 <strong>Edit Group</strong> 并输入同伴的电子邮件地址，在 Gradescope 提交中添加一名同伴。只需其中一人向 Gradescope 提交即可。</p>
+
+
+<h1 id="phase-3-multiplayer">阶段 3：多人模式</h1>
+
+
+<p>和朋友一起打字更有趣！你现在要实现多人模式功能，这样当你在自己的电脑上运行 <code>cats_gui.py</code> 时，它会连接到 <a href="https://cats.cs61a.org">cats.cs61a.org</a>
+上的课程服务器，并寻找其他对手进行比赛。</p>
+
+<p>要与朋友比赛，会有 5 个不同的程序在运行：</p>
+
+<ul>
+  <li>你的 GUI，它是一个负责在网页浏览器中处理所有文本着色与显示的程序。</li>
+  <li>你的 <code>cats_gui.py</code>，它是一个 Web 服务器，使用你在 <code>cats.py</code> 中编写的代码与你的 GUI 通信。</li>
+  <li>你对手的 <code>cats_gui.py</code>。</li>
+  <li>你对手的 GUI。</li>
+  <li>CS 61A 多人服务器，它负责将玩家配对并转发消息。</li>
+</ul>
+
+<p>当你输入时，你的 GUI 会把你已经输入的内容上传到你的 <code>cats_gui.py</code> 服务器，该服务器计算出你取得的进度并返回一个进度更新。这个服务器还会把进度更新上传到 CS 61A 多人服务器，这样你对手的 GUI 也能显示你的进度。</p>
+
+<p>与此同时，你的 GUI 显示会不断地通过向 <code>cats_gui.py</code> 请求你对手的进度更新来保持同步，而 <code>cats_gui.py</code> 又会从多人服务器获取该信息。</p>
+
+<p>每个玩家都有一个 <code>id</code> 编号，服务器用它来追踪打字进度。</p>
+
+
+<h3 id="problem-8">问题 8</h3>
+
+
+<p>实现 <code>report_progress</code>，它会在用户每次输完一个单词时被调用。它接受参数：到目前为止已输入的单词列表 <code>entered</code>、<code>source</code> 文本中的单词列表、用户的 <code>user_id</code>，以及一个 <code>upload</code> 函数（用于将进度报告上传到多人服务器）。<code>entered</code> 中的单词数量永远不会超过 <code>source</code>。</p>
+
+<p>你的进度是一个比值：从开头起、到第一个输错的单词为止，你正确输入的 <code>source</code> 中单词的数量，除以 <code>source</code> 单词的总数。例如，下面这个例子的进度是 <code>0.25</code>：</p>
+
+
+
+<pre><code>report_progress([&quot;Hello&quot;, &quot;ths&quot;, &quot;is&quot;], [&quot;Hello&quot;, &quot;this&quot;, &quot;is&quot;, &quot;wrong&quot;], ...)</code></pre>
+
+<p>你的 <code>report_progress</code> 函数应当：</p>
+
+<ol>
+  <li>通过调用 <code>upload</code> 函数向多人服务器上传一条消息，传入的字典应包含两个键：<code>&#x27;id&#x27;</code> 和 <code>&#x27;progress&#x27;</code>。<code>&#x27;id&#x27;</code> 键应设为用户的 <code>user_id</code>，<code>&#x27;progress&#x27;</code> 键应存储为该用户计算出的进度（定义如上）。</li>
+  <li>返回为该用户计算出的进度。</li>
+</ol>
+
+<blockquote><p><strong>提示：</strong>
+下面这个字典是 <code>upload</code> 函数可能接收的输入示例。
+该字典表示一个 <code>user_id</code> 为 4、<code>progress</code> 为 0.6 的玩家。</p>
+
+<p><code>{&#x27;id&#x27;: 4, &#x27;progress&#x27;: 0.6}</code></p></blockquote>
+
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 08 -u<button id="copy-code-python3ok-q08-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q08-u").onclick = () => copyCode('python3 ok -q 08 -u', "copy-code-python3ok-q08-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 08<button id="copy-code-python3ok-q08" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q08").onclick = () => copyCode('python3 ok -q 08', "copy-code-python3ok-q08");
+        </script>
+        <br/>
+
+
+<h3 id="problem-9">问题 9</h3>
+
+
+<p>实现 <code>time_per_word</code>，它接受两个参数：</p>
+
+<ol>
+  <li><code>words</code>：玩家正在输入的单词列表。</li>
+  <li><code>timestamps_per_player</code>：一个列表的列表，其中每个内层列表包含一些时间戳，表示每个玩家完成输入 <code>words</code> 中每个单词的时刻。</li>
+</ol>
+
+<p>该函数应返回一个具有以下结构的字典：</p>
+
+<ul>
+  <li><code>&#x27;words&#x27;</code>：玩家正在输入的单词列表。</li>
+  <li><code>&#x27;times&#x27;</code>：一个列表的列表 <code>times</code>，存储每个玩家输入每个单词所花的时间。具体来说，<code>times[i][j]</code> 的值表示玩家 <code>i</code> 输入 <code>words[j]</code> 处的单词所花的时间。它等于该玩家完成输入 <code>words[j]</code> 的时刻减去完成输入 <code>words[j&#x2d;1]</code> 的时刻。对于 <code>words[0]</code>，它等于该玩家完成输入 <code>words[0]</code> 的时刻减去开始输入的时刻。</li>
+</ul>
+
+<p>参数 <code>timestamps_per_player</code> 中的时间戳是累积的、始终递增的，而 <code>times</code> 中的值是每个玩家<strong>相邻时间戳之间的差值</strong>。</p>
+
+<p>下面是一个例子：
+如果 <code>timestamps_per_player = [[1, 3, 5], [2, 5, 6]]</code>，那么 <code>times</code> 就是 <code>[[2, 2], [3, 1]]</code>。</p>
+
+<p>这是因为第一名玩家分别在时间戳 <code>1</code>、<code>3</code>、<code>5</code> 时完成输入每个单词，而第二名玩家分别在 <code>2</code>、<code>5</code>、<code>6</code> 时完成。因此，时间戳的差值对第一名玩家是 <code>(3&#x2d;1)</code>、<code>(5&#x2d;3)</code>，对第二名玩家是 <code>(5&#x2d;2)</code>、<code>(6&#x2d;5)</code>。<code>timestamps_per_player</code> 中每个列表的第一个值表示每名玩家的初始起始时间。</p>
+
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 09 -u<button id="copy-code-python3ok-q09-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q09-u").onclick = () => copyCode('python3 ok -q 09 -u', "copy-code-python3ok-q09-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 09<button id="copy-code-python3ok-q09" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q09").onclick = () => copyCode('python3 ok -q 09', "copy-code-python3ok-q09");
+        </script>
+        <br/>
+
+
+<h3 id="problem-10">问题 10</h3>
+
+
+<p>实现 <code>fastest_words</code>，它返回每个玩家输入得最快的单词。该函数在所有玩家都完成输入后被调用。它接受 <code>time_per_word</code> 返回的字典。</p>
+
+<p><code>fastest_words</code> 函数返回一个单词列表的列表，每个玩家对应一个列表。嵌套列表的索引表示玩家。每个玩家的列表包含他们比其他所有玩家输入得都更快的单词。如果出现平局，索引最小的玩家被视为输入该单词最快的人。</p>
+
+<p>例如，考虑两名玩家输入了 <code>Just have fun</code>。玩家 0 输入 <code>&#x27;fun&#x27;</code> 最快（3 秒），玩家 1 输入 <code>&#x27;Just&#x27;</code> 最快（4 秒），而他们在单词 <code>&#x27;have&#x27;</code> 上打平（都用了 1 秒）。在这种情况下，玩家 0 被视为 <code>&#x27;have&#x27;</code> 输入最快的人，因为他们的索引更小。</p>
+
+
+<pre><code>&gt;&gt;&gt; player_0 = [5, 1, 3]
+&gt;&gt;&gt; player_1 = [4, 1, 6]
+&gt;&gt;&gt; fastest_words({&#x27;words&#x27;: [&#x27;Just&#x27;, &#x27;have&#x27;, &#x27;fun&#x27;], &#x27;times&#x27;: [player_0, player_1]}) # player 0 &#x2d;&gt; [&#x27;have&#x27;, &#x27;fun&#x27;], player 1 &#x2d;&gt; [&#x27;Just&#x27;]
+[[&#x27;have&#x27;, &#x27;fun&#x27;], [&#x27;Just&#x27;]]</code></pre>
+
+
+
+<p>使用辅助函数 <code>get_time</code>（已提供）从 <code>times</code> 中获取单个时间。当你试图访问一个不存在的时间时，它会给出有用的错误信息。</p>
+
+
+<pre><code>def get_time(times, player_num, word_index):
+    &quot;&quot;&quot;Return the time it took player_num to type the word at word_index,
+    given a list of lists of times returned by time_per_word.&quot;&quot;&quot;</code></pre>
+
+
+<blockquote><p><strong>重要</strong>：
+确保你的实现不会修改给定的玩家输入列表。
+对于上面的例子，对 <code>[player_0, player_1]</code> 调用 <code>fastest_words</code>
+不应修改 <code>player_0</code> 或 <code>player_1</code>。</p>
+
+<p>玩家数量不一定总是两个，因此请将这个函数泛化，使其能够处理数量不定的玩家。</p></blockquote>
+
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 10 -u<button id="copy-code-python3ok-q10-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q10-u").onclick = () => copyCode('python3 ok -q 10 -u', "copy-code-python3ok-q10-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q 10<button id="copy-code-python3ok-q10" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-q10").onclick = () => copyCode('python3 ok -q 10', "copy-code-python3ok-q10");
+        </script>
+        <br/>
+
+<p>恭喜！现在你可以和课程中的其他学生进行对战了。将 <code>cats.py</code> 底部的 <code>enable_multiplayer</code> 设为 <code>True</code>，然后尽情地快速输入吧！</p>
+
+
+<pre><code>python3 cats_gui.py</code></pre>
+
+
+<h1 id="project-submission">项目提交</h1>
+
+
+<p>对所有问题运行 <code>ok</code>，以确保所有测试都已解锁并通过：</p>
+
+
+<pre><code>python3 ok</code></pre>
+
+<p>你也可以查看项目各部分的得分：</p>
+
+
+<pre><code>python3 ok &#x2d;&#x2d;score</code></pre>
+
+
+<h3 id="provenance-prepare-your-submission-bundle-2">溯源记录器：准备你的提交包</h3>
+
+
+<p>当你完成本次作业后：</p>
+
+<ol>
+  <li>打开命令面板：<strong><code>Command(⌘) + Shift(⇧) + P</code></strong>（macOS）/ <strong><code>Ctrl + Shift + P</code></strong>（Windows/Linux）。</li>
+  <li>输入 <strong><code>Prepare Submission Bundle</code></strong> 并选择 <strong>Provenance: Prepare Submission Bundle</strong>。</li>
+</ol>
+
+<p><img class="img-responsive center-block" src="https://i.postimg.cc/gjVn5g2J/command-palette.png" alt="从命令面板运行 “Provenance: Prepare Submission Bundle”" width="100%" height=""></p>
+
+<p>一个密封的 <strong><code>.zip</code></strong> 文件会保存在你的作业文件夹旁边。VS Code 会告诉你保存位置。这个包同时包含你的作业文件和过程日志。</p>
+
+
+<h3 id="submit-2">提交</h3>
+
+
+<p>只把那个 <strong><code>.zip</code></strong> 上传到 Gradescope——不要上传其他内容。该包已经包含了你的作业文件，因此你无需单独提交代码。</p>
+
+<!-- change to cats.py if not using provenance -->
+当你满意后，将 Provenance 的 zip 文件上传到 <strong>Gradescope</strong> 上的 <strong>Cats</strong> 作业来提交本次作业。如需复习如何操作，请参阅 <a href="/lab/lab00/#task-c-submitting-the-assignment">Lab 00</a>。
+
+<p>你可以通过点击 <strong>Edit Group</strong> 并输入同伴的电子邮件地址，在 Gradescope 提交中添加一名同伴。只需其中一人向 Gradescope 提交即可。</p>
+
+
+<h1 id="phase-4-efficiency-extra-challenge">阶段 4：效率（额外挑战）</h1>
+
+
+
+<h3 id="optional-problem-ec">（可选）问题 EC</h3>
+
+
+<blockquote><p><strong>注意</strong>：
+本题为<strong>可选</strong>题目，<strong>不计分</strong>。它是为那些希望提升代码效率的人准备的额外挑战。<strong>只有在你完成了项目中所有其他问题之后，才尝试本题。</strong></p></blockquote>
+
+<!-- line break -->
+
+<blockquote><p>在答疑时间和项目派对上，工作人员会优先帮助有必做问题的学生。除非<a href="https://oh.cs61a.org/">队列</a>为空，否则我们不会提供关于本题的帮助。在本题中，你将实现记忆化（memoization）装饰器，通过“记住”某些计算量特别大的操作的结果来提升我们程序的效率。</p></blockquote>
+
+<p>请确保你已经熟悉装饰器（decorators）和记忆化（memoization）。如果你需要复习，请打开下方的下拉框获取更多信息。</p>
+
+
+        <button id='toggle-4' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        装饰器<noscript> （启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-4">
+Python 装饰器让你能够修改一个已存在的函数，而无需改变该函数的结构。
+
+<p>具体来说，装饰器函数是一个高阶函数，它……</p>
+
+<ul>
+  <li>将原始函数作为输入</li>
+  <li>返回一个具有修改后功能的新函数</li>
+  <li>这个新函数<strong>必须</strong>包含与原始函数相同的参数</li>
+</ul>
+
+<p>下面展示了一个装饰器的例子，它会将一个单输入函数执行两次：</p>
+
+
+<pre><code>&gt;&gt;&gt; def do_twice(original_function):
+...     def repeat(x):
+...             original_function(x)
+...             original_function(x)
+...     return repeat</code></pre>
+
+
+
+<p>我们可以在多种场景下应用这个函数：</p>
+
+
+<pre><code># Printing a value twice
+&gt;&gt;&gt; @do_twice
+... def print_value(x):
+...     print(x)
+...
+&gt;&gt;&gt; print_value(5)
+5
+5
+# 将同一个元素添加进列表两次
+&gt;&gt;&gt; lst = []
+&gt;&gt;&gt; @do_twice
+... def add_to_list(item):
+...     lst.append(item)
+...
+&gt;&gt;&gt; add_to_list(5)
+&gt;&gt;&gt; lst
+[5, 5]</code></pre>
+
+
+
+<p>此外，请注意，我们也可以直接调用装饰器函数，而不使用 <code>@</code> 语法（即 <code>print_value = do_twice(print_value)</code>）。不过，将装饰器直接放在我们所修改的函数上方通常更有用，因为它们能更清楚地描述这些函数在代码中是如何被改变的。</p></div></p>
+
+
+        <button id='toggle-5' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        记忆化<noscript> （启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-5">
+请注意，我们在前面几题中写的 diff 函数效率很低：你可能会发现计算机会多次进行相同的递归调用。对于一个有多个参数和三次递归调用的函数，这一点可能更难以察觉。先用课堂上定义的 <code>fib</code> 这样的函数来观察会更直观。
+
+<p><img class="img-responsive center-block" src="images/fib_tree.png" alt="斐波那契调用树" width="" height=""></p>
+
+<p>注意上面这棵树的图中有多少冗余的递归调用。我们的目标是让程序把已经求值过的递归调用的结果存储起来，这样如果将来遇到相同的递归调用，就可以复用它们。例如，<code>fib(5)</code> 的第一个分支调用了 <code>fib(3)</code>，而它尚未被求值。因此我们必须遍历它后续的所有递归调用才能找到它的返回值。然而，当我们遇到作为 <code>fib(4)</code> 一个分支的 <code>fib(3)</code> 调用时，我们之前已经求出过它的返回值了！所以如果我们能以一种叫做“缓存”（cache）的方式存储并检索这些信息，就可以避免不必要的计算。我们不再需要对它的分支 <code>fib(1)</code> 和 <code>fib(2)</code> 进行任何后续的递归调用。这就是<strong>记忆化</strong>（memoization）的概念：把开销很大的计算结果存入缓存，并在我们再次执行相同操作时从缓存中取回信息。</p>
+</div><br></p>
+
+<p>我们将使用两个记忆化装饰器。<code>memo</code> 是一个通用的装饰器，它会对其所标注的函数进行记忆化。如果 <code>memo</code> 遇到一个它没见过的输入，它会把计算结果存入自己的<code>cache</code>。如果 <code>memo</code> 收到一个它已经见过的输入，它会直接取<code>cache</code>中存储的值返回，而不做任何额外的计算。我们已经为你提供了 <code>memo</code> 的完整实现。</p>
+
+<p>你的任务是实现 <code>memo_diff</code>。<code>memo_diff</code> 是一个高阶函数，它接受一个 <code>diff_function</code>，并返回另一个名为 <code>memoized</code> 的 diff 函数；和所有 diff 函数一样，它接受 <code>entered</code>、<code>source</code> 和 <code>limit</code>。<code>memoized</code> 应当执行以下操作：</p>
+
+<ul>
+  <li>当 <code>memoized</code> 第一次遇到一个 (<code>entered</code>, <code>source</code>) 对时，它应当使用 <code>diff_function</code> 计算其差异，并将该值连同所使用的 <code>limit</code> 一起，以一个 (<code>value</code>, <code>limit</code>) 元组对的形式缓存起来。</li>
+  <li>如果 <code>memoized</code> 再次遇到该 (<code>entered</code>, <code>source</code>) 对，并且所给定的 <code>limit</code> 小于或等于缓存的 <code>limit</code>，它就应当返回记忆化后的 <code>value</code>。否则，应当重新计算差异、重新缓存并返回。</li>
+</ul>
+
+<blockquote><p><strong>重要：</strong> 在实现这个函数时，请确保你使用元组（tuple）而不是列表（list）在缓存中存储成对的值。在字典中，键必须是<em>不可变的</em>（这就是为什么可以用元组，但不能用列表）。如果你好奇 <code>memo_diff</code> 为何与 <code>memo</code> 不同、以及为何这样实现，请参考下面的下拉框：</p></blockquote>
+
+
+        <button id='toggle-6' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        更多信息<noscript> （启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-6">
+<code>memo</code> 和 <code>memo_diff</code> 有何不同？虽然 <code>memo</code> 只存储一次函数调用的结果，但 <code>memo_diff</code> 会考虑一个额外的约束 <code>limit</code>，它会影响缓存的结果能否被使用。当 <code>memo_diff</code> 函数被传入一个 (<code>entered</code>, <code>source</code>) 对调用时，它不仅仅检查这对组合之前是否出现过；它还会检查 <code>limit</code> 是否小于或等于缓存的 <code>limit</code>。这是 <code>memo</code> 不会执行的额外检查。
+
+<p>为什么 <code>limit</code> 要这样处理？我们已经知道，<code>limit</code> 表示一个 diff 函数所关心的差异上限——也就是说，超过 <code>limit</code> 的差异值其实可以视为相同。因此，diff 函数在差异低于 <code>limit</code> 时会给出准确的值，而在高于 <code>limit</code> 时会给出不准确的值。所以，如果一个缓存好的差异值是在更高的 <code>limit</code> 下计算出来的，我们就可以信任它；但在更低的 <code>limit</code> 下计算出来的就不能信任。</p>
+
+<p>例如，下面第一次调用的结果可以让我们预测第二次调用的结果。更高的 <code>limit</code> 提供了更多信息。然而，第二次调用却无法让我们预测第一次调用的结果。</p>
+
+
+<pre><code>&gt;&gt;&gt; minimum_mewtations(&quot;hello&quot;, &quot;hasldfasdfsffsfasdf&quot;, 100)
+17
+&gt;&gt;&gt; minimum_mewtations(&quot;hello&quot;, &quot;hasldfasdfsffsfasdf&quot;, 2)
+3</code></pre>
+
+
+</div><br>
+
+<p>一旦你实现了 <code>memo_diff</code>，请按以下步骤收尾：</p>
+
+<ol>
+  <li>用 <code>memo</code> 装饰 <code>autocorrect</code>。</li>
+  <li>用 <code>memo_diff</code> 装饰 <code>minimum_mewtations</code>。</li>
+</ol>
+
+<p>现在运行 <code>autocorrect</code> 和 <code>minimum_mewtations</code> 应该会快得多！</p>
+
+<blockquote><p><strong>注意</strong>：
+如果你没能通过涉及 <code>call_count</code> 的自动评分测试，很可能是你的 <code>minimum_mewtations</code> 实现（来自问题 7）没有使用尽可能紧凑的基准情形，仍然需要一些优化。
+问题 7 的测试并不严格，所以即使你通过了问题 7 的测试，你的基准情形也可能还不是最紧凑的。
+请确保你没有进行不必要的递归调用。
+我们在这里对此要求严格，因为拥有最紧凑的基准情形对你的代码效率至关重要。</p>
+
+<p><strong>重要</strong>：
+先自己尝试！只有在某个测试用例上卡了很久时，才参考下面的常见错误部分。否则，你可能无法从这个项目中收获太多。</p></blockquote>
+
+
+        <button id='toggle-7' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        常见错误<noscript> （启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-7">
+
+<ul>
+  <li>考虑这种情况 <code>minimum_mewtations(entered = &quot;maooo&quot;, source = &quot;mao&quot;, limit = 0)</code>：由于不允许任何变换且两个单词不相同，你的函数能多快判断出结果是不可能的？</li>
+  <li>考虑这种情况 <code>minimum_mewtations(entered = &quot;habc&quot;, source = &quot;hmao&quot;, limit = some_limit_greater_than_zero)</code>：鉴于两个字符串都以相同的字符 <code>h</code> 开头，在这种情况下最有效的方法是什么？函数是否还应该尝试“添加”（得到 <code>habc</code> 和 <code>mao</code>）或“删除”（得到 <code>abc</code> 和 <code>hmao</code>）？你的实现是否利用了这一优化？</li>
+</ul>
+
+</div>
+
+<blockquote><p>注意：自动评分器运行需要一点时间，但不应超过 10 秒。</p></blockquote>
+
+
+<p>Before writing any code, unlock the tests to verify your understanding of the question:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q EC -u<button id="copy-code-python3ok-qEC-u" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qEC-u").onclick = () => copyCode('python3 ok -q EC -u', "copy-code-python3ok-qEC-u");
+        </script>
+        <br/>
+<p>Once you are done unlocking, begin implementing your solution. You can check your correctness with:</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q EC<button id="copy-code-python3ok-qEC" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qEC").onclick = () => copyCode('python3 ok -q EC', "copy-code-python3ok-qEC");
+        </script>
+        <br/>
+
+<script>
+/*
+This code is duplicated in lab-check-in.html. Doesn't work if we move it to a separate
+file because of JQuery document ready concurrency issues.
+*/
+$(function() {
+    $('.alwaystoggle').css('display', 'inline-block');
+    $('.alwaystoggle').click(function() {
+      var solution_id = $(this).attr('id');
+      $('div.' + solution_id).slideToggle(600);
+    });
+});
+</script>
+
+<script>
+$("#cats_typing").hover(
+  function() {
+    $("#cats_typing").attr("src", "images/cats_typing.gif");
+  },
+  function() {
+    $("#cats_typing").attr("src", "images/cats_typing_still.gif");
+  }
+);
+</script>
+
+
+  </div>
+
+  <div class='col-md-3 sticky'>
+    <nav class='hidden-print hidden-sm hidden-xs sidebar'>
+      <ul>
+  <li><a href="#introduction">引言</a></li>
+  <li><a href="#final-product">最终成果</a></li>
+  <li><a href="#download-starter-files">下载初始文件</a></li>
+  <li><a href="#logistics">项目安排</a></li>
+  <li><a href="#recording-your-work-with-the-provenance-recorder">使用溯源记录器记录你的工作</a></li>
+  <ul>
+    <li><a href="#before-you-start">开始之前</a></li>
+    <li><a href="#1-install-the-extension">1. 安装扩展</a></li>
+    <li><a href="#2-open-the-assignment-folder">2. 打开作业文件夹</a></li>
+    <li><a href="#3-confirm-it-s-recording">3. 确认正在记录</a></li>
+    <li><a href="#4-work-normally">4. 正常工作</a></li>
+    <li><a href="#troubleshooting">故障排除</a></li>
+    <li><a href="#privacy-at-a-glance">隐私一览</a></li>
+  </ul>
+  <li><a href="#phase-1-typing">阶段 1：打字</a></li>
+  <ul>
+    <li><a href="#problem-1">问题 1</a></li>
+    <li><a href="#problem-2">问题 2</a></li>
+    <li><a href="#problem-3">问题 3</a></li>
+    <li><a href="#problem-4">问题 4</a></li>
+  </ul>
+  <li><a href="#phase-2-autocorrect">阶段 2：自动纠错</a></li>
+  <ul>
+    <li><a href="#problem-5">问题 5</a></li>
+    <li><a href="#problem-6">问题 6</a></li>
+    <li><a href="#problem-7">问题 7</a></li>
+    <li><a href="#optional-extension-final-diff">（可选）扩展：Final Diff</a></li>
+  </ul>
+  <li><a href="#checkpoint-submission">检查点提交</a></li>
+  <ul>
+    <li><a href="#provenance-prepare-your-submission-bundle">溯源记录器：准备你的提交包</a></li>
+    <li><a href="#submit">提交</a></li>
+  </ul>
+  <li><a href="#phase-3-multiplayer">阶段 3：多人模式</a></li>
+  <ul>
+    <li><a href="#problem-8">问题 8</a></li>
+    <li><a href="#problem-9">问题 9</a></li>
+    <li><a href="#problem-10">问题 10</a></li>
+  </ul>
+  <li><a href="#project-submission">项目提交</a></li>
+  <ul>
+    <li><a href="#provenance-prepare-your-submission-bundle-2">溯源记录器：准备你的提交包</a></li>
+    <li><a href="#submit-2">提交</a></li>
+  </ul>
+  <li><a href="#phase-4-efficiency-extra-challenge">阶段 4：效率（额外挑战）</a></li>
+  <ul>
+    <li><a href="#optional-problem-ec">（可选）问题 EC</a></li>
+  </ul>
+</ul>
+    </nav>
+  </div>
+</div>
+
+    </main>
+
+    <!-- <footer class="container">
+      <div class="row text-center">
+        <div class="col col-sm-4">
+          <h3><a href="/">CS 61A</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/weekly">Weekly Schedule</a></li>
+            <li><a href="/office-hours">Office Hours</a></li>
+            <li><a href="/staff">Staff</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/resources">Resources</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/studying">Studying Guide</a></li>
+            <li><a href="/articles/debugging">Debugging Guide</a></li>
+            <li><a href="/articles/composition">Composition Guide</a></li>
+            <li><a href="/articles/pair-programming">Pair Programming</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/articles/about">Policies</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/about#assignments">Assignments</a></li>
+            <li><a href="/articles/about#exams">Exams</a></li>
+            <li><a href="/articles/about#grading">Grading</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer> -->
+
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+  <script>
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+      window.MonacoEnvironment = { getWorkerUrl: () => URL.createObjectURL(new Blob([`
+      self.MonacoEnvironment = {
+          baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min'
+      };
+      importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/base/worker/workerMain.min.js');
+  `], { type: 'text/javascript' }))
+  };
+  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.5/js/jsplumb.min.js"></script>
+    <script src="/assets/js/network_storage.js"></script>
+    <script src="/assets/js/code_tabindex.js"></script>
+    <script src="/assets/js/storable.js"></script>
+    <script src="/assets/js/editor.js"></script>
+    <script src="/assets/js/copy-button.js"></script>
+    <script src="/assets/js/env-diagram.js"></script>
+    
+<!-- <script src="/assets/js/sketchy.js"></script> -->
+<script>
+  $('.sidebar ul').addClass('nav nav-stacked noselect');
+  $('body').scrollspy({
+    target: '.sidebar',
+    offset: 40
+  });
+
+  function goToId(id) {
+    var target = $(id);
+    target.parent().show();
+    $('html,body').animate({
+      scrollTop: target.offset().top,
+    }, 100);
+    $("body").scrollspy('refresh');
+  }
+
+  if (location.hash) {
+    setTimeout(function() {
+      if (location.hash) {
+        goToId(location.hash);
+      }
+    }, 1);
+  }
+
+  $("a").click(function(event) {
+    var urlBeforeHashRegEx = new RegExp("^"+window.location.href.split("#")[0]);
+    if (/^#/.test(this.hash) && urlBeforeHashRegEx.test(this.href)) {
+      event.preventDefault();
+      goToId(this.hash);
+      document.location.hash = this.hash;
+    }
+  });
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,1217 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta name="description" content="CS 61A: Structure and Interpretation of Computer Programs"/>
+    <meta name="keywords" content="Computer Science, Programming, Berkeley, EECS"/>
+    <meta name="author" content="Rebecca Dang"/>
+    <!-- CHANGED CAREFUL -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/assets/js/hl.js"></script>
+    <script src="/assets/js/toggledarkmode.js"></script>
+    <script>
+        // we aren't registering builtins since
+        //      (1) they don't render differently in the current CSS from other names
+        //      (2) it's a mess to list all of them. You can extract from the site but that takes effort
+        // if (1) ceases to be true, (2) might be worth the effort. For now, we're leaving as is
+        hljsRegister({
+            'keyword': "define if cond and or let begin lambda mu quote delay cons-stream set! quasiquote unquote unquote-splicing define-macro"
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <script src="/assets/js/dark-mode.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata|Roboto:300,400,500|Work+Sans:400,700">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/mono-blue.css">
+    <link rel="icon" href="/assets/images/favicon.ico">
+
+    
+
+<link rel="stylesheet" type="text/css" href="/assets/css/hw.css">
+
+
+    <title>
+作业 4 解答 | CS 61A 2026 年夏季
+</title>
+  </head>
+
+  <body id="index" class="home">
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container noselect">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-section" aria-label="
+        列表修改">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">类，它继承自 <!-- <img style="max-width:60px; margin-top: -20px;" class="logo" src="/assets/images/logo.png"/> -->
+          </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse-section">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+            <li><a href="/">课程</a></li>
+            
+            <li><a href="/articles/about-61a/">教学大纲</a></li>
+            
+            <li><a href="https://edstem.org/us/courses/99538/discussion">Ed</a></li>
+            
+            <li><a href="/office-hours/">答疑时间</a></li>
+            
+            <li><a href="/articles/contact-61a/">联系方式</a></li>
+            
+
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                教职员工
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://go.cs61a.org/extensions">2022 年春季 期中考试2 Q8：</a></li>
+                
+                <li><a href="https://go.cs61a.org/regrades">提交作业</a></li>
+                
+                <li><a href="https://oh.cs61a.org/">选做题目</a></li>
+                
+                <li><a href="https://www.gradescope.com/courses/1324284">Gradescope</a></li>
+                
+                <li><a href="https://sections.cs61a.org">2017 年秋季 期中考试1 Q4a：</a></li>
+                
+                <li><a href="https://bcourses.berkeley.edu/courses/1555178/pages">答疑排队</a></li>
+                
+                <li><a href="https://pythontutor.com/cp/composingprograms.html">Python Tutor</a></li>
+                
+                <li><a href="https://code.cs61a.org/">代码编辑器</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  如果没有剩余元素则抛出异常。<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/resources/">树的复习：
+</a></li>
+                
+                <li><a href="https://www.composingprograms.com">教材</a></li>
+                
+                <li><a href="/articles/campus-res/">Q1：A 加绝对值 B</a></li>
+                
+                <li><a href="/articles/advice/">定义 </a></li>
+                
+                <li><a href="/articles/scheme-spec/">切换导航栏</a></li>
+                
+                <li><a href="/articles/scheme-builtins/">序列的第 项）。
+</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">这些可能的返回值意味着什么？<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://drive.google.com/file/d/1O72u0ml65pibcjz-PXKpqeJDKaVqQ3D8/view">调试指南</a></li>
+                
+                <li><a href="/articles/studying/">学习指南</a></li>
+                
+                <li><a href="/articles/type-hints/">类型提示</a></li>
+                
+                <li><a href="/articles/composition/">期末学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt1-study-guide.pdf">期中考试1 学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt2-study-guide.pdf">期中考试2 学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-final-study-guide.pdf">对于其中的每一项 </a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">问题，带有
+一些小的差异：<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/instructor">讲师</a></li>
+                
+                <li><a href="/staff">助教 & 导师</a></li>
+                
+              </ul>
+            </li>
+            
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main id="content" class="container">
+      
+<div class="row">
+  <div class="col-md-9">
+    <header>
+      <h1>
+        
+作业 4 解答
+        
+        
+        <ul class="inline-block list-inline">
+          <li><a href="hw03.zip" class="label label-outline">hw03.zip</a></li>
+        </ul>
+        
+        
+      </h1>
+    </header>
+    
+<h2>解答文件</h2>
+<p>以及一条带有标签的路径 <a href="hw03.py">hw03.py</a>.</p>
+
+    
+<h1 id="required-questions">对 </h1>
+
+
+<!-- <br>
+
+        <button id='toggle-1' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        Getting Started Videos<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-1">
+
+
+<h2 id="getting-started-videos" class="no-toc">Getting Started Videos</h2>
+
+
+<p>These videos may provide some helpful direction for tackling the coding
+problems on this assignment.</p>
+
+<blockquote><p>To see these videos, you should be logged into your berkeley.edu email.</p></blockquote>
+
+
+            <iframe width="560" height="315" src="https://youtube.com/embed/videoseries?list=PLx38hZJ5RLZdUJfnsYhx4Klg1Www86gyx"
+                frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" aria-label = "hw3-getstarted"
+                allowfullscreen></iframe><p><a href='https://youtu.be/playlist?list=PLx38hZJ5RLZdUJfnsYhx4Klg1Www86gyx'> YouTube link </a></p>
+</div> -->
+
+<p>（同一个列表）正在你不知情的情况下被修改，以及当你在遍历列表时
+移除多个匹配元素会发生什么。
+ <br>
+
+        <button id="toggle-2" class="btn btn-outline btn-lg alwaystoggle toggle">
+        可变树<noscript>并整除 </noscript>
+        </button>
+        <div class="solution toggle-2">引入一个接受奇数的内部辅助函数 <strong>可变的</strong>为了做到这一点，我们将为每个分支创建一个生成器，它生成
+这些“部分路径”。通过调用 <strong>不可变的</strong>：属于特定对象的变量。每个 </p>
+
+<p>没有办法改变一棵树（那不会违反抽象屏障）。<code>append</code>方法。</p>
+
+<pre><code>&gt;&gt;&gt; s = [1, 3, 4]
+&gt;&gt;&gt; t = s  # A second name for the same list
+&gt;&gt;&gt; t[0] = 2  # this changes the first element of the list to 2, affecting both s and t
+&gt;&gt;&gt; s
+[2, 3, 4]
+&gt;&gt;&gt; s.append(5)  # this adds 5 to the end of the list, affecting both s and t
+&gt;&gt;&gt; t
+[2, 3, 4, 5]</code></pre>
+
+<p>
+        提示：描述递归调用</p>
+
+<ul>
+  <li><code>append(elem)</code>：
+  添加 <code>elem</code>CS61A 呈现《圈圈游戏》。<code>None</code>.</li>
+  <li><code>extend(s)</code>下面是一个 <code>s</code>CS61A 呈现《圈圈游戏》。<code>None</code>.</li>
+  <li><code>insert(i, elem)</code>：
+  插入 <code>elem</code>在索引 <code>i</code>。如果 <code>i</code>来构建分支的其余部分，并将那个
+结果附加到 <code>elem</code>对象返回字符串来描述机器的状态和操作。
+确保你的输出匹配 <code>elem</code>。返回 <code>None</code>.</li>
+  <li><code>remove(elem)</code>注意：我们需要进行整除 <code>elem</code>实例作为 <code>None</code>。
+  如果出错 <code>elem</code>以去除小数。</li>
+  <li><code>pop(i)</code>这次关于迭代器的另一个复习：
+<code>i</code>.</li>
+  <li><code>pop()</code>写一个接受一个整数 </li>
+</ul>
+
+<p>生成器函数的主体直到 <code>pop</code>（很少使用）。</p>
+
+<pre><code>&gt;&gt;&gt; d = {2: 3, 4: 16}
+&gt;&gt;&gt; d[2] = 4
+&gt;&gt;&gt; d[3] = 9
+&gt;&gt;&gt; d
+{2: 4, 4: 16, 3: 9}
+&gt;&gt;&gt; d.pop(4)
+16
+&gt;&gt;&gt; d
+{2: 4, 3: 9}</code></pre>
+
+</div>
+
+<p>将返回来自
+输入的下一个更小的美元纸币面值（例如 <br>
+
+        <button id="toggle-3" class="btn btn-outline btn-lg alwaystoggle toggle">函数。你可以 <noscript>并整除 </noscript>
+        </button>
+        <div class="solution toggle-3">使用递归；如果你使用循环，测试将失败。<em>
+        生成器</em>在以下函数中填空以添加 <strong>生成器</strong>5 张 1 美元、2 张 5 美元纸币<code>yield</code>到 1，我们返回第一个能整除
+的整数 <code>return</code>（面向对象编程）使用对象和类来组织程序。这是一个类的例子：<em>不</em>用尽元素时，它返回 </p>
+
+<p>你可以调用以树作为参数的函数，例如 </p>
+
+<pre><code>def countdown(n):
+    print(&quot;Beginning countdown!&quot;)
+    while n &gt;= 0:
+        yield n
+        n &#x2d;= 1
+    print(&quot;Blastoff!&quot;)</code></pre>
+
+<p>调用 <code>countdown(k)</code>注意迭代器本身也是可迭代对象：调用 <code>k</code>
+将生成来自迭代器或可迭代对象的所有值。<code>iter</code>如果你在开始时遇到困难，想想如果这
+不是一个生成器函数，你会如何处理这个问题。递归步骤会是什么样子？</p>
+
+<pre><code>&gt;&gt;&gt; c = countdown(5)
+&gt;&gt;&gt; c
+&lt;generator object countdown ...&gt;
+&gt;&gt;&gt; c is iter(c)
+True</code></pre>
+
+<p>使用 doctest 中提供的字符串，包括标点和空格。<code>next</code>，并返回
+序列中的步数：<code>next</code>：当创建一个类的新实例时自动调用的特殊函数。<code>yield</code>变量用于跟踪到目前为止的乘积。我们
+从 <code>yield</code>：一个类的单个实例。在 Python 中，一个新对象通过
+  调用一个类来创建。</p>
+
+<pre><code>&gt;&gt;&gt; next(c)
+Beginning countdown!
+5</code></pre>
+
+<p>。
+这里我们将使用标准的美元纸币面值：1、5、10、20、50 和 100。
+例如，以下集合为零钱 <code>next</code>。它返回一个单参数函数，使得
+ <code>yield</code>参数（它接受一个单参数函数）。
+例如，<code>next</code>作为本次作业的一部分，填写
+<code>yield</code>因为没有连续数字对。<code>Beginning countdown!</code>有详细的说明。</p>
+
+<pre><code>&gt;&gt;&gt; next(c)
+4
+&gt;&gt;&gt; next(c)
+3</code></pre>
+
+<p>类将调用 <code>next</code>被调用，
+执行从函数主体的第一行开始，并继续直到
+<code>StopIteration</code>使用 Ok 运行本地语法检查器（它检查你除了两个空白之外没有修改任何提供的代码）：<code>yield</code>语句）。</p>
+
+<pre><code>&gt;&gt;&gt; next(c)
+2
+&gt;&gt;&gt; next(c)
+1
+&gt;&gt;&gt; next(c)
+0
+&gt;&gt;&gt; next(c)
+Blastoff!
+StopIteration</code></pre>
+
+<p>生成器函数<code>countdown</code>回顾树的抽象数据类型：树被定义为具有一个标签和
+一些分支。之前，我们使用 Python
+列表实现了树的抽象。让我们看看另一种使用对象的实现：</p>
+
+<pre><code>&gt;&gt;&gt; c1, c2 = countdown(5), countdown(5)
+&gt;&gt;&gt; c1 is c2
+False
+&gt;&gt;&gt; next(c1)
+5
+&gt;&gt;&gt; next(c2)
+5</code></pre>
+
+<p>
+            CS 61A
+            </p>
+
+<ul>
+  <li>一个 <em>
+        生成器</em>有一个 <code>yield</code>有用。
+一个简单例子：<em>
+来自 </em>.</li>
+  <li>调用 <code>iter</code>，
+并访问任何超类方法，就好像我们是超类的一个实例。
+例如，</li>
+  <li>是创建一个新列表，包含
+的第一个元素 <code>next</code>与第二半部分的元素。它
+不修改 <code>next</code>：属于对象并通过点号调用的函数。按照惯例，方法的第一个参数是 <code>StopIteration</code>被抛出。</li>
+  <li><p>进入函数并运行直到带有 <code>next</code>的函数 </p>
+
+  <ul>
+    <li><p>第一个 <code>next</code>调用的工作方式如下：</p>
+
+    <ol>
+      <li>原地并返回同一个被修改的列表。这个 <code>yield</code>.</li>
+      <li>起始值。对于 <code>yield</code>在 while
+循环中使用，以确保我们遍历所有值 <code>next</code>调用。</li>
+    </ol></li>
+    <li><p>而随后的 <code>next</code>函数接受一个 </p>
+
+    <ol>
+      <li>以及
+两个单参数函数： <strong>
+        继承<code>yield</code>，执行从
+之后的行继续 </strong>，所以你可以直接返回 <code>yield</code>语句。</li>
+      <li>起始值。对于 <code>yield</code>在 while
+循环中使用，以确保我们遍历所有值 <code>next</code>调用。</li>
+    </ol></li>
+  </ul></li>
+  <li>你可能会发现使用内置的
+双参数版本很有帮助 <code>iter</code>那么第一部分是 </li>
+  <li>
+可迭代对象是我们可以逐个遍历其元素的对象。
+可迭代对象可以用于 for 循环和列表推导式。可迭代对象也
+可以使用 </li>
+</ul>
+
+<p>从树中移除一些节点称为 <code>yield from</code>语句。 <code>yield from</code>确保路径只被添加到这个分支。</p>
+
+<pre><code>&gt;&gt;&gt; def gen_list(lst):
+...     yield from lst
+...
+&gt;&gt;&gt; g = gen_list([1, 2, 3, 4])
+&gt;&gt;&gt; next(g)
+1
+&gt;&gt;&gt; next(g)
+2
+&gt;&gt;&gt; next(g)
+3
+&gt;&gt;&gt; next(g)
+4
+&gt;&gt;&gt; next(g)
+StopIteration</code></pre>
+
+</div>
+
+<p>还有许多其他列表修改方法：<br>
+
+        <button id="toggle-4" class="btn btn-outline btn-lg alwaystoggle toggle">作业，以及 <noscript>并整除 </noscript>
+        </button>
+        <div class="solution toggle-4">。没有办法对迭代器进行索引，
+也没有办法向后退。一旦迭代器产生了一个元素，
+我们就没有办法再次获得那个元素，除非我们存储它。<code>list</code>这项调查计入课程的 2 个调查点之一。这个调查点没有延期。</p>
+
+<pre><code>&gt;&gt;&gt; for x in &quot;cat&quot;:
+...     print(x)
+c
+a
+t
+&gt;&gt;&gt; [x*2 for x in (1, 2, 3)]
+[2, 4, 6]
+&gt;&gt;&gt; list(range(4))
+[0, 1, 2, 3]</code></pre>
+
+<p>会上下波动但最终结束于 1（至少对于
+所有尝试过的数字——没有人曾证明
+序列会终止）。类似地，一块冰雹在最终落回地面之前，会在
+大气中来来回回地上下运动。</p>
+
+<p>在 Python 中，<strong>可迭代对象</strong>：属于类并通过点号访问的变量。这个 <code>iter</code>以及一个可选的 <em>迭代器</em>。一个 <strong>迭代器</strong>移除当前在 <code>next</code>函数。</p>
+
+<ul>
+  <li><code>iter(iterable)</code>，然后将
+对该分支的递归调用的结果附加到 </li>
+  <li><code>next(iterator)</code>并
+返回数字 8 在 <code>StopIteration</code>
+作业 1 解答 | CS 61A 2026 年夏季
+</li>
+</ul>
+
+<p>并
+返回小于 <code>iter</code>你可以通过运行在本地查看本次作业中每个题目的分数<code>next</code>函数：</p>
+
+<pre><code>&gt;&gt;&gt; lst = [1, 2, 3]
+&gt;&gt;&gt; lst_iter = iter(lst)
+&gt;&gt;&gt; lst_iter
+&lt;list_iterator object ...&gt;
+&gt;&gt;&gt; next(lst)
+1
+&gt;&gt;&gt; next(lst)
+2
+&gt;&gt;&gt; next(lst)
+3
+&gt;&gt;&gt; next(lst)
+StopIteration</code></pre>
+
+<p>作为参数，但它
+  看起来我们并没有传入一个！这是因为点号
+  <code>next</code>作业也会包含往年的考试级别题目供你查看。
+这些题目没有提交环节；如果你想挑战一下，随时可以尝试！</p>
+
+<p>遍历每个分支以找到标签为 <code>iter</code>，我们已经找到一条从根到
+包含 </p>
+
+<p>
+到达语句。注意，因此， <code>iter</code>和 <code>next</code>带有一个列表：</p>
+
+<pre><code>&gt;&gt;&gt; lst = [1, 2, 3]
+&gt;&gt;&gt; next(lst)             # Calling next on an iterable
+TypeError: &#x27;list&#x27; object is not an iterator
+&gt;&gt;&gt; list_iter = iter(lst) # Creates an iterator for the list
+&gt;&gt;&gt; next(list_iter)       # Calling next on an iterator
+1
+&gt;&gt;&gt; next(iter(list_iter)) # Calling iter on an iterator returns itself
+2
+&gt;&gt;&gt; for e in list_iter:   # Exhausts remainder of list_iter
+...     print(e)
+3
+&gt;&gt;&gt; next(list_iter)       # No elements left!
+StopIteration
+&gt;&gt;&gt; lst                   # Original iterable is unaffected
+[1, 2, 3]</code></pre>
+
+<p>这个 <code>map</code>和 <code>filter</code>之前执行过的语句。就像
+第一次调用 <page-break>
+</div></p>
+
+<p>Scheme 规范<br>
+
+        <button id="toggle-5" class="btn btn-outline btn-lg alwaystoggle toggle">
+        树<noscript>并整除 </noscript>
+        </button>
+        <div class="solution toggle-5">
+一个 <code>tree</code>如果你需要复习可变性，请查阅下拉菜单。可以
+直接跳到题目，如果
+遇到困难再回来查阅。
+ <code>cs61a</code>，提出
+以下数学谜题。<code>projects</code>, <code>lab</code>上面看到的类。<code>homework</code>函数。原始函数不属于任何特定的 <code>hw01</code>, <code>lab01</code>, <code>hog</code>。在这种情况下，不需要额外的节点来确保一条标记为 <code>ok</code>将该项的一个副本附加到 <code>cs61a</code>不会
+再次被打印。</p>
+
+<p><img class="img-responsive center-block" src="assets/cs61a-tree.png" alt="cs61a_tree" width="" height=""></p>
+
+<p>，我们想从 1 开始，因为
+  从 0 开始意味着我们的结果（通过与起始值相乘）
+  将始终为 0。对于 </p>
+
+<p>对于一棵树 <code>t</code>:</p>
+
+<ul>
+  <li>并
+从 <code>label(t)</code>返回它。</li>
+  <li>
+        提示：递归情况<code>branches(t)</code>到任何具有标签 </li>
+  <li>生成器的另一个有用工具是 <code>tree(label(t), branches(t))</code>.</li>
+  <li>：返回一个针对给定可迭代对象元素的迭代器。<code>is_leaf(t)</code>.</li>
+  <li>你将进行哪些递归调用？<code>t == x</code>或 <code>t[0]</code>或 <code>x in t</code>或 <code>list(t)</code>，等等。</li>
+  <li>为我们提供给定序列上的迭代器，我们可以
+使用 </li>
+</ul>
+
+<p>如何融合项。对于 <code>t1</code>，的第一个元素 <code>branches(t1)[1]</code>是 <code>t2</code>.</p>
+
+<pre><code class="python">t2 = tree(5, [tree(6), tree(7)])
+t1 = tree(3, [tree(4), t2])</code></pre>
+
+
+
+<p><img class="img-responsive center-block" src="assets/example_tree_illustration.png" alt="示例树" width="100%" height=""></p>
+
+<p>一个 <strong>路径</strong>。下一级是分隔不同作业的文件夹，</div></p>
+
+
+<h2 id="mutability">可变性</h2>
+
+
+
+<h3 id="q1-inventory-pickup">Q2：寻找浆果！</h3>
+
+
+<p>嵌套的数字列表<code>inventory_pickup</code>将求值为 <code>inventory</code>，一个列表 <code>items</code>。
+例如，如果 <code>capacity</code>将返回值放在 <code>inventory</code>最初，那么序列长度为一步。 <code>inventory</code>拥有 <code>capacity</code>被隐式绑定到 <code>items</code>对象，因此我们必须为 <code>capacity</code>如果
+美元纸币面值的总和是 <code>inventory</code>属性。与类属性一样，实例属性通过点号访问。<code>items</code>生成器不应重新启动，除非它是这样定义的。要重新从
+生成器中的第一个元素开始，只需再次调用生成器函数
+  来创建一个新的生成器。</p>
+
+<p><strong>时间：</strong>作为一个例子
+说明如何用更小的部分累加得到最终值的方式数。
+如果你需要在递归调用之间跟踪多个值，
+考虑写一个辅助函数。</p>
+
+<p>Q4：数美元<code>items</code>:
+<br></p>
+
+<ul>
+  <li>那么计数是如何完成的？再次，由于生成器是迭代器，我们调用
+<code>inventory</code></li>
+  <li>并返回
+它包含的条目数。<code>inventory</code></li>
+</ul>
+
+<p><strong>重要：</strong>当你对分数满意时，将作业提交到 Gradescope 以获得学分。</p>
+
+
+        <button id="toggle-6" class="btn btn-outline btn-lg alwaystoggle toggle">
+        提示：<noscript>并整除 </noscript>
+        </button>
+        <div class="solution toggle-6">
+
+<blockquote><p><code>items</code>对象。然后，供 Python 调用 <code>inventory</code>
+到 0。由于生成器是迭代器，我们可以调用 <code>items</code>而
+<code>inventory</code>没有给出最大分区大小，因此我们需要创建一个辅助
+  函数，它接受两个参数：当前所需的总和与美元纸币面值。</div></p></blockquote>
+
+<solution>
+
+<pre><code>def inventory_pickup(inventory: list, items: list, capacity: int) &#x2d;&gt; list:
+    &quot;&quot;&quot;Simulate picking up every item in items and add them, one at a time, to the inventory IN PLACE.
+    The function should return the mutated inventory.
+
+    &gt;&gt;&gt; inv = [1, 2, 1, 3, 1]
+    &gt;&gt;&gt; inv_test = inventory_pickup(inv, [1, 4], 10)
+    &gt;&gt;&gt; inv_test
+    [2, 3, 1, 4]
+
+    &gt;&gt;&gt; inv2 = [11, 12, 13]
+    &gt;&gt;&gt; inv2_test = inventory_pickup(inv2, inv2, 7)
+    &gt;&gt;&gt; inv2_test
+    [11, 12, 13]
+
+    &gt;&gt;&gt; inv3 = [1, 2, 1, 3, 1]
+    &gt;&gt;&gt; check_mutation = inv3
+    &gt;&gt;&gt; inv3_test = inventory_pickup(inv3, inv3, 3)
+    &gt;&gt;&gt; inv3_test
+    [2, 3, 1]
+    &gt;&gt;&gt; check_mutation is inv3_test
+    True
+
+    &gt;&gt;&gt; inv4 = [1, 2, 3, 4]
+    &gt;&gt;&gt; inv4_test = inventory_pickup(inv4, [5, 6, 7, 8, 9, 10], 10)
+    &gt;&gt;&gt; inv4_test
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    &gt;&gt;&gt; inv5 = [1, 2, 3, 4]
+    &gt;&gt;&gt; inv5_test = inventory_pickup(inv5, [5, 6, 7, 8], 6)
+    &gt;&gt;&gt; inv5_test
+    [3, 4, 5, 6, 7, 8]
+
+    &gt;&gt;&gt; inv6 = [&#x27;hello&#x27;, &#x27;world&#x27;]
+    &gt;&gt;&gt; inv6_test = inventory_pickup(inv6, [&#x27;hi&#x27;, &#x27;hello&#x27;], 4)
+    &gt;&gt;&gt; inv6_test
+    [&#x27;world&#x27;, &#x27;hi&#x27;, &#x27;hello&#x27;]
+    &quot;&quot;&quot;
+<div class="sol-highlight">    pickup_order = list(items)
+
+    for item in pickup_order:
+        while item in inventory:
+            inventory.remove(item)
+        inventory.append(item)
+
+    overflow = len(inventory) &#x2d; capacity
+    for _ in range(overflow):
+        inventory.pop(0)
+
+    return inventory
+
+    # 备选解法
+    pickup_order = list(items)
+
+    for item in pickup_order:
+        while item in inventory:
+            inventory.remove(item)
+        inventory.append(item)
+
+    while len(inventory) &gt; capacity:
+        inventory.pop(0)
+
+    return inventory
+
+    # 可能相当小众的备选解法
+    pickup_order = items[:]
+
+    for item in pickup_order:
+        inventory[:] = [i for i in inventory if i != item]
+        inventory.append(item)
+
+    overflow = len(inventory) &#x2d; capacity
+    if overflow &gt; 0:
+        inventory[:] = inventory[overflow:]
+
+    return inventory</div></code></pre>
+
+</solution>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q inventory_pickup<button id="copy-code-python3ok-qinventory_pickup" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qinventory_pickup").onclick = () => copyCode('python3 ok -q inventory_pickup', "copy-code-python3ok-qinventory_pickup");
+        </script>
+        <br/>
+
+
+<h2 id="trees">树</h2>
+
+
+
+<h3 id="q2-finding-berries">申请延期</h3>
+
+
+<p>
+使用递归；如果你使用任何赋值语句或循环，测试将失败。
+（你可以定义新函数，但也不要在那里放赋值语句。）<code>berry_finder</code>这并不会提交本次作业！<code>True</code>你可以在 <code>&#x27;berry&#x27;</code>和 <code>False</code>否则。</p>
+
+<blockquote><p><strong>提示</strong>将继续生成连续的递减
+整数直到 0。在下一次调用中，一个 <code>for</code>语句并返回一个 </p></blockquote>
+
+<solution>
+
+<pre><code class="python">def berry_finder(t):
+    &quot;&quot;&quot;Returns True if t contains a node with the value &#x27;berry&#x27; and 
+    False otherwise.
+
+    &gt;&gt;&gt; scrat = tree(&#x27;berry&#x27;)
+    &gt;&gt;&gt; berry_finder(scrat)
+    True
+    &gt;&gt;&gt; sproul = tree(&#x27;roots&#x27;, [tree(&#x27;branch1&#x27;, [tree(&#x27;leaf&#x27;), tree(&#x27;berry&#x27;)]), tree(&#x27;branch2&#x27;)])
+    &gt;&gt;&gt; berry_finder(sproul)
+    True
+    &gt;&gt;&gt; numbers = tree(1, [tree(2), tree(3, [tree(4), tree(5)]), tree(6, [tree(7)])])
+    &gt;&gt;&gt; berry_finder(numbers)
+    False
+    &gt;&gt;&gt; t = tree(1, [tree(&#x27;berry&#x27;,[tree(&#x27;not berry&#x27;)])])
+    &gt;&gt;&gt; berry_finder(t)
+    True
+    &quot;&quot;&quot;
+<div class="sol-highlight">    if label(t) == &#x27;berry&#x27;:
+        return True
+    for b in branches(t):
+        if berry_finder(b):
+            return True
+    return False
+
+# 备选解法
+def berry_finder_alt(t):
+    if label(t) == &#x27;berry&#x27;:
+        return True
+    return True in [berry_finder(b) for b in branches(t)]</div></code></pre>
+
+
+</solution>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q berry_finder<button id="copy-code-python3ok-qberry_finder" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qberry_finder").onclick = () => copyCode('python3 ok -q berry_finder', "copy-code-python3ok-qberry_finder");
+        </script>
+        <br/>
+
+
+<h3 id="q3-size">Q3：大小</h3>
+
+
+<p>2021 年秋季 期中考试2 Q3bc：<code>size_of_tree</code>在本地查看你的分数<code>t</code>具有
+最小标签的分支并移除（</p>
+
+<solution>
+
+<pre><code>def size_of_tree(t):
+    &quot;&quot;&quot;Return the number of entries in the tree.
+    &gt;&gt;&gt; numbers = tree(1, [tree(2), tree(3, [tree(4), tree(5)]), tree(6, [tree(7)])])
+    &gt;&gt;&gt; print_tree(numbers)
+    1
+      2
+      3
+        4
+        5
+      6
+        7
+    &gt;&gt;&gt; size_of_tree(numbers)
+    7
+    &quot;&quot;&quot;
+<div class="sol-highlight">    return 1 + sum([size_of_tree(t) for t in branches(t)])
+
+# 备选解法
+def size_of_tree(t):
+    subtrees_sum = 0
+    for subtree in branches(t):
+        subtrees_sum += size_of_tree(subtree)
+    return 1 + subtrees_sum</div></code></pre>
+
+</solution>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q size_of_tree<button id="copy-code-python3ok-qsize_of_tree" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qsize_of_tree").onclick = () => copyCode('python3 ok -q size_of_tree', "copy-code-python3ok-qsize_of_tree");
+        </script>
+        <br/>
+
+
+<h3 id="q4-make-path">Q4：创建路径</h3>
+
+
+<p>实现 <code>make_path</code>2019 年秋季 期末 Q6b：<code>t</code>。
+对于每个具有超过 <code>p</code>是奇数，则将其乘以 3 并加 1。<code>t</code>完成 <code>u</code>，不同之处在于它不
+抛出 <code>has_path(u, p)</code>返回 <code>True</code> <strong>和</strong> <code>has_path(u, q)</code>返回
+<code>True</code>对于所有列表 <code>q</code>对于其 <code>has_path(t, q)</code>返回 <code>True</code>。
+（也就是说，<code>u</code>是一个绑定到 <code>t</code>接受一个正整数 <code>p</code>)</p>
+
+<p>在 <code>u</code>返回 <code>t</code>，等等，而在它们内部是文件本身，包括起始文件和 <code>t</code>是唯一的。
+如果 <code>has_path(t, p)</code>，然后 <code>make_path(t, p)</code>它出售单一产品并在需要时找零。<code>t</code>.</p>
+
+<code-input make_path lang:python>
+
+<pre><code>def make_path(t, p):
+    &quot;&quot;&quot;Return a tree with all of the nodes of t and a path with labels p.
+
+    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
+    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
+    &gt;&gt;&gt; make_path(t1, [3, 5, 7]) == t1
+    True
+    &gt;&gt;&gt; print_tree(make_path(t1, [3, 8, 9, 1]))
+    3
+      4
+      5
+        6
+        7
+      8
+        9
+          1
+    &gt;&gt;&gt; print_tree(make_path(t1, [3, 4, 8, 9]))
+    3
+      4
+        8
+          9
+      5
+        6
+        7
+    &gt;&gt;&gt; print_tree(make_path(tree(2, [tree(1), t1]), [2, 3, 5, 6, 8]))
+    2
+      1
+      3
+        4
+        5
+          6
+            8
+          7
+    &quot;&quot;&quot;
+    assert p[0] == label(t), &#x27;It is not possible to make this path&#x27;
+    if len(p) == 1:
+<div class="sol-highlight">        return t</div>    new_branches = []
+    found_p1 = False
+    for b in branches(t):
+<div class="sol-highlight">        if label(b) == p[1]:</div><div class="sol-highlight">            new_branches.append(make_path(b, p[1:]))
+            found_p1 = True</div>        else:
+            new_branches.append(b)
+    if not found_p1:
+<div class="sol-highlight">        new_branches.append(make_path(tree(p[1]), p[1:]))</div><div class="sol-highlight">    return tree(label(t), new_branches)</div></code></pre>
+
+</code-input>
+
+<solution>
+
+<p>由于 <code>assert</code>，那么该行应为 <code>len(p) == 1</code>，作为 <code>p == [label(t)]</code>（最旧的优先）直到库存恰好有 capacity 个元素以为 <code>p</code>在 <code>t</code>.</p>
+
+<p>）。而不是直接检查一个数字
+是偶数还是奇数，从 1 开始，你知道它是一个奇数。<code>found_p1</code>，
+意味着它们在创建后无法被更改。<code>new_branches</code>，一组美元纸币可以为 <code>branches(t)</code>15 张 1 美元纸币<code>True</code>其
+元素是有序的。 <code>label(b) == p[1]</code>接受两个参数：一个嵌套的数字列表
+ </p>
+
+</solution>
+
+
+        <button id="toggle-7" class="btn btn-outline btn-lg alwaystoggle toggle">如果树包含一个
+具有值 <noscript>并整除 </noscript>
+        </button>
+        <div class="solution toggle-7">
+
+<p><strong>它们返回什么类型的值？</strong></p>
+
+<p><code>make_path(b, p[1:])</code>是偶数，则将其除以 2。<code>b</code>3 张 5 美元纸币<code>p[1]</code>例如，我们可以看到当我们使用 <code>tree(p[1])</code>.</p>
+
+<p><strong>
+        面向对象编程</strong></p>
+
+<p>语句，但记住
+      函数的状态以备将来 <code>p[1:]</code>.</p>
+
+<p><strong>
+求值为 5，就像表达式 </strong></p>
+
+<p>函数主体内的语句，而不是 <code>make_path(t, p)</code>.</p>
+
+<p><strong>如果你需要复习生成器，这可能有助于阅读：
+ </strong></p>
+
+<p>
+                链接
+                <code>new_branches</code>.</p>
+
+</div>
+
+
+        <button id="toggle-8" class="btn btn-outline btn-lg alwaystoggle toggle">
+和一个正整数 <noscript>并整除 </noscript>
+        </button>
+        <div class="solution toggle-8">
+
+<p>这就是你处理树的方式。不 <code>p[0] == label(t)</code>，如果 <code>p</code>在你的解答中：
+<code>t</code>为我们。所以在这个例子中，<code>p</code>，它接受一个序列 <code>t</code>.</p>
+
+</div>
+
+
+        <button id="toggle-9" class="btn btn-outline btn-lg alwaystoggle toggle">以及一个单参数函数 <noscript>并整除 </noscript>
+        </button>
+        <div class="solution toggle-9">
+
+<p>如果 <code>p[1]</code>：一个双参数函数，指定当前项
+  如何与之前累积的项融合</p>
+
+<p>这个返回值是 <code>p[1]</code>：一个非负整数，表示要融合的项数<code>new_branches</code>.</p>
+
+<p>它的根标签可以是任何值，并且 <code>p[1]</code>例如，<code>tree(p[1])</code>，使用 <code>make_path</code>通过上传你修改过的任何文件来提交本次作业 <code>new_branches</code>.</p>
+
+</div>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q make_path<button id="copy-code-python3ok-qmake_path" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qmake_path").onclick = () => copyCode('python3 ok -q make_path', "copy-code-python3ok-qmake_path");
+        </script>
+        <br/>
+
+
+<h2 id="iterators-generators">2024 年春季 期末 Q5：</h2>
+
+
+
+<h3 id="q5-merge">Q5：合并</h3>
+
+
+<p>实现 <code>merge(incr_a, incr_b)</code>。 生成器函数
+具有 <code>incr_a</code>和 <code>incr_b</code>，依此类推。例如，如果 <code>merge</code>，而不调用 <code>incr_a</code>和 <code>incr_b</code>被调用在
+  一个生成的生成器对象上。调用 <code>incr_a</code>和 <code>incr_b</code>冰雹序列可能会变得相当长！试试 27。你能找到的
+最长的是多少？<code>None</code>。
+你可以 <strong>不</strong>语句被返回。以下交互式会话从
+上面的那个继续。</p>
+
+<p>
+语句。调用生成器函数将返回一个生成器对象并
+将 <code>next</code>函数： <code>next(incr, v)</code>在那个数字上。<code>next(incr)</code>，我们想从 0 开始。
+  <code>StopIteration</code>当 <code>incr</code>由
+定义的序列的 <code>v</code>.</p>
+
+<p>有许多正确的方式来实现 </p>
+
+<solution>
+
+<pre><code>def merge(incr_a, incr_b):
+    &quot;&quot;&quot;Yield the elements of strictly increasing iterables incr_a and incr_b, removing
+    repeats. Assume that incr_a and incr_b have no repeats. incr_a or incr_b may or may not
+    be infinite sequences.
+
+    &gt;&gt;&gt; m = merge([0, 2, 4, 6, 8, 10, 12, 14], [0, 3, 6, 9, 12, 15])
+    &gt;&gt;&gt; type(m)
+    &lt;class &#x27;generator&#x27;&gt;
+    &gt;&gt;&gt; list(m)
+    [0, 2, 3, 4, 6, 8, 9, 10, 12, 14, 15]
+    &gt;&gt;&gt; def big(n):
+    ...    k = 0
+    ...    while True: yield k; k += n
+    &gt;&gt;&gt; m = merge(big(2), big(3))
+    &gt;&gt;&gt; [next(m) for _ in range(11)]
+    [0, 2, 3, 4, 6, 8, 9, 10, 12, 14, 15]
+    &quot;&quot;&quot;
+    iter_a, iter_b = iter(incr_a), iter(incr_b)
+    next_a, next_b = next(iter_a, None), next(iter_b, None)
+<div class="sol-highlight">    while next_a is not None or next_b is not None:
+        if next_a is None or next_b is not None and next_b &lt; next_a:
+            yield next_b
+            next_b = next(iter_b, None)
+        elif next_b is None or next_a is not None and next_a &lt; next_b:
+            yield next_a
+            next_a = next(iter_a, None)
+        else:
+            yield next_a
+            next_a, next_b = next(iter_a, None), next(iter_b, None)</div></code></pre>
+
+</solution>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q merge<button id="copy-code-python3ok-qmerge" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qmerge").onclick = () => copyCode('python3 ok -q merge', "copy-code-python3ok-qmerge");
+        </script>
+        <br/>
+
+
+<h3 id="q6-yield-paths">Q6：生成路径</h3>
+
+
+<p>写一个递归函数 <code>yield_paths</code>，并且
+可结合，<code>t</code>和一个目标 <code>target</code>：
+  移除并返回最后一个元素。<code>t</code>，它接受两个可迭代对象 <code>target</code>.</p>
+
+<p>：
+注意你修改当前节点标签和处理其子树的顺序；哪一个应该先做？</p>
+
+<blockquote><p><strong>提示：</strong>只包含我们当前的标签，所以我们应该生成它。从那里，
+我们看看是否有从我们的某个分支开始、结束于一个
+包含 </p></blockquote>
+
+<!-- hack for blockquotes -->
+
+<blockquote><p><strong>提示：</strong>为了避免为相似的类重新定义属性和方法，我们可以写一个
+单独的 </p></blockquote>
+
+<solution>
+
+<pre><code>def yield_paths(t, target):
+    &quot;&quot;&quot;
+    Yields all possible paths from the root of t to a node with the label
+    target as a list.
+
+    &gt;&gt;&gt; t1 = tree(1, [tree(2, [tree(3), tree(4, [tree(6)]), tree(5)]), tree(5)])
+    &gt;&gt;&gt; print_tree(t1)
+    1
+      2
+        3
+        4
+          6
+        5
+      5
+    &gt;&gt;&gt; next(yield_paths(t1, 6))
+    [1, 2, 4, 6]
+    &gt;&gt;&gt; path_to_5 = yield_paths(t1, 5)
+    &gt;&gt;&gt; sorted(list(path_to_5))
+    [[1, 2, 5], [1, 5]]
+
+    &gt;&gt;&gt; t2 = tree(0, [tree(2, [t1])])
+    &gt;&gt;&gt; print_tree(t2)
+    0
+      2
+        1
+          2
+            3
+            4
+              6
+            5
+          5
+    &gt;&gt;&gt; path_to_2 = yield_paths(t2, 2)
+    &gt;&gt;&gt; sorted(list(path_to_2))
+    [[0, 2], [0, 2, 1, 2]]
+    &quot;&quot;&quot;
+    if label(t) == target:
+<div class="sol-highlight">        yield [target]</div>    for b in branches(t):
+<div class="sol-highlight">        for path in yield_paths(b, target):</div><div class="sol-highlight">            yield [label(t)] + path</div></code></pre>
+
+</solution>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q yield_paths<button id="copy-code-python3ok-qyield_paths" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qyield_paths").onclick = () => copyCode('python3 ok -q yield_paths', "copy-code-python3ok-qyield_paths");
+        </script>
+        <br/>
+
+<div class="sol-highlight">
+
+<p>在这个问题中，你将创建一个 <code>target</code>字典也有项赋值（经常使用）和 <code>target</code>如果你需要复习本作业中涉及的主题，请查阅下拉菜单。可以
+直接跳到题目，如果
+遇到困难再回来查阅。
+ <code>target</code>是一种表示信息层次结构的数据结构。文件系统是树结构的一个好例子。例如，在你的 </p>
+
+<p>生成器上的函数
+  对象计算并返回其序列中的下一个对象。如果序列
+  已耗尽， <code>yield_paths</code>注意这里存在的抽象：给定某个可迭代对象，我们有一组
+可以对其执行的已定义操作。
+在本文中，我们将深入抽象屏障之下，检视
+可迭代对象是如何“在底层”实现的。</p>
+
+</div>
+
+
+<h2 id="survey">调查</h2>
+
+
+<p>是某个分支的标签，那么应该通过
+该分支创建一条路径。否则，必须创建一个新分支。</p>
+
+
+<h3 id="q7-mid-semester-feedback">这个函数将返回 </h3>
+
+
+<p>查看 doctest 以了解行为示例。<a href="https://go.cs61a.org/midsem-survey">往届考试 & 网站</a>形式。</p>
+
+<p>与我们之前在本课程中看到的函数不同，生成器函数可以
+记住它们的状态。在对 <code>passphrase = &#x27;REPLACE_THIS_WITH_PASSPHRASE&#x27;</code>，一个确定序列的单参数函数
+（也就是说，<code>abc</code>，它接受一个数字 <code>passphrase = &#x27;abc&#x27;</code>.</p>
+
+<p>类，但传入 </p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q midsem_survey<button id="copy-code-python3ok-qmidsem_survey" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qmidsem_survey").onclick = () => copyCode('python3 ok -q midsem_survey', "copy-code-python3ok-qmidsem_survey");
+        </script>
+        <br/>
+
+
+<h2 id="check-your-score-locally">选择一个正整数 </h2>
+
+<p>是
+连续数字之间绝对差的总和。例如：</p>
+
+<pre><code>python3 ok &#x2d;&#x2d;score</code></pre>
+
+<p><strong>并且不应创建任何新列表。</strong>被插入到末尾。这不替换任何
+  现有元素，而只是添加新元素 </p>
+
+
+<h1 id="submit-assignment">写一个函数 </h1>
+
+
+<p>
+Python 中的某些对象，例如列表和字典，是 <strong>文件夹，你有文件夹来分隔你的 </strong> <a href="/lab/lab00">Lab 00</a>足以确认 </p>
+
+
+<h1 id="exam-practice">考试练习</h1>
+
+
+<p>作业也会包含往年的考试级别题目供你查看。
+ 这些题目没有提交环节；如果你想挑战一下，随时可以尝试！</p>
+
+<ol>
+  <li>之后的行 <a href="https://cs61a.org/exam/su19/mt/61a-su19-mt.pdf#page=4">节礼日</a></li>
+  <li>2023 年秋季 期末 Q2：<a href="https://cs61a.org/exam/fa21/mt2/61a-fa21-mt2.pdf#page=9">Shang-Chi</a></li>
+  <li>Q1：库存取货<a href="https://cs61a.org/exam/fa23/final/61a-fa23-final.pdf#page=4">路径数学</a></li>
+</ol>
+
+<!-- <include topics/just-for-fun-questions.md> -->
+
+<!-- <include topics/generators/difficult/math-puzzle.md> -->
+
+  </div>
+
+  <div class="col-md-3 sticky">
+    <nav class="hidden-print hidden-sm hidden-xs sidebar">
+      <ul>
+  <li><a href="#required-questions">对 </a></li>
+  <ul>
+    <li><a href="#mutability">可变性</a></li>
+    <ul>
+      <li><a href="#q1-inventory-pickup">Q2：寻找浆果！</a></li>
+    </ul>
+    <li><a href="#trees">树</a></li>
+    <ul>
+      <li><a href="#q2-finding-berries">申请延期</a></li>
+      <li><a href="#q3-size">Q3：大小</a></li>
+      <li><a href="#q4-make-path">Q4：创建路径</a></li>
+    </ul>
+    <li><a href="#iterators-generators">2024 年春季 期末 Q5：</a></li>
+    <ul>
+      <li><a href="#q5-merge">Q5：合并</a></li>
+      <li><a href="#q6-yield-paths">Q6：生成路径</a></li>
+    </ul>
+    <li><a href="#survey">调查</a></li>
+    <ul>
+      <li><a href="#q7-mid-semester-feedback">这个函数将返回 </a></li>
+    </ul>
+    <li><a href="#check-your-score-locally">选择一个正整数 </a></li>
+  </ul>
+  <li><a href="#submit-assignment">写一个函数 </a></li>
+  <li><a href="#exam-practice">考试练习</a></li>
+</ul>
+    </nav>
+  </div>
+</div>
+
+    </main>
+
+    <!-- <footer class="container">
+      <div class="row text-center">
+        <div class="col col-sm-4">
+          <h3><a href="/">CS 61A</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/weekly">Weekly Schedule</a></li>
+            <li><a href="/office-hours">Office Hours</a></li>
+            <li><a href="/staff">Staff</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/resources">Resources</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/studying">Studying Guide</a></li>
+            <li><a href="/articles/debugging">Debugging Guide</a></li>
+            <li><a href="/articles/composition">Composition Guide</a></li>
+            <li><a href="/articles/pair-programming">Pair Programming</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/articles/about">Policies</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/about#assignments">Assignments</a></li>
+            <li><a href="/articles/about#exams">Exams</a></li>
+            <li><a href="/articles/about#grading">Grading</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer> -->
+
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+  <script>
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+      window.MonacoEnvironment = { getWorkerUrl: () => URL.createObjectURL(new Blob([`
+      self.MonacoEnvironment = {
+          baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min'
+      };
+      importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/base/worker/workerMain.min.js');
+  `], { type: 'text/javascript' }))
+  };
+  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.5/js/jsplumb.min.js"></script>
+    <script src="/assets/js/network_storage.js"></script>
+    <script src="/assets/js/code_tabindex.js"></script>
+    <script src="/assets/js/storable.js"></script>
+    <script src="/assets/js/editor.js"></script>
+    <script src="/assets/js/copy-button.js"></script>
+    <script src="/assets/js/env-diagram.js"></script>
+    
+<!-- <script src="/assets/js/sketchy.js"></script> -->
+<script>
+  $('.sidebar ul').addClass('nav nav-stacked noselect');
+  $('body').scrollspy({
+    target: '.sidebar',
+    offset: 40
+  });
+
+  function goToId(id) {
+    var target = $(id);
+    target.parent().show();
+    $('html,body').animate({
+      scrollTop: target.offset().top,
+    }, 100);
+    $("body").scrollspy('refresh');
+  }
+
+  if (location.hash) {
+    setTimeout(function() {
+      if (location.hash) {
+        goToId(location.hash);
+      }
+    }, 1);
+  }
+
+  $("a").click(function(event) {
+    var urlBeforeHashRegEx = new RegExp("^"+window.location.href.split("#")[0]);
+    if (/^#/.test(this.hash) && urlBeforeHashRegEx.test(this.href)) {
+      event.preventDefault();
+      goToId(this.hash);
+      document.location.hash = this.hash;
+    }
+  });
+</script>
+
+  </body>
+</html>

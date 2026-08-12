@@ -1,0 +1,601 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta name="description" content ="CS 61A: Structure and Interpretation of Computer Programs" />
+    <meta name="keywords" content ="Computer Science, Programming, Berkeley, EECS" />
+    <meta name="author" content ="Rebecca Dang" />
+    <!-- CHANGED CAREFUL -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/assets/js/hl.js"></script>
+    <script src="/assets/js/toggledarkmode.js"></script>
+    <script>
+        // we aren't registering builtins since
+        //      (1) they don't render differently in the current CSS from other names
+        //      (2) it's a mess to list all of them. You can extract from the site but that takes effort
+        // if (1) ceases to be true, (2) might be worth the effort. For now, we're leaving as is
+        hljsRegister({
+            'keyword': "define if cond and or let begin lambda mu quote delay cons-stream set! quasiquote unquote unquote-splicing define-macro"
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <script src="/assets/js/dark-mode.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata|Roboto:300,400,500|Work+Sans:400,700">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/mono-blue.css">
+    <link rel="icon" href="/assets/images/favicon.ico">
+
+    
+
+<link rel="stylesheet" type="text/css" href="/assets/css/disc.css">
+
+
+    <title>
+讨论 3 | CS 61A 2026 年夏季学期
+</title>
+  </head>
+
+  <body id="index" class="home">
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container noselect">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-section" aria-label="切换导航栏">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">
+            CS 61A
+            <!-- <img style="max-width:60px; margin-top: -20px;" class="logo" src="/assets/images/logo.png"/> -->
+          </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse-section">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+            <li><a href="/">课程讲义</a></li>
+            
+            <li><a href="/articles/about-61a/">课程大纲</a></li>
+            
+            <li><a href="https://edstem.org/us/courses/99538/discussion">Ed</a></li>
+            
+            <li><a href="/office-hours/">答疑时间</a></li>
+            
+            <li><a href="/articles/contact-61a/">联系方式</a></li>
+            
+
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                链接
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://go.cs61a.org/extensions">申请延期</a></li>
+                
+                <li><a href="https://go.cs61a.org/regrades">申请重新评分</a></li>
+                
+                <li><a href="https://oh.cs61a.org/">答疑排队</a></li>
+                
+                <li><a href="https://www.gradescope.com/courses/1324284">Gradescope</a></li>
+                
+                <li><a href="https://sections.cs61a.org">添加/更改讨论小组</a></li>
+                
+                <li><a href="https://bcourses.berkeley.edu/courses/1555178/pages">课程录像</a></li>
+                
+                <li><a href="https://pythontutor.com/cp/composingprograms.html">Python Tutor</a></li>
+                
+                <li><a href="https://code.cs61a.org/">代码编辑器</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                资源
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/resources/">历年试卷与网站</a></li>
+                
+                <li><a href="https://www.composingprograms.com">教科书</a></li>
+                
+                <li><a href="/articles/campus-res/">校园资源</a></li>
+                
+                <li><a href="/articles/advice/">学生建议</a></li>
+                
+                <li><a href="/articles/scheme-spec/">Scheme 规范</a></li>
+                
+                <li><a href="/articles/scheme-builtins/">Scheme 内置过程</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                指南
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://drive.google.com/file/d/1O72u0ml65pibcjz-PXKpqeJDKaVqQ3D8/view">调试指南</a></li>
+                
+                <li><a href="/articles/studying/">学习指南</a></li>
+                
+                <li><a href="/articles/type-hints/">类型提示</a></li>
+                
+                <li><a href="/articles/composition/">写作指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt1-study-guide.pdf">期中一学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt2-study-guide.pdf">期中二学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-final-study-guide.pdf">期末学习指南</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                教学团队
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/instructor">授课教师</a></li>
+                
+                <li><a href="/staff">助教与辅导员</a></li>
+                
+              </ul>
+            </li>
+            
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main id="content" class="container">
+      
+<div class='row'>
+  <div class='col-md-9'>
+    <header>
+      <h1>
+        
+讨论 3：递归、树形递归
+
+        
+        
+        
+        <ul class="inline-block list-inline">
+          <li><a href="disc03.pdf" class="label label-outline">disc03.pdf</a></li>
+        </ul>
+        
+        
+        
+      </h1>
+    </header>
+    
+
+<!-- <div class="alert storable-login-status"></div> -->
+
+
+
+    
+<!-- If there are fewer than 3 people in your group, merge your group with another group in the room. If your group has 6 or more students, you're welcome to split into two sub-groups and then sync up at the end. If you want two separate Pensieve documents for the two sub-groups, just have one sub-group add 1000 to their group number.
+
+Now switch to Pensieve:
+
+<ul>
+  <li><strong>Everyone</strong>: Go to <a href="https://www.pensieve.co/student/courses/cs61a/clazzes/cs61a_fa25/assignments/c6d75a5d-0f9b-410e-adc7-48ad3740fe20">pensieve.co</a>, log in with your @berkeley.edu email, and <strong>enter your group number</strong> as the room number (which was in the email that assigned you to this discussion). As long as you all enter the same number (any number), you'll all be using a shared document.</li>
+</ul>
+
+Once you're on Pensieve, you don't need to return to this page; Pensieve has all the same content (but more features). If for some reason Penseive doesn't work, return to this page and continue with the discussion. -->
+
+
+
+<h1 id="attendance">签到</h1>
+
+
+<p>你的助教会在讨论课期间过来为你签到。
+<!-- You can start on the worksheet before being checked in; you don't need to wait for your TA to get started. --></p>
+
+<p>如果你因正当理由（例如生病或时间冲突）缺席讨论课，请在一周内发送邮件至 <a href="mailto:cs61a@berkeley.edu">cs61a@berkeley.edu</a> 以获得出勤学分。
+</p>
+
+<!-- 
+        <button id='toggle-1' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        Study Suggestion<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-1"> -->
+
+
+
+<!-- </div> -->
+
+<!-- # Recursion
+
+Many students find this discussion challenging. Everything gets easier with practice. Please help each other learn. It's also long. If you don't finish, don't worry.
+
+**VERY IMPORTANT:** In this discussion, don't check your answers until your whole group is sure that the answer is right. Figure things out and check your work by _thinking_ about what your code will do.  Your goal should be to have all checks pass the first time you run them! If you need help, ask.
+
+**VERY IMPORTANT:** In this discussion, don't check your answers until your whole group is sure that the answer is right. Figure things out and check your work by _thinking_ about what your code will do. If you need help, ask. -->
+
+
+<h3 id="q1-skip-factorial">Q1：跳步阶乘</h3>
+
+
+<p>为 <code>skip_factorial</code> 函数定义基例，该函数返回<strong>从 <code>n</code> 开始、每隔一个正整数</strong>的乘积。</p>
+
+
+            <div class="monaco-storable" id="skip_factorial-input" style="height:270px;"></div>
+            <!-- <a href="javascript:void" id="modal-link-skip_factorial-input">Run in 61A Code</a> -->
+            <div class="modal fade" id="modal-skip_factorial-input" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content" style="padding-bottom: -5px">
+                    <iframe
+                        id="code-iframe-skip_factorial-input"
+                        width="100%"
+                        height="700px"
+                        style="border: none; display:block;"
+                    ></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="storable-status"></div>
+            <script>
+                $(() => activateEditor('def skip_factorial(n):\n    &quot;&quot;&quot;Return the product of positive integers n * (n &#x2d; 2) * (n &#x2d; 4) * ...\n\n    &gt;&gt;&gt; skip_factorial(5) # 5 * 3 * 1\n    15\n    &gt;&gt;&gt; skip_factorial(8) # 8 * 6 * 4 * 2\n    384\n    &quot;&quot;&quot;\n    if ___:\n        return ___\n    else:\n        return ___\n\n', "python", "skip_factorial-input"));
+            </script>
+        
+
+
+
+
+<h3 id="q2-swipe">Q2：Swipe</h3>
+
+
+<p>实现 <code>swipe</code>，它打印参数 <code>n</code> 的各位数字，每行一个，<strong>先倒序再正序</strong>。最左边的数字只打印一次。<strong>不得使用</strong> <code>while</code>、<code>for</code> 或 <code>str</code>。（当然要使用递归！）</p>
+
+
+            <div class="monaco-storable" id="swipe-input" style="height:378px;"></div>
+            <!-- <a href="javascript:void" id="modal-link-swipe-input">Run in 61A Code</a> -->
+            <div class="modal fade" id="modal-swipe-input" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content" style="padding-bottom: -5px">
+                    <iframe
+                        id="code-iframe-swipe-input"
+                        width="100%"
+                        height="700px"
+                        style="border: none; display:block;"
+                    ></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="storable-status"></div>
+            <script>
+                $(() => activateEditor('def swipe(n):\n    &quot;&quot;&quot;Print the digits of n, one per line, first backward then forward.\n\n    &gt;&gt;&gt; swipe(283)\n    3\n    8\n    2\n    8\n    3\n    &quot;&quot;&quot;\n    if n &lt; 10:\n        print(n)\n    else:\n        "*** YOUR CODE HERE ***"\n\n\n\n\n\n\n\n', "python", "swipe-input"));
+            </script>
+        
+
+
+
+<div class="page-break"></div>
+
+
+<h3 id="q3-is-prime">Q3：判断素数</h3>
+
+
+<p>实现 <code>is_prime</code>，它接受一个大于 1 的整数 <code>n</code>。当 <code>n</code> 是素数时返回 <code>True</code>，否则返回 <code>False</code>。尝试按照下面的思路，但用递归实现，不要使用 <code>while</code>（或 <code>for</code>）循环。</p>
+
+<p>你需要定义另一个“辅助”函数（一个仅仅为了帮助实现本函数而存在的函数）。将这个辅助函数定义在 <code>is_prime</code> 内部，还是作为全局帧中的一个独立函数，会有区别吗？试着让它接受的参数尽可能少。</p>
+
+
+            <div class="monaco-storable" id="is-prime-input" style="height:540px;"></div>
+            <!-- <a href="javascript:void" id="modal-link-is-prime-input">Run in 61A Code</a> -->
+            <div class="modal fade" id="modal-is-prime-input" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content" style="padding-bottom: -5px">
+                    <iframe
+                        id="code-iframe-is-prime-input"
+                        width="100%"
+                        height="700px"
+                        style="border: none; display:block;"
+                    ></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="storable-status"></div>
+            <script>
+                $(() => activateEditor('def is_prime(n):\n    &quot;&quot;&quot;Returns True if n is a prime number and False otherwise.\n    &gt;&gt;&gt; is_prime(9)\n    False\n    &gt;&gt;&gt; is_prime(2)\n    True\n    &gt;&gt;&gt; is_prime(16)\n    False\n    &gt;&gt;&gt; is_prime(521)\n    True\n    &quot;&quot;&quot;\n    "*** YOUR CODE HERE ***"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n', "python", "is-prime-input"));
+            </script>
+        
+
+
+
+<div class="page-break"></div>
+
+
+<h3 id="q4-recursive-hailstone">Q4：递归冰雹序列</h3>
+
+
+<!-- This was Homework 2, so this may need to be changed during the regular school year depending on content. -->
+回忆一下 <a href="/hw/hw01/">作业 1</a> 中的 <code>hailstone</code> 函数。
+
+<ul>
+  <li>首先，选取一个正整数 <code>n</code> 作为起点。如果 <code>n</code> 是偶数，将其除以 2。</li>
+  <li>如果 <code>n</code> 是奇数，将其乘以 3 再加 1。重复此过程，直到 <code>n</code> 变为 1。</li>
+  <li>补全下面这个递归版本的 <code>hailstone</code>，它打印出序列中的各个值，并返回步数。</li>
+</ul>
+
+
+            <div class="monaco-storable" id="recursive-hailstone-input" style="height:630px;"></div>
+            <!-- <a href="javascript:void" id="modal-link-recursive-hailstone-input">Run in 61A Code</a> -->
+            <div class="modal fade" id="modal-recursive-hailstone-input" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content" style="padding-bottom: -5px">
+                    <iframe
+                        id="code-iframe-recursive-hailstone-input"
+                        width="100%"
+                        height="700px"
+                        style="border: none; display:block;"
+                    ></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="storable-status"></div>
+            <script>
+                $(() => activateEditor('def hailstone(n):\n    &quot;&quot;&quot;Print out the hailstone sequence starting at n, \n    and return the number of elements in the sequence.\n    &gt;&gt;&gt; a = hailstone(10)\n    10\n    5\n    16\n    8\n    4\n    2\n    1\n    &gt;&gt;&gt; a\n    7\n    &gt;&gt;&gt; b = hailstone(1)\n    1\n    &gt;&gt;&gt; b\n    1\n    &quot;&quot;&quot;\n    print(n)\n    if n % 2 == 0:\n        return even(n)\n    else:\n        return odd(n)\n\ndef even(n):\n    return ____\n\ndef odd(n):\n    "*** YOUR CODE HERE ***"\n\n\n\n\n\n', "python", "recursive-hailstone-input"));
+            </script>
+        
+
+</p>
+
+<div class="page-break"></div>
+
+
+<h3 id="q5-maximum-subsequence">Q5：最大子序列</h3>
+
+
+<p>一个数的<em>子序列</em>是指从该数中取出的一系列数字（不一定连续）。例如，12345 的子序列包括 123、234、124、245 等。你的任务是找出长度不超过指定值的最大子序列。</p>
+
+<blockquote><p><strong>提示：</strong> 要将一个数字（<code>d</code>）添加到一个已有的数（<code>n</code>）后面，计算：<code>n * 10 + d</code>。例如，要将数字 <code>8</code> 加到 <code>15</code> 后面得到 <code>158</code>，就计算 <code>15 * 10 + 8</code>。</p></blockquote>
+
+
+            <div class="monaco-storable" id="max-subseq-input" style="height:702px;"></div>
+            <!-- <a href="javascript:void" id="modal-link-max-subseq-input">Run in 61A Code</a> -->
+            <div class="modal fade" id="modal-max-subseq-input" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content" style="padding-bottom: -5px">
+                    <iframe
+                        id="code-iframe-max-subseq-input"
+                        width="100%"
+                        height="700px"
+                        style="border: none; display:block;"
+                    ></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="storable-status"></div>
+            <script>
+                $(() => activateEditor('def max_subseq(n, t):\n    &quot;&quot;&quot;\n    Return the maximum subsequence of length at most t that can be found in the given number n.\n    For example, for n = 2012 and t = 2, we have that the subsequences are\n        2\n        0\n        1\n        2\n        20\n        21\n        22\n        01\n        02\n        12\n    and of these, the maximum number is 22, so our answer is 22.\n\n    &gt;&gt;&gt; max_subseq(2012, 2)\n    22\n    &gt;&gt;&gt; max_subseq(20125, 3)\n    225\n    &gt;&gt;&gt; max_subseq(20125, 5)\n    20125\n    &gt;&gt;&gt; max_subseq(20125, 6) # note that 20125 == 020125\n    20125\n    &gt;&gt;&gt; max_subseq(12345, 3)\n    345\n    &gt;&gt;&gt; max_subseq(12345, 0) # 0 is of length 0\n    0\n    &gt;&gt;&gt; max_subseq(12345, 1)\n    5\n    &quot;&quot;&quot;\n    "*** YOUR CODE HERE ***"\n\n\n\n\n\n\n\n', "python", "max-subseq-input"));
+            </script>
+        
+
+<!--**There are two key insights for this problem:**
+You need to split into the case where the ones digit is used and the case where it is not.
+  In the case where it is, we want to reduce <code>t</code> since we used one of the digits; in the
+  case where it isn't used, we keep <code>t</code> the same. Finally, given these two possibilities,
+  how can we continue this process of splitting into two cases to grow the subsequence and
+  find the maximum of all of the different subsequences that are below a certain length?
+In the case where we are using the ones digit, we need to attach the digit onto the end of
+  the number/subsequence that is being built (and eventually returned). For example, the way
+  to attach a digit <code>d</code> to the end of a number <code>n</code> is to do <code>10 * n + d</code>. To see this in use,
+  think about what we would need to do if we wanted to attach <code>8</code>(<code>d</code>) to the end of <code>15</code> (<code>n</code>)
+  to make <code>158</code>. We cannot just do <code>15 + 8</code> (because that is <code>23</code>), instead we need to do
+  <code>(10 * 15) + 8</code> (which is <code>150 + 8</code>, giving us <code>158</code> like we wanted). -->
+
+<div class="page-break"></div>
+
+
+<h3 id="q6-sevens">Q6：Sevens</h3>
+
+
+<p><strong>七的游戏</strong>：围成一圈的玩家从 1 开始顺时针依次报数。（起始玩家说 1，他左边的玩家说 2，依此类推。）如果一个数能被 7 整除或含有数字 7（或同时满足），则改变方向。数字必须在 <a href="https://www.youtube.com/watch?v=ymJIXzvDvj4">每分钟 60 拍</a> 的节拍上说出。如果有人在不是自己回合时说了数字，或轮到自己时错过了节拍，游戏结束。</p>
+
+<p>例如，5 名玩家会像这样数到 20：</p>
+
+<pre><code>Player 1 says 1
+Player 2 says 2
+Player 3 says 3
+Player 4 says 4
+Player 5 says 5
+Player 1 says 6  # 绕圈一圈
+Player 2 says 7  # 改为逆时针
+Player 1 says 8
+Player 5 says 9  # 逆时针绕回一圈
+Player 4 says 10
+Player 3 says 11
+Player 2 says 12
+Player 1 says 13
+Player 5 says 14 # 改回顺时针
+Player 1 says 15
+Player 2 says 16
+Player 3 says 17 # 改回逆时针
+Player 2 says 18
+Player 1 says 19
+Player 5 says 20</code></pre>
+
+
+
+<!-- Play a few games. Post the highest score your group reached on Discord. -->
+
+<p>实现 <code>sevens</code>，它接受一个正整数 <code>n</code> 和玩家人数 <code>k</code>。它返回 <code>k</code> 名玩家中是谁说出了 <code>n</code>。你可以调用 <code>has_seven</code>。</p>
+
+<p>解决本题的一种有效方法是模拟这个游戏，在第 <code>n</code> 轮停止。
+实现时必须跟踪以下内容：</p>
+
+<ul>
+  <li>最终数字 <code>n</code></li>
+  <li>当前数字 <code>i</code></li>
+  <li>将要说出 <code>i</code> 的玩家 <code>who</code></li>
+  <li>以及决定下一位玩家的当前 <code>direction</code>（递增或递减）。</li>
+</ul>
+
+<p>用整数来表示所有这些量会比较方便，其中 <code>direction</code> 在 <code>1</code>
+（递增）和 <code>&#x2d;1</code>（递减）之间切换。</p>
+
+
+            <div class="monaco-storable" id="sevens-input" style="height:702px;"></div>
+            <!-- <a href="javascript:void" id="modal-link-sevens-input">Run in 61A Code</a> -->
+            <div class="modal fade" id="modal-sevens-input" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content" style="padding-bottom: -5px">
+                    <iframe
+                        id="code-iframe-sevens-input"
+                        width="100%"
+                        height="700px"
+                        style="border: none; display:block;"
+                    ></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="storable-status"></div>
+            <script>
+                $(() => activateEditor('def sevens(n, k):\n    &quot;&quot;&quot;Return the (clockwise) position of who says n among k players.\n\n    &gt;&gt;&gt; sevens(2, 5)\n    2\n    &gt;&gt;&gt; sevens(6, 5)\n    1\n    &gt;&gt;&gt; sevens(7, 5)\n    2\n    &gt;&gt;&gt; sevens(8, 5)\n    1\n    &gt;&gt;&gt; sevens(9, 5)\n    5\n    &gt;&gt;&gt; sevens(18, 5)\n    2\n    &quot;&quot;&quot;\n    def f(i, who, direction):\n        if i == n:\n            return who\n        "*** YOUR CODE HERE ***"\n\n\n\n\n\n\n\n\n\n\n\n\n    return f(1, 1, 1)\n\ndef has_seven(n):\n    if n == 0:\n        return False\n    elif n % 10 == 7:\n        return True\n    else:\n        return has_seven(n // 10)\n', "python", "sevens-input"));
+            </script>
+        
+
+
+
+<!-- This question is quite difficult but the solution is short and elegant. -->
+
+<!-- <include topics/recursion/difficult/karel.md> -->
+
+<!-- <include topics/recursion/difficult/y-combinator.md> -->
+<script>
+    $('.alwaystoggle').css('display', 'inline-block');
+    $('.alwaystoggle').click(function() {
+      var solution_id = $(this).attr('id');
+      $('div.' + solution_id).slideToggle(600);
+    });
+</script>
+
+  </div>
+
+  <div class='col-md-3 sticky'>
+    <nav class='hidden-print hidden-sm hidden-xs sidebar'>
+      <ul>
+  <li><a href="#attendance">签到</a></li>
+  <ul>
+    <li><a href="#q1-skip-factorial">Q1：跳步阶乘</a></li>
+    <li><a href="#q2-swipe">Q2：Swipe</a></li>
+    <li><a href="#q3-is-prime">Q3：判断素数</a></li>
+    <li><a href="#q4-recursive-hailstone">Q4：递归冰雹序列</a></li>
+    <li><a href="#q5-maximum-subsequence">Q5：最大子序列</a></li>
+    <li><a href="#q6-sevens">Q6：Sevens</a></li>
+  </ul>
+</ul>
+    </nav>
+  </div>
+</div>
+
+    </main>
+
+    <!-- <footer class="container">
+      <div class="row text-center">
+        <div class="col col-sm-4">
+          <h3><a href="/">CS 61A</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/weekly">Weekly Schedule</a></li>
+            <li><a href="/office-hours">Office Hours</a></li>
+            <li><a href="/staff">Staff</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/resources">Resources</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/studying">Studying Guide</a></li>
+            <li><a href="/articles/debugging">Debugging Guide</a></li>
+            <li><a href="/articles/composition">Composition Guide</a></li>
+            <li><a href="/articles/pair-programming">Pair Programming</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/articles/about">Policies</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/about#assignments">Assignments</a></li>
+            <li><a href="/articles/about#exams">Exams</a></li>
+            <li><a href="/articles/about#grading">Grading</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer> -->
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+  <script>
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+      window.MonacoEnvironment = { getWorkerUrl: () => URL.createObjectURL(new Blob([`
+      self.MonacoEnvironment = {
+          baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min'
+      };
+      importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/base/worker/workerMain.min.js');
+  `], { type: 'text/javascript' }))
+  };
+  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.5/js/jsplumb.min.js"></script>
+    <script src="/assets/js/network_storage.js"></script>
+    <script src="/assets/js/code_tabindex.js"></script>
+    <script src="/assets/js/storable.js"></script>
+    <script src="/assets/js/editor.js"></script>
+    <script src="/assets/js/copy-button.js"></script>
+    <script src="/assets/js/env-diagram.js"></script>
+    
+<!-- <script src="/assets/js/sketchy.js"></script> -->
+<script>
+  $('.sidebar ul').addClass('nav nav-stacked noselect');
+  $('body').scrollspy({
+    target: '.sidebar',
+    offset: 40
+  });
+
+  function goToId(id) {
+    var target = $(id);
+    target.parent().show();
+    $('html,body').animate({
+      scrollTop: target.offset().top,
+    }, 100);
+    $("body").scrollspy('refresh');
+  }
+
+  if (location.hash) {
+    setTimeout(function() {
+      if (location.hash) {
+        goToId(location.hash);
+      }
+    }, 1);
+  }
+
+  $("a").click(function(event) {
+    var urlBeforeHashRegEx = new RegExp("^"+window.location.href.split("#")[0]);
+    if (/^#/.test(this.hash) && urlBeforeHashRegEx.test(this.href)) {
+      event.preventDefault();
+      goToId(this.hash);
+      document.location.hash = this.hash;
+    }
+  });
+</script>
+
+  </body>
+</html>

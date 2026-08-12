@@ -1,0 +1,27 @@
+{
+    "name": "Lab 8",
+    "endpoint": "cal/cs61a/su26/lab08",
+    "src": [
+        "lab08.py",
+        "classes.py"
+    ],
+    "tests": {
+        "lab*.py": "doctest",
+        "tests/*.py": "ok_test",
+        "classes.py": "doctest"
+    },
+    "default_tests": [
+        "link",
+        "without",
+        "duplicate_link",
+        "slice_link",
+        "has_cycle"
+    ],
+    "protocols": [
+        "restore",
+        "file_contents",
+        "unlock",
+        "grading",
+        "analytics"
+    ]
+}

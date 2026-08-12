@@ -1,0 +1,1058 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta name="description" content ="CS 61A: Structure and Interpretation of Computer Programs" />
+    <meta name="keywords" content ="Computer Science, Programming, Berkeley, EECS" />
+    <meta name="author" content ="Rebecca Dang" />
+    <!-- CHANGED CAREFUL -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/assets/js/hl.js"></script>
+    <script src="/assets/js/toggledarkmode.js"></script>
+    <script>
+        // we aren't registering builtins since
+        //      (1) they don't render differently in the current CSS from other names
+        //      (2) it's a mess to list all of them. You can extract from the site but that takes effort
+        // if (1) ceases to be true, (2) might be worth the effort. For now, we're leaving as is
+        hljsRegister({
+            'keyword': "define if cond and or let begin lambda mu quote delay cons-stream set! quasiquote unquote unquote-splicing define-macro"
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <script src="/assets/js/dark-mode.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata|Roboto:300,400,500|Work+Sans:400,700">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/mono-blue.css">
+    <link rel="icon" href="/assets/images/favicon.ico">
+
+    
+    
+    <link rel="stylesheet" href="/assets/css/lab.css">
+
+
+    <title>
+实验 5：可变性、迭代器、生成器 | CS 61A 2026 年夏季
+</title>
+  </head>
+
+  <body id="index" class="home">
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container noselect">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-section" aria-label="切换导航栏">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">
+            CS 61A
+            <!-- <img style="max-width:60px; margin-top: -20px;" class="logo" src="/assets/images/logo.png"/> -->
+          </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse-section">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+            <li><a href="/">课程讲座</a></li>
+            
+            <li><a href="/articles/about-61a/">课程大纲</a></li>
+            
+            <li><a href="https://edstem.org/us/courses/99538/discussion">Ed</a></li>
+            
+            <li><a href="/office-hours/">答疑时间</a></li>
+            
+            <li><a href="/articles/contact-61a/">联系方式</a></li>
+            
+
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                链接
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://go.cs61a.org/extensions">申请延期</a></li>
+                
+                <li><a href="https://go.cs61a.org/regrades">申请重新评分</a></li>
+                
+                <li><a href="https://oh.cs61a.org/">答疑排队</a></li>
+                
+                <li><a href="https://www.gradescope.com/courses/1324284">Gradescope</a></li>
+                
+                <li><a href="https://sections.cs61a.org">添加/更改讨论小组</a></li>
+                
+                <li><a href="https://bcourses.berkeley.edu/courses/1555178/pages">课程录像</a></li>
+                
+                <li><a href="https://pythontutor.com/cp/composingprograms.html">Python Tutor</a></li>
+                
+                <li><a href="https://code.cs61a.org/">代码编辑器</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                资源
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/resources/">往年试题与网站</a></li>
+                
+                <li><a href="https://www.composingprograms.com">教材</a></li>
+                
+                <li><a href="/articles/campus-res/">校园资源</a></li>
+                
+                <li><a href="/articles/advice/">学长学姐建议</a></li>
+                
+                <li><a href="/articles/scheme-spec/">Scheme 规范</a></li>
+                
+                <li><a href="/articles/scheme-builtins/">Scheme 内置过程</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                指南
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://drive.google.com/file/d/1O72u0ml65pibcjz-PXKpqeJDKaVqQ3D8/view">调试指南</a></li>
+                
+                <li><a href="/articles/studying/">学习指南</a></li>
+                
+                <li><a href="/articles/type-hints/">类型提示</a></li>
+                
+                <li><a href="/articles/composition/">写作指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt1-study-guide.pdf">MT1 学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt2-study-guide.pdf">MT2 学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-final-study-guide.pdf">期末考试学习指南</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                助教团队
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/instructor">讲师</a></li>
+                
+                <li><a href="/staff">助教与辅导</a></li>
+                
+              </ul>
+            </li>
+            
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main id="content" class="container">
+      
+<div class='row'>
+  <div class='col-md-9'>
+    <header>
+      <h1>
+        
+实验 5：可变性、迭代器、生成器
+
+        
+        
+        <ul class="inline-block list-inline">
+          <li><a href="lab05.zip" class="label label-outline">lab05.zip</a></li>
+        </ul>
+        
+        
+      </h1>
+    </header>
+    
+
+<p><i>截止时间：7 月 9 日（星期四）晚上 11:59。</i></p>
+
+
+
+
+<h2 id='starter-files'>初始文件</h2>
+
+<p>下载 <a href="lab05.zip">lab05.zip</a>。</p>
+
+
+
+
+<!--  -->
+
+<h1 id="attendance">出勤</h1>
+
+
+<p>除了参与实验外，你还需要提交实验中的题目，才能获得实验的学分。</p>
+
+<p>如果你有正当理由（例如生病或时间冲突）缺勤，或者由于某些原因没有被签到，请在一周内发送邮件至 <a href="mailto:cs61a@berkeley.edu">cs61a@berkeley.edu</a> 以补算出勤。</p>
+
+<h1 id="required-questions">必做题目</h1>
+
+
+
+        <button id='toggle-1' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        入门视频<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-1">
+
+
+<h2 id="getting-started-videos" class="no-toc">入门视频</h2>
+
+
+<p>这些视频也许能为你解决本次作业中的编程问题提供一些有用的指引。</p>
+
+<blockquote><p>要观看这些视频，你需要登录你的 berkeley.edu 邮箱。</p></blockquote>
+
+
+            <iframe width="560" height="315" src="https://youtube.com/embed/videoseries?list=PLx38hZJ5RLZcgRGz3rUv835rg3iwf3MFz"
+                frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" aria-label = "lab5-getstarted"
+                allowfullscreen></iframe><p><a href='https://youtu.be/playlist?list=PLx38hZJ5RLZcgRGz3rUv835rg3iwf3MFz'> YouTube 链接 </a></p>
+</div>
+
+
+        <button id='toggle-2' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        列表变更<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-2">
+
+
+<h2 id="mutability" class="no-toc">可变性</h2>
+
+
+<p>Python 中有些对象，例如列表和字典，是<strong>可变的</strong>，
+也就是说它们的内容或状态可以被改变。
+其他对象，例如数值类型、元组和字符串，是<strong>不可变的</strong>，
+也就是说它们在被创建之后就无法被改变。</p>
+
+<p>列表最常用的两种变更操作是元素赋值和 <code>append</code> 方法。</p>
+
+<pre><code>&gt;&gt;&gt; s = [1, 3, 4]
+&gt;&gt;&gt; t = s  # 同一个列表的第二个名称
+&gt;&gt;&gt; t[0] = 2  # 将列表的第一个元素改为 2，s 和 t 都会受影响
+&gt;&gt;&gt; s
+[2, 3, 4]
+&gt;&gt;&gt; s.append(5)  # 在列表末尾添加 5，s 和 t 都会受影响
+&gt;&gt;&gt; t
+[2, 3, 4, 5]</code></pre>
+
+<p>还有许多其他的列表变更方法：</p>
+
+<ul>
+  <li><code>append(elem)</code>：
+  将 <code>elem</code> 添加到列表末尾。返回 <code>None</code>。</li>
+  <li><code>extend(s)</code>：
+  将可迭代对象 <code>s</code> 中的所有元素添加到列表末尾。返回 <code>None</code>。</li>
+  <li><code>insert(i, elem)</code>：
+  在索引 <code>i</code> 处插入 <code>elem</code>。如果 <code>i</code> 大于或等于列表的长度，
+  则 <code>elem</code> 会被插入到末尾。这不会替换任何已有元素，只是添加新的元素 <code>elem</code>。返回 <code>None</code>。</li>
+  <li><code>remove(elem)</code>：
+  移除列表中第一个出现的 <code>elem</code>。返回 <code>None</code>。
+  如果 <code>elem</code> 不在列表中则报错。</li>
+  <li><code>pop(i)</code>：
+  移除并返回索引 <code>i</code> 处的元素。</li>
+  <li><code>pop()</code>：
+  移除并返回最后一个元素。</li>
+</ul>
+
+<p>字典也有元素赋值（经常使用）和 <code>pop</code>（很少使用）。</p>
+
+<pre><code>&gt;&gt;&gt; d = {2: 3, 4: 16}
+&gt;&gt;&gt; d[2] = 4
+&gt;&gt;&gt; d[3] = 9
+&gt;&gt;&gt; d
+{2: 4, 4: 16, 3: 9}
+&gt;&gt;&gt; d.pop(4)
+16
+&gt;&gt;&gt; d
+{2: 4, 3: 9}</code></pre>
+
+</div>
+
+
+        <button id='toggle-3' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        迭代器<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-3">
+
+
+<h2 id="iterators" class="no-toc">迭代器</h2>
+
+
+<p><strong>可迭代对象</strong>是指任何可以被逐个遍历、一次经过一个元素的对象。我们使用过的一种遍历可迭代对象的语句是 <code>for</code> 语句：</p>
+
+<pre><code>for elem in iterable:
+    # do something</code></pre>
+
+<p>一般来说，<strong>可迭代对象</strong>是一个对象，对其调用内置函数 <code>iter</code> 会返回一个<em>迭代器</em>。<strong>迭代器</strong>是一个对象，对其调用内置函数 <code>next</code> 会返回下一个值。</p>
+
+<p>例如，列表就是一个可迭代的值。</p>
+
+<pre><code>&gt;&gt;&gt; s = [1, 2, 3, 4]
+&gt;&gt;&gt; next(s)       # s 是可迭代的，但不是迭代器
+TypeError: &#x27;list&#x27; object is not an iterator
+&gt;&gt;&gt; t = iter(s)   # 创建一个迭代器
+&gt;&gt;&gt; t
+&lt;list_iterator object ...&gt;
+&gt;&gt;&gt; next(t)       # 在迭代器上调用 next
+1
+&gt;&gt;&gt; next(t)       # 在同一个迭代器上调用 next
+2
+&gt;&gt;&gt; next(iter(t)) # 在迭代器上调用 iter 会返回它自身
+3
+&gt;&gt;&gt; t2 = iter(s)
+&gt;&gt;&gt; next(t2)      # 第二个迭代器从 s 的开头开始
+1
+&gt;&gt;&gt; next(t)       # 第一个迭代器不受第二个迭代器的影响
+4
+&gt;&gt;&gt; next(t)       # 没有剩余元素了！
+StopIteration
+&gt;&gt;&gt; s             # 原始的可迭代对象不受影响
+[1, 2, 3, 4]</code></pre>
+
+<p>你也可以在 <code>for</code> 语句中使用迭代器，因为所有迭代器都是可迭代的。但请注意，由于迭代器会保留自己的状态，它们只能用来遍历一个可迭代对象一次：</p>
+
+<pre><code>&gt;&gt;&gt; t = iter([4, 3, 2, 1])
+&gt;&gt;&gt; for e in t:
+...     print(e)
+4
+3
+2
+1
+&gt;&gt;&gt; for e in t:
+...     print(e)</code></pre>
+
+<p>有些内置函数会返回迭代器。这些内置的 Python 序列操作被称为惰性计算。</p>
+
+<pre><code>&gt;&gt;&gt; m = map(lambda x: x * x, [3, 4, 5])
+&gt;&gt;&gt; next(m)
+9
+&gt;&gt;&gt; next(m)
+16
+&gt;&gt;&gt; f = filter(lambda x: x &gt; 3, [3, 4, 5])
+&gt;&gt;&gt; next(f)
+4
+&gt;&gt;&gt; next(f)
+5
+&gt;&gt;&gt; z = zip([30, 40, 50], [3, 4, 5])
+&gt;&gt;&gt; next(z)
+(30, 3)
+&gt;&gt;&gt; next(z)
+(40, 4)</code></pre>
+
+</div>
+
+
+        <button id='toggle-4' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        生成器<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-4">
+
+
+<h2 id="generators" class="no-toc">生成器</h2>
+
+
+<p>我们可以通过编写<em>生成器函数</em>来创建自定义的迭代器，生成器函数会返回一种特殊类型的迭代器，称为<strong>生成器</strong>。生成器函数的函数体中使用 <code>yield</code> 语句，而不是 <code>return</code> 语句。调用生成器函数会返回一个生成器对象，并且<em>不会</em>执行函数体。</p>
+
+<p>例如，我们来看下面这个生成器函数：</p>
+
+<pre><code>def countdown(n):
+    print(&quot;Beginning countdown!&quot;)
+    while n &gt;= 0:
+        yield n
+        n &#x2d;= 1
+    print(&quot;Blastoff!&quot;)</code></pre>
+
+<p>调用 <code>countdown(k)</code> 会返回一个从 <code>k</code> 倒数到 0 的生成器对象。由于生成器是迭代器，我们可以对其结果对象调用 <code>iter</code>，这只返回同一个对象。注意，此时函数体并没有执行：没有任何内容被打印，也没有任何数字被输出。</p>
+
+<pre><code>&gt;&gt;&gt; c = countdown(5)
+&gt;&gt;&gt; c
+&lt;generator object countdown ...&gt;
+&gt;&gt;&gt; c is iter(c)
+True</code></pre>
+
+<p>那么倒计数是如何进行的呢？同样，由于生成器是迭代器，我们调用 <code>next</code> 来获取下一个元素！第一次调用 <code>next</code> 时，执行从函数体的第一行开始，一直持续到遇到 <code>yield</code> 语句。此时会返回 <code>yield</code> 语句中表达式的计算结果。下面的交互会话接在上一个会话之后。</p>
+
+<pre><code>&gt;&gt;&gt; next(c)
+Beginning countdown!
+5</code></pre>
+
+<p>与我们在本课程中见过的一般函数不同，生成器函数可以记住自己的状态。在之后任何连续调用 <code>next</code> 时，执行会从上次执行过的 <code>yield</code> 语句之后的那一行继续。与第一次调用 <code>next</code> 一样，执行会一直持续到下一个 <code>yield</code> 语句。注意，正因如此，<code>Beginning countdown!</code> 不会被再次打印。</p>
+
+<pre><code>&gt;&gt;&gt; next(c)
+4
+&gt;&gt;&gt; next(c)
+3</code></pre>
+
+<p>接下来的 3 次 <code>next</code> 调用会依次产生递减的整数，直到 0。在下一次调用时，会抛出 <code>StopIteration</code> 错误，因为没有更多的值可以产生了（即函数体在到达 <code>yield</code> 语句之前就已经执行到了末尾）。</p>
+
+<pre><code>&gt;&gt;&gt; next(c)
+2
+&gt;&gt;&gt; next(c)
+1
+&gt;&gt;&gt; next(c)
+0
+&gt;&gt;&gt; next(c)
+Blastoff!
+StopIteration</code></pre>
+
+<p>对 <code>countdown</code> 的分别调用会创建各自拥有独立状态的生成器对象。通常，生成器不应重新开始。如果你想重置序列，可以再次调用生成器函数来创建另一个生成器对象。</p>
+
+<pre><code>&gt;&gt;&gt; c1, c2 = countdown(5), countdown(5)
+&gt;&gt;&gt; c1 is c2
+False
+&gt;&gt;&gt; next(c1)
+5
+&gt;&gt;&gt; next(c2)
+5</code></pre>
+
+<p>以下是对上述内容的总结：</p>
+
+<ul>
+  <li><em>生成器函数</em>含有 <code>yield</code> 语句，并返回<em>生成器对象</em>。</li>
+  <li>在生成器对象上调用 <code>iter</code> 函数会返回同一个对象，且不改变其当前状态。</li>
+  <li>生成器函数的函数体在对其结果生成器对象调用 <code>next</code> 之前不会被求值。对生成器对象调用 <code>next</code> 函数会计算并返回其序列中的下一个对象。如果序列已耗尽，则抛出 <code>StopIteration</code>。</li>
+  <li><p>生成器会为下一次 <code>next</code> 调用"记住"自己的状态。因此，</p>
+
+  <ul>
+    <li><p>第一次 <code>next</code> 调用的工作方式如下：</p>
+
+    <ol>
+      <li>进入函数并执行，直到出现带有 <code>yield</code> 的那一行。</li>
+      <li>返回 <code>yield</code> 语句中的值，但为后续的 <code>next</code> 调用记住函数的状态。</li>
+    </ol></li>
+    <li><p>后续的 <code>next</code> 调用的工作方式如下：</p>
+
+    <ol>
+      <li>重新进入函数，从<strong>上次执行过的 <code>yield</code> 语句之后的那一行</strong>开始，一直执行到下一个 <code>yield</code> 语句。</li>
+      <li>返回 <code>yield</code> 语句中的值，但为后续的 <code>next</code> 调用记住函数的状态。</li>
+    </ol></li>
+  </ul></li>
+  <li>调用生成器函数会返回一个全新的生成器对象（就像在可迭代对象上调用 <code>iter</code> 一样）。</li>
+  <li>除非是那样定义的，生成器不应重新开始。要想从生成器中的第一个元素重新开始，只需再次调用生成器函数来创建一个新的生成器即可。</li>
+</ul>
+
+<p>生成器的另一个实用工具是 <code>yield from</code> 语句。<code>yield from</code> 会产生一个迭代器或可迭代对象中的所有值。</p>
+
+<pre><code>&gt;&gt;&gt; def gen_list(lst):
+...     yield from lst
+...
+&gt;&gt;&gt; g = gen_list([1, 2, 3, 4])
+&gt;&gt;&gt; next(g)
+1
+&gt;&gt;&gt; next(g)
+2
+&gt;&gt;&gt; next(g)
+3
+&gt;&gt;&gt; next(g)
+4
+&gt;&gt;&gt; next(g)
+StopIteration</code></pre>
+
+</div>
+
+
+<h2 id="mutability">可变性</h2>
+
+
+
+<h3 id="q1-wwpd-list-mutation">Q1：WWPD：列表变更</h3>
+
+
+<blockquote><p><strong>重要：</strong>
+对于所有 WWPD 题目，如果你认为答案是
+<code>&lt;function...&gt;</code>，请输入 <code>Function</code>；如果报错，请输入 <code>Error</code>；如果什么都不显示，请输入 <code>Nothing</code>。</p></blockquote>
+
+<!-- separate block quotes -->
+
+<blockquote><p>使用 Ok 通过以下"Python 会显示什么？"题目来检验你的知识：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q list-mutation -u<button id="copy-code-python3ok-qlist-mutation-u" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qlist-mutation-u").onclick = () => copyCode('python3 ok -q list-mutation -u', "copy-code-python3ok-qlist-mutation-u");
+        </script>
+        <br/></blockquote>
+
+<pre><code>&gt;&gt;&gt; s = [6, 7, 8]
+&gt;&gt;&gt; print(s.append(6))
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x4e;&#x6f;&#x6e;&#x65;</div>
+&gt;&gt;&gt; s
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x5b;&#x36;&#x2c;&#x20;&#x37;&#x2c;&#x20;&#x38;&#x2c;&#x20;&#x36;&#x5d;</div>
+&gt;&gt;&gt; s.insert(0, 9)
+&gt;&gt;&gt; s
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x5b;&#x39;&#x2c;&#x20;&#x36;&#x2c;&#x20;&#x37;&#x2c;&#x20;&#x38;&#x2c;&#x20;&#x36;&#x5d;</div>
+&gt;&gt;&gt; x = s.pop(1)
+&gt;&gt;&gt; s
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x5b;&#x39;&#x2c;&#x20;&#x37;&#x2c;&#x20;&#x38;&#x2c;&#x20;&#x36;&#x5d;</div>
+&gt;&gt;&gt; s.remove(x)
+&gt;&gt;&gt; s
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x5b;&#x39;&#x2c;&#x20;&#x37;&#x2c;&#x20;&#x38;&#x5d;</div>
+&gt;&gt;&gt; a, b = s, s[:]
+&gt;&gt;&gt; a is s
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x54;&#x72;&#x75;&#x65;</div>
+&gt;&gt;&gt; b == s
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x54;&#x72;&#x75;&#x65;</div>
+&gt;&gt;&gt; b is s
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x46;&#x61;&#x6c;&#x73;&#x65;</div>
+&gt;&gt;&gt; a.pop()
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x38;</div>
+&gt;&gt;&gt; a + b
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x5b;&#x39;&#x2c;&#x20;&#x37;&#x2c;&#x20;&#x39;&#x2c;&#x20;&#x37;&#x2c;&#x20;&#x38;&#x5d;</div>
+&gt;&gt;&gt; s = [3]
+&gt;&gt;&gt; s.extend([4, 5])
+&gt;&gt;&gt; s
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x5b;&#x33;&#x2c;&#x20;&#x34;&#x2c;&#x20;&#x35;&#x5d;</div>
+&gt;&gt;&gt; a
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x5b;&#x39;&#x2c;&#x20;&#x37;&#x5d;</div>
+&gt;&gt;&gt; s.extend([s.append(9), s.append(10)])
+&gt;&gt;&gt; s
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x5b;&#x33;&#x2c;&#x20;&#x34;&#x2c;&#x20;&#x35;&#x2c;&#x20;&#x39;&#x2c;&#x20;&#x31;&#x30;&#x2c;&#x20;&#x4e;&#x6f;&#x6e;&#x65;&#x2c;&#x20;&#x4e;&#x6f;&#x6e;&#x65;&#x5d;</div></code></pre>
+        <button id='prompt-1' class='btn btn-outline btn-lg solutiontoggle prompt'>
+        显示答案<noscript> (enable JavaScript)</noscript>
+        </button>
+        
+
+
+<h3 id="q2-insert-items">Q2：插入元素</h3>
+
+
+<p>编写一个函数，接受一个列表 <code>s</code>、一个值 <code>before</code> 和一个值
+<code>after</code>。它在 <code>s</code> 中原地修改，在 <code>s</code> 中每个等于 <code>before</code> 的值之后紧跟着插入 <code>after</code>。返回 <code>s</code>。</p>
+
+<blockquote><p><strong>重要：</strong>不应创建任何新列表。</p></blockquote>
+
+<!-- separate block quotes -->
+
+<blockquote><p><strong>注意：</strong>
+如果传入的 <code>before</code> 和 <code>after</code> 的值相等，请确保在遍历列表时不会创建一个无限长的列表。
+如果你的代码运行需要好几秒，说明函数可能陷入了不断插入新值的无限循环。</p></blockquote>
+
+<solution>
+
+<pre><code>def insert_items(s: list[int], before: int, after: int) &#x2d;&gt; list[int]:
+    &quot;&quot;&quot;Insert after into s following each occurrence of before and then return s.
+
+    &gt;&gt;&gt; test_s = [1, 5, 8, 5, 2, 3]
+    &gt;&gt;&gt; new_s = insert_items(test_s, 5, 7)
+    &gt;&gt;&gt; new_s
+    [1, 5, 7, 8, 5, 7, 2, 3]
+    &gt;&gt;&gt; test_s
+    [1, 5, 7, 8, 5, 7, 2, 3]
+    &gt;&gt;&gt; new_s is test_s
+    True
+    &gt;&gt;&gt; double_s = [1, 2, 1, 2, 3, 3]
+    &gt;&gt;&gt; double_s = insert_items(double_s, 3, 4)
+    &gt;&gt;&gt; double_s
+    [1, 2, 1, 2, 3, 4, 3, 4]
+    &gt;&gt;&gt; large_s = [1, 4, 8]
+    &gt;&gt;&gt; large_s2 = insert_items(large_s, 4, 4)
+    &gt;&gt;&gt; large_s2
+    [1, 4, 4, 8]
+    &gt;&gt;&gt; large_s3 = insert_items(large_s2, 4, 6)
+    &gt;&gt;&gt; large_s3
+    [1, 4, 6, 4, 6, 8]
+    &gt;&gt;&gt; large_s3 is large_s
+    True
+    &quot;&quot;&quot;
+    "*** YOUR CODE HERE ***"
+
+
+
+
+</code></pre>
+
+</solution>
+
+<p>使用 Ok 来测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q insert_items<button id="copy-code-python3ok-qinsert_items" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qinsert_items").onclick = () => copyCode('python3 ok -q insert_items', "copy-code-python3ok-qinsert_items");
+        </script>
+        <br/>
+
+<!--  -->
+
+
+<h3 id="q3-group-by">Q3：分组</h3>
+
+<p>编写一个函数，接受一个列表 <code>s</code> 和一个函数 <code>fn</code>，返回一个字典，根据将 <code>fn</code> 应用到元素上得到的结果对 <code>s</code> 中的元素进行分组。</p>
+
+<ul>
+  <li>字典应为 <code>fn</code> 在 <code>s</code> 上每个不同的结果各设一个键。</li>
+  <li>每个键对应的值应是一个列表，包含 <code>s</code> 中所有在传入 <code>fn</code> 后产生该键（即该结果）的元素。</li>
+</ul>
+
+<p>换句话说，对于 <code>s</code> 中的每个元素 <code>e</code>，确定 <code>fn(e)</code>，并将 <code>e</code> 加入字典中对应 <code>fn(e)</code> 的那个列表里。</p>
+
+<solution>
+
+<pre><code>def group_by(s: list[int], fn) &#x2d;&gt; dict[int, list[int]]:
+    &quot;&quot;&quot;Return a dictionary of lists that together contain the elements of s.
+    The key for each list is the value that fn returns when called on any of the
+    values of that list.
+
+    &gt;&gt;&gt; group_by([12, 23, 14, 45], lambda p: p // 10)
+    {1: [12, 14], 2: [23], 4: [45]}
+    &gt;&gt;&gt; group_by(range(&#x2d;3, 4), lambda x: x * x)
+    {9: [&#x2d;3, 3], 4: [&#x2d;2, 2], 1: [&#x2d;1, 1], 0: [0]}
+    &quot;&quot;&quot;
+    grouped = {}
+    for ____ in ____:
+        key = ____
+        if key in grouped:
+            ____
+        else:
+            grouped[key] = ____
+    return grouped</code></pre>
+
+</solution>
+
+<p>使用 Ok 来测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q group_by<button id="copy-code-python3ok-qgroup_by" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qgroup_by").onclick = () => copyCode('python3 ok -q group_by', "copy-code-python3ok-qgroup_by");
+        </script>
+        <br/>
+
+<!-- <code-input group_by lang:python>
+
+<pre><code>def group_by(s: list[int], fn) &#x2d;&gt; dict[int, list[int]]:
+    &quot;&quot;&quot;Return a dictionary of lists that together contain the elements of s.
+    The key for each list is the value that fn returns when called on any of the
+    values of that list.
+
+    &gt;&gt;&gt; group_by([12, 23, 14, 45], lambda p: p // 10)
+    {1: [12, 14], 2: [23], 4: [45]}
+    &gt;&gt;&gt; group_by(range(&#x2d;3, 4), lambda x: x * x)
+    {9: [&#x2d;3, 3], 4: [&#x2d;2, 2], 1: [&#x2d;1, 1], 0: [0]}
+    &quot;&quot;&quot;
+    grouped = {}
+    for ____ in ____:
+        key = ____
+        if key in grouped:
+            ____
+        else:
+            grouped[key] = ____
+    return grouped</code></pre>
+
+</code-input> -->
+
+
+<h2 id="iterators">迭代器</h2>
+
+
+
+<h3 id="q4-wwpd-iterators">Q4：WWPD：迭代器</h3>
+
+
+<blockquote><p><strong>重要：</strong>
+如果发生 <code>StopIteration</code> 异常，请输入 <code>StopIteration</code>；
+如果你认为是发生了其他错误，请输入 <code>Error</code>；
+如果输出是一个迭代器对象，请输入 <code>Iterator</code>。</p></blockquote>
+
+<!-- separate block quotes -->
+
+<blockquote><p><strong>重要：</strong> Python 的内置函数 <code>map</code>、<code>filter</code> 和 <code>zip</code> 返回的是<em>迭代器</em>，而不是列表。</p></blockquote>
+
+<!-- separate block quotes -->
+
+<blockquote><p>使用 Ok 通过以下"Python 会显示什么？"题目来检验你的知识：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q iterators-wwpd -u<button id="copy-code-python3ok-qiterators-wwpd-u" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qiterators-wwpd-u").onclick = () => copyCode('python3 ok -q iterators-wwpd -u', "copy-code-python3ok-qiterators-wwpd-u");
+        </script>
+        <br/></blockquote>
+
+<pre><code>&gt;&gt;&gt; s = [1, 2, 3, 4]
+&gt;&gt;&gt; t = iter(s)
+&gt;&gt;&gt; next(s)
+<div class="alt prompt-2">______</div><div class="solution prompt-2">&#x45;&#x72;&#x72;&#x6f;&#x72;</div>
+&gt;&gt;&gt; next(t)
+<div class="alt prompt-2">______</div><div class="solution prompt-2">&#x31;</div>
+&gt;&gt;&gt; next(t)
+<div class="alt prompt-2">______</div><div class="solution prompt-2">&#x32;</div>
+&gt;&gt;&gt; next(iter(s))
+<div class="alt prompt-2">______</div><div class="solution prompt-2">&#x31;</div>
+&gt;&gt;&gt; next(iter(s))
+<div class="alt prompt-2">______</div><div class="solution prompt-2">&#x31;</div>
+&gt;&gt;&gt; u = t
+&gt;&gt;&gt; next(u)
+<div class="alt prompt-2">______</div><div class="solution prompt-2">&#x33;</div>
+&gt;&gt;&gt; next(t)
+<div class="alt prompt-2">______</div><div class="solution prompt-2">&#x34;</div></code></pre>
+        <button id='prompt-2' class='btn btn-outline btn-lg solutiontoggle prompt'>
+        显示答案<noscript> (enable JavaScript)</noscript>
+        </button>
+        
+
+<pre><code>&gt;&gt;&gt; r = range(6)
+&gt;&gt;&gt; r_iter = iter(r)
+&gt;&gt;&gt; next(r_iter)
+<div class="alt prompt-3">______</div><div class="solution prompt-3">&#x30;</div>
+&gt;&gt;&gt; [x + 1 for x in r]
+<div class="alt prompt-3">______</div><div class="solution prompt-3">&#x5b;&#x31;&#x2c;&#x20;&#x32;&#x2c;&#x20;&#x33;&#x2c;&#x20;&#x34;&#x2c;&#x20;&#x35;&#x2c;&#x20;&#x36;&#x5d;</div>
+&gt;&gt;&gt; [x + 1 for x in r_iter]
+<div class="alt prompt-3">______</div><div class="solution prompt-3">&#x5b;&#x32;&#x2c;&#x20;&#x33;&#x2c;&#x20;&#x34;&#x2c;&#x20;&#x35;&#x2c;&#x20;&#x36;&#x5d;</div>
+&gt;&gt;&gt; next(r_iter)
+<div class="alt prompt-3">______</div><div class="solution prompt-3">&#x53;&#x74;&#x6f;&#x70;&#x49;&#x74;&#x65;&#x72;&#x61;&#x74;&#x69;&#x6f;&#x6e;</div></code></pre>
+        <button id='prompt-3' class='btn btn-outline btn-lg solutiontoggle prompt'>
+        显示答案<noscript> (enable JavaScript)</noscript>
+        </button>
+        
+
+<pre><code>&gt;&gt;&gt; map_iter = map(lambda x : x + 10, range(5))
+&gt;&gt;&gt; next(map_iter)
+<div class="alt prompt-4">______</div><div class="solution prompt-4">&#x31;&#x30;</div>
+&gt;&gt;&gt; next(map_iter)
+<div class="alt prompt-4">______</div><div class="solution prompt-4">&#x31;&#x31;</div>
+&gt;&gt;&gt; list(map_iter)
+<div class="alt prompt-4">______</div><div class="solution prompt-4">&#x5b;&#x31;&#x32;&#x2c;&#x20;&#x31;&#x33;&#x2c;&#x20;&#x31;&#x34;&#x5d;</div>
+&gt;&gt;&gt; for e in filter(lambda x : x % 4 == 0, range(1000, 1008)):
+...     print(e)
+<div class="alt prompt-4">______</div><div class="solution prompt-4">&#x31;&#x30;&#x30;&#x30;&#xa;&#x31;&#x30;&#x30;&#x34;</div>
+&gt;&gt;&gt; [x + y for x, y in zip([1, 2, 3], [4, 5, 6])]
+<div class="alt prompt-4">______</div><div class="solution prompt-4">&#x5b;&#x35;&#x2c;&#x20;&#x37;&#x2c;&#x20;&#x39;&#x5d;</div></code></pre>
+        <button id='prompt-4' class='btn btn-outline btn-lg solutiontoggle prompt'>
+        显示答案<noscript> (enable JavaScript)</noscript>
+        </button>
+        
+
+
+<h3 id="q5-count-occurrences">Q5：计数出现次数</h3>
+
+
+<p>实现 <code>count_occurrences</code>，它接受一个迭代器 <code>t</code>、一个整数 <code>n</code> 和一个值 <code>x</code>。它返回 <code>t</code> 的前 <code>n</code> 个元素中等于 <code>x</code> 的元素个数。</p>
+
+<p>你可以假设 <code>t</code> 至少有 <code>n</code> 个元素。</p>
+
+<blockquote><p><strong>重要</strong>：你应该恰好对 <code>t</code> 调用 <code>next</code> <code>n</code> 次。如果你需要遍历超过 <code>n</code> 个元素，想一想如何优化你的解法。</p></blockquote>
+
+<solution>
+
+<pre><code>
+def count_occurrences(t: Iterator[int], n: int, x: int) &#x2d;&gt; int:
+    &quot;&quot;&quot;Return the number of times that x is equal to one of the
+    first n elements of iterator t.
+
+    &gt;&gt;&gt; s = iter([10, 9, 10, 9, 9, 10, 8, 8, 8, 7])
+    &gt;&gt;&gt; count_occurrences(s, 10, 9)
+    3
+    &gt;&gt;&gt; t = iter([10, 9, 10, 9, 9, 10, 8, 8, 8, 7])
+    &gt;&gt;&gt; count_occurrences(t, 3, 10)
+    2
+    &gt;&gt;&gt; u = iter([3, 2, 2, 2, 1, 2, 1, 4, 4, 5, 5, 5])
+    &gt;&gt;&gt; count_occurrences(u, 1, 3)  # Only iterate over 3
+    1
+    &gt;&gt;&gt; count_occurrences(u, 3, 2)  # Only iterate over 2, 2, 2
+    3
+    &gt;&gt;&gt; list(u)                     # Ensure that the iterator has advanced the right amount
+    [1, 2, 1, 4, 4, 5, 5, 5]
+    &gt;&gt;&gt; v = iter([4, 1, 6, 6, 7, 7, 6, 6, 2, 2, 2, 5])
+    &gt;&gt;&gt; count_occurrences(v, 6, 6)
+    2
+    &quot;&quot;&quot;
+    "*** YOUR CODE HERE ***"
+</code></pre>
+
+</solution>
+
+<p>使用 Ok 来测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q count_occurrences<button id="copy-code-python3ok-qcount_occurrences" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qcount_occurrences").onclick = () => copyCode('python3 ok -q count_occurrences', "copy-code-python3ok-qcount_occurrences");
+        </script>
+        <br/>
+
+
+<h2 id="generators">生成器</h2>
+
+
+
+<h3 id="q6-generate-permutations">Q6：生成排列</h3>
+
+
+<p>给定一个由互不相同元素组成的序列，该序列的一个<em>排列</em>是一个包含该序列元素的列表，元素的顺序任意。例如，
+<code>[1, 2, 3]</code>、<code>[2, 1, 3]</code>、<code>[1, 3, 2]</code> 和 <code>[3, 2, 1]</code> 都是序列 <code>[1, 2, 3]</code> 的部分排列。</p>
+
+<p>实现 <code>perms</code>，一个生成器函数，它接受一个序列 <code>seq</code> 并返回一个生成器，产生 <code>seq</code> 的所有排列。对于本题，假设 <code>seq</code> 不为空。</p>
+
+<p>排列可以任意顺序产生。
+<br/>
+<!-- Note that the doctests test whether
+you are yielding all possible permutations, but not in any particular order.
+The built-in <code>sorted</code> function takes in an iterable object and returns a list
+containing the elements of the iterable in non-decreasing order. --></p>
+
+<!-- > <em>Hint:</em> If you had the permutations of all but one of the elements in <code>seq</code>,
+
+<blockquote><p>how could you use that to generate the permutations
+of the full <code>seq</code>? For example, you can use <code>perms([1,2])</code>
+to generate permutations for <code>perms([1,2,3])</code>:</p>
+
+<p><img class="img-responsive center-block" src="assets/list-permutations.png" alt="Permutation example" width="" height=""></p>
+
+<p>Try drawing a similar diagram for <code>perms([1,2,3,4])</code>. --></p></blockquote>
+
+<!-- hack for blockquotes -->
+
+<blockquote><p><em>Hint:</em>
+记住，因为生成器就是迭代器，可以对其进行遍历！</p></blockquote>
+
+<!--
+
+<blockquote><p><em>Hint:</em> If you're having trouble getting started, see the hints video
+for this question for tips on how to approach this question.
+--></p></blockquote>
+
+<solution>
+
+<pre><code>def perms(seq):
+    &quot;&quot;&quot;Generates all permutations of the given sequence. Each permutation is a
+    list of the elements in SEQ in a different order. The permutations may be
+    yielded in any order.
+
+    &gt;&gt;&gt; p = perms([100])
+    &gt;&gt;&gt; type(p)
+    &lt;class &#x27;generator&#x27;&gt;
+    &gt;&gt;&gt; next(p)
+    [100]
+    &gt;&gt;&gt; try: # Prints &quot;No more permutations!&quot; if calling next would cause an error
+    ...     next(p)
+    ... except StopIteration:
+    ...     print(&#x27;No more permutations!&#x27;)
+    No more permutations!
+    &gt;&gt;&gt; sorted(perms([1, 2, 3])) # Returns a sorted list containing elements of the generator
+    [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
+    &gt;&gt;&gt; sorted(perms((10, 20, 30)))
+    [[10, 20, 30], [10, 30, 20], [20, 10, 30], [20, 30, 10], [30, 10, 20], [30, 20, 10]]
+    &gt;&gt;&gt; sorted(perms(&quot;ab&quot;))
+    [[&#x27;a&#x27;, &#x27;b&#x27;], [&#x27;b&#x27;, &#x27;a&#x27;]]
+    &quot;&quot;&quot;
+    "*** YOUR CODE HERE ***"
+</code></pre>
+
+</solution>
+
+<p>使用 Ok 来测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q perms<button id="copy-code-python3ok-qperms" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qperms").onclick = () => copyCode('python3 ok -q perms', "copy-code-python3ok-qperms");
+        </script>
+        <br/>
+
+
+<h2 id="check-your-score-locally">在本地检查你的得分</h2>
+
+<p>你可以运行以下命令，在本地检查本次作业中每道题的得分：</p>
+
+<pre><code>python3 ok &#x2d;&#x2d;score</code></pre>
+
+<p><strong>这不会提交作业！</strong>当你对得分满意后，请将作业提交到 Gradescope 以获取学分。</p>
+
+
+<h1 id="submit-assignment">提交作业</h1>
+
+
+<p>将你修改过的所有文件上传<strong>到对应的 Gradescope 作业</strong>来提交本次作业。<a href="../lab00/#submitting-the-assignment">实验 00</a> 中有详细说明。</p>
+
+<p>正确完成所有题目计一分。
+<!-- If you are in the regular lab, you will need your attendance from your TA to receive that one point. -->
+请确保在离开前你的助教已经记录了你的出勤。</p>
+
+
+<h1 id="optional-questions">选做题目</h1>
+
+
+<blockquote><p>这些题目是可选的。即使你未完成它们，仍可获得本次作业的学分。它们是很好的练习，所以还是建议你完成！</p></blockquote>
+
+
+<h3 id="q7-repeated">Q7：重复</h3>
+
+
+<p>实现 <code>repeated</code>，它接受一个迭代器 <code>t</code> 和一个大于 1 的整数 <code>k</code>。它返回 <code>t</code> 中第一个连续出现 <code>k</code> 次的值。
+你可以假设 <code>t</code> 中至少有一个元素连续出现了至少 <code>k</code> 次。</p>
+
+<blockquote><p><strong>重要：</strong> 只对 <code>t</code> 调用<code>必要的最少次数</code>的 <code>next</code>。
+如果你收到了 <code>StopIteration</code> 异常，说明你的 <code>repeated</code> 函数调用 <code>next</code> 的次数太多了。</p></blockquote>
+
+<solution>
+
+<pre><code>
+def repeated(t: Iterator[int], k: int) &#x2d;&gt; int:
+    &quot;&quot;&quot;Return the first value in iterator t that appears k times in a row,
+    calling next on t as few times as possible.
+
+    &gt;&gt;&gt; s = iter([10, 9, 10, 9, 9, 10, 8, 8, 8, 7])
+    &gt;&gt;&gt; repeated(s, 2)
+    9
+    &gt;&gt;&gt; t = iter([10, 9, 10, 9, 9, 10, 8, 8, 8, 7])
+    &gt;&gt;&gt; repeated(t, 3)
+    8
+    &gt;&gt;&gt; u = iter([3, 2, 2, 2, 1, 2, 1, 4, 4, 5, 5, 5])
+    &gt;&gt;&gt; repeated(u, 3)
+    2
+    &gt;&gt;&gt; repeated(u, 3)
+    5
+    &gt;&gt;&gt; v = iter([4, 1, 6, 6, 7, 7, 8, 8, 2, 2, 2, 5])
+    &gt;&gt;&gt; repeated(v, 3)
+    2
+    &quot;&quot;&quot;
+    assert k &gt; 1
+    "*** YOUR CODE HERE ***"
+</code></pre>
+
+</solution>
+
+<p>使用 Ok 来测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q repeated<button id="copy-code-python3ok-qrepeated" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qrepeated").onclick = () => copyCode('python3 ok -q repeated', "copy-code-python3ok-qrepeated");
+        </script>
+        <br/>
+
+<!-- <include topics/generators/medium/sequence-gen.md> -->
+<script>
+    $('.alwaystoggle').css('display', 'inline-block');
+    $('.alwaystoggle').click(function() {
+      var solution_id = $(this).attr('id');
+      $('div.' + solution_id).slideToggle(600);
+    });
+</script>
+
+  </div>
+
+  <div class='col-md-3 sticky'>
+    <nav class='hidden-print hidden-sm hidden-xs sidebar'>
+      <ul>
+  <li><a href="#lab-checkoff-questions">实验签到问题</a></li>
+  <li><a href="#attendance">出勤</a></li>
+  <li><a href="#required-questions">必做题目</a></li>
+  <ul>
+    <li><a href="#mutability">可变性</a></li>
+    <ul>
+      <li><a href="#q1-wwpd-list-mutation">Q1：WWPD：列表变更</a></li>
+      <li><a href="#q2-insert-items">Q2：插入元素</a></li>
+      <li><a href="#q3-group-by">Q3：分组</a></li>
+    </ul>
+    <li><a href="#iterators">迭代器</a></li>
+    <ul>
+      <li><a href="#q4-wwpd-iterators">Q4：WWPD：迭代器</a></li>
+      <li><a href="#q5-count-occurrences">Q5：计数出现次数</a></li>
+    </ul>
+    <li><a href="#generators">生成器</a></li>
+    <ul>
+      <li><a href="#q6-generate-permutations">Q6：生成排列</a></li>
+    </ul>
+    <li><a href="#check-your-score-locally">在本地检查你的得分</a></li>
+  </ul>
+  <li><a href="#submit-assignment">提交作业</a></li>
+  <li><a href="#optional-questions">选做题目</a></li>
+  <ul>
+    <li><a href="#q7-repeated">Q7：重复</a></li>
+  </ul>
+</ul>
+    </nav>
+  </div>
+</div>
+
+    </main>
+
+    <!-- <footer class="container">
+      <div class="row text-center">
+        <div class="col col-sm-4">
+          <h3><a href="/">CS 61A</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/weekly">Weekly Schedule</a></li>
+            <li><a href="/office-hours">Office Hours</a></li>
+            <li><a href="/staff">Staff</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/resources">Resources</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/studying">Studying Guide</a></li>
+            <li><a href="/articles/debugging">Debugging Guide</a></li>
+            <li><a href="/articles/composition">Composition Guide</a></li>
+            <li><a href="/articles/pair-programming">Pair Programming</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/articles/about">Policies</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/about#assignments">Assignments</a></li>
+            <li><a href="/articles/about#exams">Exams</a></li>
+            <li><a href="/articles/about#grading">Grading</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer> -->
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+  <script>
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+      window.MonacoEnvironment = { getWorkerUrl: () => URL.createObjectURL(new Blob([`
+      self.MonacoEnvironment = {
+          baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min'
+      };
+      importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/base/worker/workerMain.min.js');
+  `], { type: 'text/javascript' }))
+  };
+  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.5/js/jsplumb.min.js"></script>
+    <script src="/assets/js/network_storage.js"></script>
+    <script src="/assets/js/code_tabindex.js"></script>
+    <script src="/assets/js/storable.js"></script>
+    <script src="/assets/js/editor.js"></script>
+    <script src="/assets/js/copy-button.js"></script>
+    <script src="/assets/js/env-diagram.js"></script>
+    
+<!-- <script src="/assets/js/sketchy.js"></script> -->
+<script>
+  $('.sidebar ul').addClass('nav nav-stacked noselect');
+  $('body').scrollspy({
+    target: '.sidebar',
+    offset: 40
+  });
+
+  function goToId(id) {
+    var target = $(id);
+    target.parent().show();
+    $('html,body').animate({
+      scrollTop: target.offset().top,
+    }, 100);
+    $("body").scrollspy('refresh');
+  }
+
+  if (location.hash) {
+    setTimeout(function() {
+      if (location.hash) {
+        goToId(location.hash);
+      }
+    }, 1);
+  }
+
+  $("a").click(function(event) {
+    var urlBeforeHashRegEx = new RegExp("^"+window.location.href.split("#")[0]);
+    if (/^#/.test(this.hash) && urlBeforeHashRegEx.test(this.href)) {
+      event.preventDefault();
+      goToId(this.hash);
+      document.location.hash = this.hash;
+    }
+  });
+</script>
+
+  </body>
+</html>

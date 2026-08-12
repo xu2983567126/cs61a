@@ -1,0 +1,28 @@
+{
+    "name": "Homework 3",
+    "endpoint": "cal/cs61a/su26/hw03",
+    "src": [
+        "hw03.py"
+    ],
+    "tests": {
+        "hw*.py": "doctest",
+        "tests/*.py": "ok_test"
+    },
+    "default_tests": [
+        "inventory_pickup",
+        "berry_finder",
+        "size_of_tree",
+        "make_path",
+        "merge",
+        "yield_paths",
+        "midsem_survey"
+    ],
+    "protocols": [
+        "restore",
+        "file_contents",
+        "analytics",
+        "help",
+        "unlock",
+        "grading"
+    ]
+}

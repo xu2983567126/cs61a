@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta name="description" content="CS 61A: Structure and Interpretation of Computer Programs"/>
+    <meta name="keywords" content="Computer Science, Programming, Berkeley, EECS"/>
+    <meta name="author" content="Rebecca Dang"/>
+    <!-- CHANGED CAREFUL -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/assets/js/hl.js"></script>
+    <script src="/assets/js/toggledarkmode.js"></script>
+    <script>
+        // we aren't registering builtins since
+        //      (1) they don't render differently in the current CSS from other names
+        //      (2) it's a mess to list all of them. You can extract from the site but that takes effort
+        // if (1) ceases to be true, (2) might be worth the effort. For now, we're leaving as is
+        hljsRegister({
+            'keyword': "define if cond and or let begin lambda mu quote delay cons-stream set! quasiquote unquote unquote-splicing define-macro"
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <script src="/assets/js/dark-mode.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata|Roboto:300,400,500|Work+Sans:400,700">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/mono-blue.css">
+    <link rel="icon" href="/assets/images/favicon.ico">
+
+    
+
+<link rel="stylesheet" type="text/css" href="/assets/css/lab.css">
+
+
+    <title>
+实验 0 解答 | CS 61A 2026 年夏季
+</title>
+  </head>
+
+  <body id="index" class="home">
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container noselect">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-section" aria-label="切换导航栏">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">
+            CS 61A
+            <!-- <img style="max-width:60px; margin-top: -20px;" class="logo" src="/assets/images/logo.png"/> -->
+          </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse-section">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+            <li><a href="/">课程讲义</a></li>
+            
+            <li><a href="/articles/about-61a/">课程大纲</a></li>
+            
+            <li><a href="https://edstem.org/us/courses/99538/discussion">Ed</a></li>
+            
+            <li><a href="/office-hours/">答疑时间</a></li>
+            
+            <li><a href="/articles/contact-61a/">联系方式</a></li>
+            
+
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                链接
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://go.cs61a.org/extensions">申请延期</a></li>
+                
+                <li><a href="https://go.cs61a.org/regrades">申请重新评分</a></li>
+                
+                <li><a href="https://oh.cs61a.org/">答疑排队</a></li>
+                
+                <li><a href="https://www.gradescope.com/courses/1324284">Gradescope</a></li>
+                
+                <li><a href="https://sections.cs61a.org">添加/更改小节</a></li>
+                
+                <li><a href="https://bcourses.berkeley.edu/courses/1555178/pages">课程录像</a></li>
+                
+                <li><a href="https://pythontutor.com/cp/composingprograms.html">Python Tutor</a></li>
+                
+                <li><a href="https://code.cs61a.org/">代码编辑器</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                资源
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/resources/">往年试题与网站</a></li>
+                
+                <li><a href="https://www.composingprograms.com">教材</a></li>
+                
+                <li><a href="/articles/campus-res/">校园资源</a></li>
+                
+                <li><a href="/articles/advice/">学长学姐建议</a></li>
+                
+                <li><a href="/articles/scheme-spec/">Scheme 规范</a></li>
+                
+                <li><a href="/articles/scheme-builtins/">Scheme 内置过程</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                指南
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://drive.google.com/file/d/1O72u0ml65pibcjz-PXKpqeJDKaVqQ3D8/view">调试指南</a></li>
+                
+                <li><a href="/articles/studying/">学习指南</a></li>
+                
+                <li><a href="/articles/type-hints/">类型注解</a></li>
+                
+                <li><a href="/articles/composition/">写作指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt1-study-guide.pdf">期中考试1复习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt2-study-guide.pdf">期中考试2复习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-final-study-guide.pdf">期末复习指南</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                教职工
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/instructor">讲师</a></li>
+                
+                <li><a href="/staff">助教与导师</a></li>
+                
+              </ul>
+            </li>
+            
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main id="content" class="container">
+      
+<div class="row">
+  <div class="col-md-9">
+    <header>
+      <h1>
+        
+实验 0 解答
+
+        
+        
+        <ul class="inline-block list-inline">
+          <li><a href="lab00.zip" class="label label-outline">lab00.zip</a></li>
+        </ul>
+        
+        
+      </h1>
+    </header>
+    
+<h2>解答文件</h2>
+<h2 id="lab-checkoff-questions">实验打卡问题</h2>
+
+
+<ul>
+  <li><strong>What does <code>cd</code> 做什么？</strong></li>
+  <li>切换到指定目录。</li>
+  <li><strong>What does <code>ls</code> 做什么？</strong></li>
+  <li>列出当前目录中的所有文件。</li>
+  <li><strong>What does <code>mkdir</code> 做什么？</strong></li>
+  <li>创建一个新目录。</li>
+</ul>
+
+    
+<p><strong>本实验是所有学生都必须完成的。</strong></p>
+
+
+<h1 id="attendance">出勤</h1>
+
+
+<p>除了出勤，你还需要提交实验题目才能获得实验学分。</p>
+
+<p>If you miss lab for a good reason (such as sickness or a scheduling conflict) or you don't get checked in for some reason, email <a href="mailto:cs61a@berkeley.edu">cs61a@berkeley.edu</a> 在一周内完成以获得出勤学分。</p>
+
+
+<h2 id="introduction">引言</h2>
+
+
+<p>本实验介绍如何配置你的电脑以完成作业，并介绍 Python 的一些基础知识。如果你需要任何帮助，请在 Ed 上发帖，或在你分配到的实验小节中寻求帮助。</p>
+
+<p>以下是本实验的概要：</p>
+
+<ul>
+  <li><p><strong>环境配置</strong>：配置课程所需的必要软件。这需要以下几个组件，列在下面。</p>
+
+  <ul>
+    <li><strong>安装终端</strong>：安装一个终端，以便你可以与文件交互并完成本课程中的任务以及运行 OK 命令。</li>
+    <li><strong>安装 Python 3</strong>：在你的电脑上安装 Python 3.8 或更高版本（最好是 Python 3.11 或更高版本）。</li>
+    <li><strong>安装文本编辑器</strong>: Install software to edit <code>.py</code> 文件。几乎所有学生都使用 VS Code。</li>
+  </ul></li>
+  <li><strong>复习：你的计算机系统</strong> 这是对你的计算机系统如何工作的概述，包括绝对文件路径和相对文件路径的含义。</li>
+  <li><strong>操作演示：使用终端</strong>：本节引导你如何使用终端和 Python 解释器。</li>
+  <li><strong>操作演示：整理你的文件</strong>：本节引导你如何使用终端来整理和浏览本课程的文件。
+  <strong>每个人都应当阅读本节。</strong></li>
+  <li><strong>必做：完成作业</strong>：你必须完成本节才能获得本次作业的学分。这部分的主要目标是让你练习使用我们的软件。</li>
+  <li><strong>必做：提交作业</strong>：提交你的工作。</li>
+  <li><strong>附录：有用的 Python 命令行选项</strong>：这些是命令，
+在调试你的工作时很有用，但不是完成实验所必需的。我们包含它们是因为它们很可能在本课程中一直对你有帮助。</li>
+</ul>
+
+
+<h2 id="setup">环境配置</h2>
+
+
+<blockquote><p>要配置你的设备，请选择对应于你操作系统的指南。</p></blockquote>
+
+<ul>
+  <li><strong><a href="../../articles/setup-windows">Windows 指南</a></strong></li>
+  <li><strong><a href="../../articles/setup-mac">Mac 与 Linux 指南</a></strong></li>
+</ul>
+
+
+<h2 id="your-first-assignment">你的第一个作业</h2>
+
+
+<blockquote><p>在做作业时，确保你的终端工作目录是正确的（很可能就是你解压作业的地方）。</p></blockquote>
+
+
+<h3 id="1-what-would-python-do-wwpd">1) Python 会怎么做？（WWPD）</h3>
+
+
+<p>实验作业的一个组成部分是预测 Python 解释器的行为。我们称这类问题为“Python 会怎么做？”</p>
+
+<p>In this class, we use a program called <code>ok</code> 来评估你的知识。
+<code>ok</code> will be included with every assignment. Let's go through
+how to do a WWPD question with <code>ok</code>.</p>
+
+<p>Open your terminal, and make sure you are in the <code>lab00</code> directory that contains
+the unzipped lab files for this assignment. In that directory, type <code>ls</code> 来验证存在以下文件：</p>
+
+<ul>
+  <li><code>lab00.py</code>：本实验的起始文件</li>
+  <li><code>ok</code>：我们的测试程序</li>
+  <li><code>lab00.ok</code>: a configuration file for <code>ok</code></li>
+</ul>
+
+<p>If you don't see these files, use <code>cd</code> 以导航到正确的目录。</p>
+
+<blockquote><p>Attempting to run <code>ok</code> in a directory that does not have <code>ok</code> 会产生一个错误。</p></blockquote>
+
+<p>Enter the following in your terminal, which will run <code>ok</code> and begin this section:</p>
+
+<pre><code>python3 ok &#x2d;q python&#x2d;basics &#x2d;u</code></pre>
+
+<blockquote><p>The command <code>python3 ok &#x2d;q python&#x2d;basics &#x2d;u</code> tells the Python interpreter
+to run the file with the name <code>ok</code> 在当前工作目录中。
+<code>&#x2d;q python&#x2d;basics &#x2d;u</code> are inputs provided to the <code>ok</code> 程序，它识别要运行哪个问题。</p>
+
+<p>As stated in the setup section, if the <code>python3</code> command does not work,
+please try using <code>python</code> or <code>py</code>.</p></blockquote>
+
+<p>You will be prompted to enter the output of various statements/expressions.
+You must enter them correctly to move on, but there is no penalty for
+incorrect answers.</p>
+
+<p>The first time you run Ok, you will be prompted for your bCourses email.
+Please follow <a href="/articles/using-ok/#signing-in-with-ok">这些说明</a>.</p>
+
+<prompt>
+
+<pre><code>&gt;&gt;&gt; x = 20
+&gt;&gt;&gt; x + 2
+22
+&gt;&gt;&gt; x
+20
+&gt;&gt;&gt; y = 5
+&gt;&gt;&gt; y = y + 3
+&gt;&gt;&gt; y * 2
+16
+&gt;&gt;&gt; y + x
+28</code></pre>
+
+</prompt>
+
+
+<h3 id="2-implementing-functions">2) 实现函数</h3>
+
+
+<p>Open the entire <code>lab00</code> folder in VS Code. You can drag the folder onto the VS
+Code application or open VS Code and use <code>Open Folder...</code> in the <code>File</code> menu.
+Once you open the <code>lab00</code> folder, you'll see the <code>lab00.py</code> 文件，在 VS Code 窗口左侧面板的文件资源管理器中。点击它开始编辑
+<code>lab00.py</code>，它是你将提交以获得实验学分的文件。</p>
+
+<p><strong>重要</strong>: Turn on <code>Auto Save</code> in the <code>File</code> menu of VS Code. Then, whenever
+you change a file, the contents will be saved. If you don't enable <code>Auto Save</code>，请确保经常保存你的工作。</p>
+
+<p><strong>推荐</strong>：使用 VS Code 内的终端（<code>Terminal &gt; New Terminal</code> 在菜单中）。如果你按照上面的说明在 VS Code 中打开了作业文件夹，那么 VS Code 终端的工作目录会自动设置为作业文件夹，这意味着你不需要切换目录就能检查你的工作。</p>
+
+<p>Now complete the lab. You should see a function called <code>twenty_twenty_six</code> that
+has a blank <code>return</code> statement. That blank is the only part you should change.
+Replace it with an expression that evaluates to 2026.  What's the most creative
+expression you can come up with?</p>
+
+
+<h3 id="3-running-tests">3) 运行测试</h3>
+
+
+<p>We'll also use <code>ok</code> to test your code. Switch to the terminal. Make sure you are in the <code>lab00</code> 包含
+<code>ok</code> and <code>lab00.py</code>.</p>
+
+<blockquote><p><strong>专业建议：</strong> If you
+opened the <code>lab00</code> folder in VS Code and select <code>New Terminal</code> in the <code>Terminal</code>
+menu of VS Code, then the terminal will automatically be in the <code>lab00</code>
+目录。</p></blockquote>
+
+<p>Now, run <code>ok</code> 使用此命令来测试你的代码：</p>
+
+<pre><code>python3 ok</code></pre>
+
+<blockquote class="help-windows">
+
+<p>Remember, if you are using Windows and the <code>python3</code> 命令不起作用，请尝试仅使用
+<code>python</code> or <code>py</code>.</p>
+
+</blockquote>
+
+<p>如果你正确编写了代码并完成了测试解锁，你应该会看到一个成功的测试：</p>
+
+<pre><code>=====================================================================
+Assignment: Lab 0
+=====================================================================
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Running tests
+
+&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;
+Test summary
+    2 test cases passed! No cases failed.</code></pre>
+
+<p>If you didn't pass the tests, <code>ok</code> 而是会向你显示类似这样的内容：</p>
+
+<pre><code>&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;
+Doctests for twenty_twenty_six
+
+&gt;&gt;&gt; from lab00 import *
+&gt;&gt;&gt; twenty_twenty_six()
+0
+
+# Error: expected
+#     2026
+# but got
+#     0
+
+&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;&#x2d;
+Test summary
+    0 test cases passed before encountering first failed test case</code></pre>
+
+<p>在文本编辑器中修改你的代码，直到测试通过。</p>
+
+<blockquote><p>Every time you run <code>ok</code>, <code>ok</code> 会尝试备份你的工作。如果它说“连接超时”或者你没有被加入本课程，不要担心。你仍然可以提交本次作业并获得学分。</p></blockquote>
+
+
+<h3 id="4-pre-semester-survey">4) 学期前问卷</h3>
+
+
+<p>作为本次作业的一部分，请填写
+<a href="https://go.cs61a.org/pre-semester-survey">学期前问卷</a> 形式。</p>
+
+<p>完成问卷后，你会看到一个口令。将这个口令作为字符串，填在写有
+<code>passphrase = &#x27;REPLACE_THIS_WITH_PASSPHRASE&#x27;</code> in the Python file for this assignment.
+E.g. if the passphrase is <code>abc</code>, then the line should be <code>passphrase = &#x27;abc&#x27;</code>.</p>
+
+<p>使用 Ok 测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q presem_survey<button id="copy-code-python3ok-qpresem_survey" class="inline-copy-button"><div class="copy-tooltip"><span>Copy</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qpresem_survey").onclick = () => copyCode('python3 ok -q presem_survey', "copy-code-python3ok-qpresem_survey");
+        </script>
+        <br/>
+
+
+<h2 id="check-your-score-locally">在本地查看你的得分</h2>
+
+<p>你可以运行以下命令在本地查看本次作业每道题的得分</p>
+
+<pre><code>python3 ok &#x2d;&#x2d;score</code></pre>
+
+<p><strong>这并不会提交作业！</strong> 当你对得分满意时，将作业提交到 Gradescope 以获得学分。</p>
+
+
+<h2 id="submitting-the-assignment">提交作业</h2>
+
+
+<p>既然你已经完成了第一个作业，是时候提交了。你可以按照以下步骤提交作业并获得分数。</p>
+
+<blockquote><p><strong>重要：</strong> You only need to submit to <em>Gradescope</em>; you do not need to submit to <em>Ok</em>.</p></blockquote>
+
+
+<h3 id="submit-with-gradescope">通过 Gradescope 提交</h3>
+
+
+<ol>
+  <li><p>Log in with <strong>学校账号</strong> using your CalNet ID to <a href="https://www.gradescope.com/">Gradescope</a>. You’ll be taken to your <strong>仪表盘</strong> as soon as you log in.</p>
+
+  <p float="left">
+  <img class="img-responsive center-block" src="assets/gradescope-loginscreen.png" width="200" height="200" alt="Gradescope 登录页面">
+  <img class="img-responsive center-block" src="assets/gradescope-login.png" width="200" height="100" alt="选择 Calnet ID">
+  </p></li>
+  <li>On your <strong>仪表盘</strong>，选择本课程。（你应该已经被加入到 Gradescope 中了。如果不是这样，请发一个私密的 Ed 帖子。）这将带你进入你可以提交的课程作业列表。在这个列表中，你会看到作业的状态、发布日期和截止日期。</li>
+  <li>点击作业 Lab 0 将其打开。</li>
+  <li><p>When the dialog box appears, click on the gray area that says <strong>拖放</strong>. This will open your file finder and you should select your code file <code>lab00.py</code> 你为本次作业修改过的。</p>
+
+  <p><img class="img-responsive center-block" src="assets/gradescope-submit.png" alt="gradescope 提交" width="" height=""> <br></p></li>
+  <li><p>Once you have chosen your file select the <strong>上传</strong> button. When your upload is successful, you’ll see a confirmation message on your screen and you will receive an email.</p>
+
+  <p><img class="img-responsive center-block" src="assets/gradescope-upload.png" alt="gradescope 上传" width="" height=""></p></li>
+  <li><p>Next, wait a few minutes for the autograder to grade your code file. Your final score will appear at the right and your output should be the same as the one you tested locally. You can check the code that you submitted at the top right where there is a tab labeled <strong>代码</strong>. If there are any errors, you can edit your <code>lab00.py</code> code and click <strong>重新提交</strong> at the bottom of your screen to resubmit your code file. Assignments can be resubmitted as many times as you would like before the deadline.</p>
+
+  <p><img class="img-responsive center-block" src="assets/gradescope-results.png" alt="gradescope 结果" width="" height=""></p></li>
+</ol>
+
+<p>你对 WWPD 问题的回答不会提交到 Gradescope，也没有必要提交。实验学分基于代码编写题目。</p>
+
+<p><strong>恭喜</strong>，你刚刚提交了你的第一个作业！</p>
+
+
+<h2 id="appendix-useful-python-command-line-options">附录：有用的 Python 命令行选项</h2>
+
+
+        <button id="toggle-1" class="btn btn-outline btn-lg alwaystoggle toggle">
+        终端命令<noscript> (enable JavaScript)</noscript>
+        </button>
+        <div class="solution toggle-1">
+
+<ul>
+  <li><code>ls</code>: <strong>l</strong>i<strong>s</strong>ts all files in the current directory</li>
+  <li><code>cd &lt;path to directory&gt;</code>: <strong>c</strong>hange into the specified <strong>d</strong>irectory</li>
+  <li><code>mkdir &lt;directory name&gt;</code>: <strong>m</strong>a<strong>k</strong>es a new <strong>dir</strong>ectory with the given name</li>
+</ul>
+
+</div>
+
+<p>以下是在文件上运行 Python 最常见的方式。</p>
+
+<ol>
+  <li><p>Using no command-line options will run the code in the file you provide and
+  return you to the command line. If your file just contains function
+  definitions, you'll see no output unless there is a syntax error.</p>
+
+<pre><code>python3 lab00.py</code></pre></li>
+  <li><p><strong><code>&#x2d;i</code></strong>: The <code>&#x2d;i</code> option runs the code in the file you provide, then opens
+  an interactive session (with a <code>&gt;&gt;&gt;</code> 提示符）。然后你可以求值诸如调用你定义的函数之类的表达式。要退出，输入
+  <code>exit()</code>. You can also use the keyboard shortcut <code>Ctrl&#x2d;D</code> on Linux/Mac
+  machines or <code>Ctrl&#x2d;Z  Enter</code> 在 Windows 上。</p>
+
+  <p>如果你在交互式运行时编辑了 Python 文件，你需要退出并重新启动解释器，才能使这些更改生效。</p>
+
+  <p>Here's how we can run <code>lab00.py</code> 交互式地：</p>
+
+<pre><code>python3 &#x2d;i lab00.py</code></pre></li>
+  <li><p><strong><code>&#x2d;m doctest</code></strong>：运行文件中的 doctest，即函数文档字符串中的示例。</p>
+
+  <p>Each test in the file consists of <code>&gt;&gt;&gt;</code> 后面跟着一些 Python 代码和预期输出。</p>
+
+  <p>Here's how we can run the doctests in <code>lab00.py</code>:</p>
+
+<pre><code> python3 &#x2d;m doctest lab00.py</code></pre>
+
+  <p>当我们的代码通过了所有 doctest 时，不会显示任何输出。否则，
+会显示有关失败测试的信息。</p></li>
+</ol>
+
+  </div>
+
+  <div class="col-md-3 sticky">
+    <nav class="hidden-print hidden-sm hidden-xs sidebar">
+      <ul>
+  <li><a href="#lab-checkoff-questions">实验打卡问题</a></li>
+  <li><a href="#attendance">出勤</a></li>
+  <ul>
+    <li><a href="#introduction">引言</a></li>
+    <li><a href="#setup">环境配置</a></li>
+    <li><a href="#your-first-assignment">你的第一个作业</a></li>
+    <ul>
+      <li><a href="#1-what-would-python-do-wwpd">1) Python 会怎么做？（WWPD）</a></li>
+      <li><a href="#2-implementing-functions">2) 实现函数</a></li>
+      <li><a href="#3-running-tests">3) 运行测试</a></li>
+      <li><a href="#4-pre-semester-survey">4) 学期前问卷</a></li>
+    </ul>
+    <li><a href="#check-your-score-locally">在本地查看你的得分</a></li>
+    <li><a href="#submitting-the-assignment">提交作业</a></li>
+    <ul>
+      <li><a href="#submit-with-gradescope">通过 Gradescope 提交</a></li>
+    </ul>
+    <li><a href="#appendix-useful-python-command-line-options">附录：有用的 Python 命令行选项</a></li>
+  </ul>
+</ul>
+    </nav>
+  </div>
+</div>
+
+    </main>
+
+    <!-- <footer class="container">
+      <div class="row text-center">
+        <div class="col col-sm-4">
+          <h3><a href="/">CS 61A</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/weekly">Weekly Schedule</a></li>
+            <li><a href="/office-hours">Office Hours</a></li>
+            <li><a href="/staff">Staff</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/resources">Resources</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/studying">Studying Guide</a></li>
+            <li><a href="/articles/debugging">Debugging Guide</a></li>
+            <li><a href="/articles/composition">Composition Guide</a></li>
+            <li><a href="/articles/pair-programming">Pair Programming</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/articles/about">Policies</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/about#assignments">Assignments</a></li>
+            <li><a href="/articles/about#exams">Exams</a></li>
+            <li><a href="/articles/about#grading">Grading</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer> -->
+
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+  <script>
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+      window.MonacoEnvironment = { getWorkerUrl: () => URL.createObjectURL(new Blob([`
+      self.MonacoEnvironment = {
+          baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min'
+      };
+      importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/base/worker/workerMain.min.js');
+  `], { type: 'text/javascript' }))
+  };
+  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.5/js/jsplumb.min.js"></script>
+    <script src="/assets/js/network_storage.js"></script>
+    <script src="/assets/js/code_tabindex.js"></script>
+    <script src="/assets/js/storable.js"></script>
+    <script src="/assets/js/editor.js"></script>
+    <script src="/assets/js/copy-button.js"></script>
+    <script src="/assets/js/env-diagram.js"></script>
+    
+<!-- <script src="/assets/js/sketchy.js"></script> -->
+<script>
+  $('.sidebar ul').addClass('nav nav-stacked noselect');
+  $('body').scrollspy({
+    target: '.sidebar',
+    offset: 40
+  });
+
+  function goToId(id) {
+    var target = $(id);
+    target.parent().show();
+    $('html,body').animate({
+      scrollTop: target.offset().top,
+    }, 100);
+    $("body").scrollspy('refresh');
+  }
+
+  if (location.hash) {
+    setTimeout(function() {
+      if (location.hash) {
+        goToId(location.hash);
+      }
+    }, 1);
+  }
+
+  $("a").click(function(event) {
+    var urlBeforeHashRegEx = new RegExp("^"+window.location.href.split("#")[0]);
+    if (/^#/.test(this.hash) && urlBeforeHashRegEx.test(this.href)) {
+      event.preventDefault();
+      goToId(this.hash);
+      document.location.hash = this.hash;
+    }
+  });
+</script>
+
+  </body>
+</html>

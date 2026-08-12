@@ -1,0 +1,1003 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta name="description" content ="CS 61A: Structure and Interpretation of Computer Programs" />
+    <meta name="keywords" content ="Computer Science, Programming, Berkeley, EECS" />
+    <meta name="author" content ="Rebecca Dang" />
+    <!-- CHANGED CAREFUL -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/assets/js/hl.js"></script>
+    <script src="/assets/js/toggledarkmode.js"></script>
+    <script>
+        // we aren't registering builtins since
+        //      (1) they don't render differently in the current CSS from other names
+        //      (2) it's a mess to list all of them. You can extract from the site but that takes effort
+        // if (1) ceases to be true, (2) might be worth the effort. For now, we're leaving as is
+        hljsRegister({
+            'keyword': "define if cond and or let begin lambda mu quote delay cons-stream set! quasiquote unquote unquote-splicing define-macro"
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <script src="/assets/js/dark-mode.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata|Roboto:300,400,500|Work+Sans:400,700">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/mono-blue.css">
+    <link rel="icon" href="/assets/images/favicon.ico">
+
+    
+    
+    <link rel="stylesheet" href="/assets/css/lab.css">
+
+
+    <title>
+实验 10：解释器、尾调用 | CS 61A 2026 年夏季
+</title>
+  </head>
+
+  <body id="index" class="home">
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container noselect">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-section" aria-label="切换导航栏">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">
+            CS 61A
+            <!-- <img style="max-width:60px; margin-top: -20px;" class="logo" src="/assets/images/logo.png"/> -->
+          </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse-section">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+            <li><a href="/">课程讲义</a></li>
+            
+            <li><a href="/articles/about-61a/">教学大纲</a></li>
+            
+            <li><a href="https://edstem.org/us/courses/99538/discussion">Ed</a></li>
+            
+            <li><a href="/office-hours/">答疑时间</a></li>
+            
+            <li><a href="/articles/contact-61a/">联系方式</a></li>
+            
+
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                链接
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://go.cs61a.org/extensions">申请延期</a></li>
+                
+                <li><a href="https://go.cs61a.org/regrades">申请重新评分</a></li>
+                
+                <li><a href="https://oh.cs61a.org/">答疑排队</a></li>
+                
+                <li><a href="https://www.gradescope.com/courses/1324284">Gradescope</a></li>
+                
+                <li><a href="https://sections.cs61a.org">添加/更改讨论班</a></li>
+                
+                <li><a href="https://bcourses.berkeley.edu/courses/1555178/pages">课程录像</a></li>
+                
+                <li><a href="https://pythontutor.com/cp/composingprograms.html">Python Tutor</a></li>
+                
+                <li><a href="https://code.cs61a.org/">代码编辑器</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                资源
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/resources/">往年试卷与网站</a></li>
+                
+                <li><a href="https://www.composingprograms.com">教材</a></li>
+                
+                <li><a href="/articles/campus-res/">校园资源</a></li>
+                
+                <li><a href="/articles/advice/">学长建议</a></li>
+                
+                <li><a href="/articles/scheme-spec/">Scheme 规范</a></li>
+                
+                <li><a href="/articles/scheme-builtins/">Scheme 内置过程</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                指南
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="https://drive.google.com/file/d/1O72u0ml65pibcjz-PXKpqeJDKaVqQ3D8/view">调试指南</a></li>
+                
+                <li><a href="/articles/studying/">学习指南</a></li>
+                
+                <li><a href="/articles/type-hints/">类型提示</a></li>
+                
+                <li><a href="/articles/composition/">写作指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt1-study-guide.pdf">期中一学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-mt2-study-guide.pdf">期中二学习指南</a></li>
+                
+                <li><a href="/assets/pdfs/61a-final-study-guide.pdf">期末学习指南</a></li>
+                
+              </ul>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                教职员工
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                <li><a href="/instructor">讲师</a></li>
+                
+                <li><a href="/staff">助教与辅导员</a></li>
+                
+              </ul>
+            </li>
+            
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main id="content" class="container">
+      
+<div class='row'>
+  <div class='col-md-9'>
+    <header>
+      <h1>
+        
+实验 10：解释器、尾调用
+
+        
+        
+        <ul class="inline-block list-inline">
+          <li><a href="lab10.zip" class="label label-outline">lab10.zip</a></li>
+        </ul>
+        
+        
+      </h1>
+    </header>
+    
+
+<p><i>截止时间：7 月 30 日（周四）晚上 11:59。</i></p>
+
+
+
+
+<h2 id='starter-files'>起始文件</h2>
+
+<p>下载 <a href="lab10.zip">lab10.zip</a>。</p>
+
+
+
+
+<!-- SP26 Lab 9 Interpreters Intro -->
+<!--include topics/scheme/macros/if-macro-python-intro.md-->
+<!--include topics/scheme/macros/if-macro-python.md-->
+
+
+<h1 id="attendance">签到</h1>
+
+
+<p>要获得本实验的学分，除了出勤之外，你还需要提交实验题目。</p>
+
+<p>如果你有正当理由缺勤（例如生病或时间冲突），或者由于某种原因没有签到，请在一周内发邮件至 <a href="mailto:cs61a@berkeley.edu">cs61a@berkeley.edu</a> 申请补签。</p>
+
+
+<h1 id="required-questions">必做题目</h1>
+
+
+<!-- 
+        <button id='toggle-1' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        入门视频<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-1">
+
+
+<h2 id="getting-started-videos" class="no-toc">入门视频</h2>
+
+
+<p>这些视频可能会为你完成本次作业中的编程题提供一些有用的指引。</p>
+
+<blockquote><p>要观看这些视频，你需要登录你的 berkeley.edu 邮箱。</p></blockquote>
+
+
+            <iframe width="560" height="315" src="https://youtube.com/embed/videoseries?list=PLx38hZJ5RLZdGRYz2UKK_Nk-SIfc9ZKaS"
+                frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" aria-label = "lab10-getstarted"
+                allowfullscreen></iframe><p><a href='https://youtu.be/playlist?list=PLx38hZJ5RLZdGRYz2UKK_Nk-SIfc9ZKaS'> YouTube 链接 </a></p>
+</div> -->
+
+
+<h2 id="quasiquotation">反引号引用（Quasiquotation）</h2>
+
+
+<p>如果你需要复习反引号引用，请参考下面的折叠框。如果遇到困难，也可以直接跳到题目，再回来查阅本部分。</p>
+
+
+        <button id='toggle-2' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        反引号引用<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-2">
+
+<p>普通的 quote <code>&#x27;</code> 和反引号引用 <code>`</code> 都是引用表达式的有效方式。然而，被反引号引用的表达式可以通过“反引用”（unquote）符号 <code>,</code>（用一个逗号表示）来“反引用”。当一个位于反引号引用表达式中的项被“反引用”时，该项会被 <em>求值</em>，而不是作为字面文本处理。
+这种机制有点类似于 Python 中的 <em>f-string</em>，其中 <code>{}</code> 内的表达式会被求值并插入到字符串中。</p>
+
+<pre><code class="scheme">scm&gt; (define a 5)
+a
+scm&gt; (define b 3)
+b
+scm&gt; `(* a b)  ; 反引号引用的表达式
+(* a b)
+scm&gt; `(* a ,b)  ; 反引用 b，它求值为 3
+(* a 3)
+scm&gt; `(* ,(+ a b) b)  ; 反引用 (+ a b)，它求值为 8
+(* 8 b)</code></pre>
+
+
+
+</div>
+
+
+<h3 id="q1-wwsd-quasiquote">Q1：WWSD：反引号引用</h3>
+
+
+<blockquote><p>使用 Ok 通过以下“Scheme 会显示什么？”（What Would Scheme Display?）题目来检验你的知识：</p>
+
+<pre><code>python3 ok &#x2d;q wwsd&#x2d;quasiquote &#x2d;u</code></pre></blockquote>
+
+</question>
+
+<pre><code>scm&gt; &#x27;(1 x 3)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x28;&#x31;&#x20;&#x78;&#x20;&#x33;&#x29;</div>
+scm&gt; (define x 2)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x78;</div>
+scm&gt; `(1 x 3)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x28;&#x31;&#x20;&#x78;&#x20;&#x33;&#x29;</div>
+scm&gt; `(1 ,x 3)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x28;&#x31;&#x20;&#x32;&#x20;&#x33;&#x29;</div>
+scm&gt; `(1 x ,3)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x28;&#x31;&#x20;&#x78;&#x20;&#x33;&#x29;</div>
+scm&gt; `(1 (,x) 3)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x28;&#x31;&#x20;&#x28;&#x32;&#x29;&#x20;&#x33;&#x29;</div>
+scm&gt; `(1 ,(+ x 2) 3)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x28;&#x31;&#x20;&#x34;&#x20;&#x33;&#x29;</div>
+scm&gt; (define y 3)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x79;</div>
+scm&gt; `(x ,(* y x) y)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x28;&#x78;&#x20;&#x36;&#x20;&#x79;&#x29;</div>
+scm&gt; `(1 ,(cons x (list y 4)) 5)
+<div class="alt prompt-1">______</div><div class="solution prompt-1">&#x28;&#x31;&#x20;&#x28;&#x32;&#x20;&#x33;&#x20;&#x34;&#x29;&#x20;&#x35;&#x29;</div></code></pre>
+        <button id='prompt-1' class='btn btn-outline btn-lg solutiontoggle prompt'>
+        显示答案<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        
+
+<!-- include topics/scheme/macros/write-quasiquote-expr.md -->
+
+<br>
+
+
+<h2 id="interpreters">解释器</h2>
+
+
+<p>对于下面的题目，建议先查阅 Calculator 折叠框。如果你需要复习解释器的内容，请参考其他折叠框。如果遇到困难，也可以直接跳到题目，再回来查阅本部分。</p>
+
+
+        <button id='toggle-3' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        解释器<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-3">
+
+<p>解释器（interpreter）是一个允许你使用某种特定语言与计算机交互的程序。它接收你编写的代码，
+对其解释，然后执行相应的操作，通常
+使用一种更底层的语言来与计算机硬件通信。</p>
+
+<p>在项目 4 中，你将使用 Python 开发一个 Scheme
+编程语言的解释器。有趣的是，你在本课程中一直使用的 Python
+解释器主要是用 C 语言编写的。在最低层，计算机
+通过解释机器码（machine code）来运行，机器码是一串由 0 和 1 组成的指令，指示计算机执行算术运算和数据检索等基本任务。</p>
+
+<p>当我们谈论一个解释器时，涉及两种语言：</p>
+
+<ol>
+  <li><strong>被解释的语言</strong>：对于项目 4，这就是 Scheme 语言。</li>
+  <li><strong>实现语言</strong>：这是用于创建
+  解释器本身的语言，对于项目 4，它将是 Python。</li>
+</ol>
+
+<br>
+
+<p><strong>REPL</strong></p>
+
+<p>解释器的一个常见特性是“读取-求值-打印循环”（REPL，Read-Eval-Print Loop），它通过三个阶段循环处理用户输入：</p>
+
+<ul>
+  <li><p><strong>读取（Read）</strong>：解释器首先读取用户提供的输入字符串。
+  这个输入会经过一个解析（parsing）过程，该过程包含两个关键步骤：</p>
+
+  <ul>
+    <li><em>词法分析</em>（lexical analysis）步骤将输入字符串拆分为一个个词法单元（token），
+    也就是你正在解释的这门语言中的基本元素或“单词”。
+    这些词法单元代表了输入中最小的意义单位。</li>
+    <li><p><em>语法分析</em>（syntactic analysis）步骤将上一步得到的词法单元组织成
+    底层语言能够理解的数据结构。对于我们的
+    Scheme 解释器，我们将词法单元组装成一个 <code>Link</code> 对象（类似于一个
+    <code>Link</code>），以表示原始调用表达式的结构。</p>
+
+    <ul>
+      <li><code>Link</code> 中的第一项表示调用表达式的运算符，后续元素则是操作数，即运算所作用的对象。注意，这些操作数本身也可以是调用表达式（嵌套表达式）。
+      <br></li>
+    </ul></li>
+  </ul></li>
+</ul>
+
+<p>下面是 Scheme 表达式输入的读取过程总结：<br></p>
+
+<p><img class="img-responsive center-block" src="assets/parser.png" alt="" width="" height=""><br></p>
+
+<!--
+And here is a summary of how syntactic analysis converts input tokens into <code>Link</code> objects:<br>
+
+<p><img class="img-responsive center-block" src="assets/to_link.png" alt="" width="" height=""><br> -->
+
+<ul>
+  <li><p><strong>求值（Eval）</strong>：这一步对你用该编程语言编写的表达式求值，以得到一个值。它涉及以下两个函数：</p>
+
+  <ul>
+    <li><code>eval</code> 接受一个表达式，并根据语言的规则对其求值。
+    当该表达式是一个调用表达式时，<code>eval</code> 使用 <code>apply</code> 函数来得到结果。
+    它会按顺序对运算符及其操作数求值。例如，在 <code>(add 1 2)</code> 中，
+    <code>eval</code> 会将 <code>add</code> 识别为运算符，将 <code>1</code> 和 <code>2</code> 识别为操作数。
+    它会对 <code>add</code> 求值以确保它是一个有效的函数，然后对 <code>1</code> 和
+    <code>2</code> 求值以确保它们是有效的参数。</li>
+    <li><code>apply</code> 接受已求值的运算符（即函数）并将其应用于
+    已求值的操作数（即参数）。注意，在此过程中，<code>apply</code> 可能需要对更多表达式求值（例如函数体中的那些表达式）。这正是 <code>apply</code> 可能回调 <code>eval</code> 的地方，因此这两个阶段是 <em>相互递归的</em>。</li>
+  </ul></li>
+  <li><strong>打印（Print）</strong>：显示用户输入求值的结果。</li>
+</ul>
+
+<br>
+下面是各部分是如何组合在一起的：<br>
+
+<p><img class="img-responsive center-block" src="assets/repl.png" alt="" width="" height=""></p>
+
+</div>
+
+
+        <button id='toggle-4' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        解释器<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-4">
+
+
+<h2 id="evaluation" class="no-toc">求值</h2>
+
+
+<p>要使用解释器对表达式 <code>(+ (* 3 4) 5)</code> 求值，会按以下顺序对以下表达式调用 <code>scheme_eval</code>：</p>
+
+<ol>
+  <li><code>(+ (* 3 4) 5)</code></li>
+  <li><code>+</code></li>
+  <li><code>(* 3 4)</code></li>
+  <li><code>*</code></li>
+  <li><code>3</code></li>
+  <li><code>4</code></li>
+  <li><code>5</code></li>
+</ol>
+
+<p><code>*</code> 被求值，因为它是 <code>(* 3 4)</code> 的运算符子表达式，
+而 <code>(* 3 4)</code> 又是 <code>(+ (* 3 4) 5)</code> 的操作数子表达式。</p>
+
+<p>默认情况下，<code>*</code> 求值为一个将其参数相乘的过程。
+但 <code>*</code> 随时可能被重新定义，因此每次使用符号 <code>*</code> 时都必须对其求值，以查找其当前值。</p>
+
+<pre><code>scm&gt; (* 2 3)  ; 此时它做乘法
+6
+scm&gt; (define * +)
+*
+scm&gt; (* 2 3)  ; 此时它做加法
+5</code></pre>
+
+
+
+</div>
+<br>
+
+
+        <button id='toggle-5' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        Calculator<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-5">
+
+
+<h2 id="calculator" class="no-toc">Calculator</h2>
+
+
+<p>解释器是一个执行程序的程序。今天，我们将扩展 Calculator 的解释器，Calculator 是一种简单的虚构语言，是 Scheme 的一个子集。本实验就像是 Scheme 项目的迷你版。</p>
+
+<p>Calculator 语言只包含四种基本的算术运算：<code>+</code>、<code>&#x2d;</code>、<code>*</code> 和 <code>/</code>。这些运算可以嵌套，并且可以接受数量不定的参数，就像在 Scheme 中一样。下面是一些 Calculator 表达式及其对应值的例子：</p>
+
+<pre><code class="scheme"> calc&gt; (+ 2 2 2)
+ 6
+
+ calc&gt; (&#x2d; 5)
+ &#x2d;5
+
+ calc&gt; (* (+ 1 2) (+ 2 3 4))
+ 27</code></pre>
+
+
+
+<p>Calculator 表达式用 Python 对象表示：</p>
+
+<ul>
+  <li>数字用 Python 数字表示。</li>
+  <li>算术运算的符号用 Python 字符串表示（例如 <code>&#x27;+&#x27;</code>）。</li>
+  <li>调用表达式用下面的 <code>Link</code> 类表示。</li>
+</ul>
+
+<alwaystoggle prompt="Link Class">
+
+<p>为了在 Python 中表示 Scheme 列表，我们将使用 <code>Link</code> 类（在本实验和 Scheme 项目中都是如此）。一个 <code>Link</code> 实例有两个属性：<code>first</code> 和 <code>rest</code>。<code>Link</code> 总是接受两个参数来调用。要创建一个列表，请嵌套调用 <code>Link</code>，并将 <code>nil</code> 作为最后一个 Link 的第二个参数传入。</p>
+
+<blockquote><p><strong>注意：</strong> 在 Python 代码中，<code>nil</code> 绑定到 <code>Link.empty</code>。
+类似地，Scheme 中的 <code>nil</code> 求值为一个空列表。</p></blockquote>
+
+<p>例如，一旦我们的解释器读入 Scheme 表达式 <code>(+ 2 3)</code>，它就被表示为 <code>Link(&#x27;+&#x27;, Link(2, Link(3, nil)))</code>。</p>
+
+<pre><code>&gt;&gt;&gt; p = Link(&#x27;+&#x27;, Link(2, Link(3, nil)))
+&gt;&gt;&gt; p.first
+&#x27;+&#x27;
+&gt;&gt;&gt; p.rest
+Link(2, Link(3, nil))
+&gt;&gt;&gt; p.rest.first
+2
+&gt;&gt;&gt; print(p)
+(+ 2 3)</code></pre>
+
+
+
+<p>有一个 <code>map_link</code> 函数，它接受一个单参数的 Python 函数 <code>f</code> 和一个链表 <code>s</code>。它返回对 Scheme 列表中每个元素应用 <code>f</code> 后得到的 Scheme 列表。</p>
+
+<pre><code>&gt;&gt;&gt; map_link(lambda x: 2 * x, p.rest)
+Link(4, Link(6, nil))</code></pre>
+
+
+
+<br>
+
+<p>下面是 <code>Link</code> 类和 <code>map_link</code> 函数（未显示 <code>__str__</code> 和 <code>__repr__</code> 方法）。</p>
+
+<pre><code>class Link:
+    &quot;&quot;&quot;Represents the built&#x2d;in Link data structure in Scheme.&quot;&quot;&quot;
+    empty = ()
+    def __init__(self, first, rest):
+        self.first = first
+        self.rest = rest
+
+nil = Link.empty
+
+def map_link(f, s):
+    &quot;&quot;&quot;Map function f over linked list s.
+    &gt;&gt;&gt; square = lambda x: x * x
+    &gt;&gt;&gt; map_link(square, Link(1, Link(2, Link(3))))
+    Link(1, Link(4, Link(9, nil)))
+    &quot;&quot;&quot;
+    if s is Link.empty:
+        return s
+    return Link(f(s.first), map_link(f, s.rest))</code></pre>
+
+
+</div>
+<br>
+
+<page-break>
+
+</alwaystoggle>
+
+
+<h3 id="q2-using-link">Q2：使用 Link</h3>
+
+
+<p>回答以下关于一个 <code>Link</code> 实例的问题，
+该实例表示 Calculator 表达式 <code>(+ (&#x2d; 2 4) 6 8)</code>。</p>
+
+<p>使用 Ok 检验你的理解：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q using_link -u<button id="copy-code-python3ok-qusing_link-u" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qusing_link-u").onclick = () => copyCode('python3 ok -q using_link -u', "copy-code-python3ok-qusing_link-u");
+        </script>
+        <br/>
+
+
+<h2 id="calculator-evaluation">Calculator 求值</h2>
+
+
+<p>对于问题 3（新过程），你需要更新下面的 <code>calc_eval</code> 函数，该函数对一个 Calculator 表达式求值。对于问题 3，你将确定在 Scheme 中一个调用表达式的 <code>operator</code> 和 <code>operands</code> 是什么，以及如何在 <code>calc_apply</code> 这一行中将一个过程应用于参数。</p>
+
+<solution>
+
+<pre><code>def calc_eval(exp):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; calc_eval(Link(&quot;define&quot;, Link(&quot;a&quot;, Link(1, nil))))
+    &#x27;a&#x27;
+    &gt;&gt;&gt; calc_eval(&quot;a&quot;)
+    1
+    &gt;&gt;&gt; calc_eval(Link(&quot;+&quot;, Link(1, Link(2, nil))))
+    3
+    &quot;&quot;&quot;
+    if isinstance(exp, Link):
+        operator = ____________ # 为 Q2 更新此处，例如 (+ 1 2) 中，+ 是运算符
+        operands = ____________ # 为 Q2 更新此处，例如 (+ 1 2) 中，1 和 2 是操作数
+        if operator == &#x27;and&#x27;: # and 表达式
+            return eval_and(operands)
+        elif operator == &#x27;define&#x27;: # define 表达式
+            return eval_define(operands)
+        else: # 调用表达式
+            return calc_apply(___________, ___________) # 为 Q2 更新此处，operator 的类型是什么？
+    elif exp in OPERATORS:   # 查找过程
+        return OPERATORS[exp]
+    elif isinstance(exp, int) or isinstance(exp, bool):   # 数字和布尔值
+        return exp
+    elif exp in bindings:   # 查找变量
+        return bindings[exp]</code></pre>
+
+</solution>
+
+
+<h3 id="q3-new-procedure">Q3：新过程</h3>
+
+
+<p>向 Calculator 添加 <code>//</code> 运算，这是一个整除（floor-division）过程，使得 <code>(// dividend divisor)</code> 返回 <code>dividend</code> 除以 <code>divisor</code> 的结果，忽略余数（即 Python 中的 <code>dividend // divisor</code>）。按照下面例子所示处理多个输入：<code>(// dividend divisor1 divisor2 divisor3)</code> 在 Python 中相当于 <code>(((dividend // divisor1) // divisor2) // divisor3)</code>。假设每次对 <code>//</code> 的调用至少有两个参数。</p>
+
+<blockquote><p><em>提示：</em> 你需要同时修改 <code>calc_eval</code> 和 <code>floor_div</code> 方法来完成本题！</p></blockquote>
+
+<pre><code class="scheme">calc&gt; (// 1 1)
+1
+calc&gt; (// 5 2)
+2
+calc&gt; (// 28 (+ 1 1) 1)
+14</code></pre>
+
+
+
+<blockquote><p><em>提示：</em> 确保 <code>Link</code> 中的每一个元素（运算符和所有操作数）都会被 <code>calc_eval</code> 求值一次，这样我们才能正确地将相关的 Python 运算符应用于操作数！</p></blockquote>
+
+<!-- You may find the <code>map_link</code> function useful for this. -->
+
+<solution>
+
+<pre><code>def floor_div(args):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; floor_div(Link(100, Link(10, nil)))
+    10
+    &gt;&gt;&gt; floor_div(Link(5, Link(3, nil)))
+    1
+    &gt;&gt;&gt; floor_div(Link(1, Link(1, nil)))
+    1
+    &gt;&gt;&gt; floor_div(Link(5, Link(2, nil)))
+    2
+    &gt;&gt;&gt; floor_div(Link(23, Link(2, Link(5, nil))))
+    2
+    &gt;&gt;&gt; calc_eval(Link(&quot;//&quot;, Link(4, Link(2, nil))))
+    2
+    &gt;&gt;&gt; calc_eval(Link(&quot;//&quot;, Link(100, Link(2, Link(2, Link(2, Link(2, Link(2, nil))))))))
+    3
+    &gt;&gt;&gt; calc_eval(Link(&quot;//&quot;, Link(100, Link(Link(&quot;+&quot;, Link(2, Link(3, nil))), nil))))
+    20
+    &quot;&quot;&quot;
+    "*** YOUR CODE HERE ***"
+</code></pre>
+
+</solution>
+
+<p>使用 Ok 测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q floor_div<button id="copy-code-python3ok-qfloor_div" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qfloor_div").onclick = () => copyCode('python3 ok -q floor_div', "copy-code-python3ok-qfloor_div");
+        </script>
+        <br/>
+
+
+<h3 id="q4-new-form">Q4：新形式</h3>
+
+
+<p>向我们的 Calculator 解释器中添加 <code>and</code> 表达式，并引入 Scheme 布尔值
+<code>#t</code> 和 <code>#f</code>，它们分别用 Python 的 <code>True</code> 和 <code>False</code> 表示。
+下面的例子假设条件运算符（例如 <code>&lt;</code>、<code>&gt;</code>、<code>=</code> 等）已经实现，
+但你无需为本题操心它们。</p>
+
+<pre><code class="scheme">calc&gt; (and (= 1 1) 3)
+3
+calc&gt; (and (+ 1 0) (&lt; 1 0) (/ 1 0))
+#f
+calc&gt; (and #f (+ 1 0))
+#f
+calc&gt; (and 0 1 (+ 5 1)) ; 在 Scheme 中 0 是真值！
+6</code></pre>
+
+
+
+<p>在调用表达式中，我们先对运算符求值，再对操作数求值，最后将过程应用于其参数（就像你在上一题中为 <code>floor_div</code> 所做的那样）。
+然而，我们不能像对调用表达式那样对 <code>and</code> 表达式求值。因为 <code>and</code> 是一种特殊形式（special form），它会在遇到第一个为假的自变量时进行短路（short circuit），所以我们需要添加特殊逻辑，使得不会总是对所有子表达式求值。</p>
+
+<blockquote><p><strong>重要</strong>：要检查某个 <code>val</code> 在 Scheme 中是否为假值，请使用
+<code>val is scheme_f</code> 而不是 <code>val == scheme_f</code>，因为在 Python 中 <code>0 == False</code>
+但 <code>0 is not False</code>（很疯狂，对吧！）。</p></blockquote>
+
+<solution>
+
+<pre><code>scheme_t = True   # Scheme 的 #t
+scheme_f = False  # Scheme 的 #f
+
+def eval_and(expressions):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; calc_eval(Link(&quot;and&quot;, Link(1, nil)))
+    1
+    &gt;&gt;&gt; calc_eval(Link(&quot;and&quot;, Link(False, Link(&quot;1&quot;, nil))))
+    False
+    &gt;&gt;&gt; calc_eval(Link(&quot;and&quot;, Link(1, Link(Link(&quot;//&quot;, Link(5, Link(2, nil))), nil))))
+    2
+    &gt;&gt;&gt; calc_eval(Link(&quot;and&quot;, Link(Link(&#x27;+&#x27;, Link(1, Link(1, nil))), Link(3, nil))))
+    3
+    &gt;&gt;&gt; calc_eval(Link(&quot;and&quot;, Link(Link(&#x27;&#x2d;&#x27;, Link(1, Link(0, nil))), Link(Link(&#x27;/&#x27;, Link(5, Link(2, nil))), nil))))
+    2.5
+    &gt;&gt;&gt; calc_eval(Link(&quot;and&quot;, Link(0, Link(1, nil))))
+    1
+    &gt;&gt;&gt; calc_eval(Link(&quot;and&quot;, nil))
+    True
+    &quot;&quot;&quot;
+    "*** YOUR CODE HERE ***"
+</code></pre>
+
+</solution>
+
+<p>使用 Ok 测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q eval_and<button id="copy-code-python3ok-qeval_and" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qeval_and").onclick = () => copyCode('python3 ok -q eval_and', "copy-code-python3ok-qeval_and");
+        </script>
+        <br/>
+
+
+<h2 id="macros">宏（Macros）</h2>
+
+
+<p>如果你需要复习宏，请参考下面的折叠框。如果遇到困难，也可以直接跳到题目，再回来查阅本部分。</p>
+
+
+        <button id='toggle-6' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        宏<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-6">
+
+<p>宏是一种使用 <code>define&#x2d;macro</code> 创建、并通过调用表达式应用的代码转换。一次宏调用的求值过程如下：</p>
+
+<ol>
+  <li>将宏的形式参数绑定到宏调用中那些 <strong>未求值</strong> 的操作数表达式。</li>
+  <li>对宏的函数体求值，它会返回一个表达式。</li>
+  <li>在原宏调用的帧中，对宏返回的表达式求值。</li>
+</ol>
+
+<pre><code class="scheme">scm&gt; (define&#x2d;macro (twice expr) (list &#x27;begin expr expr))
+twice
+scm&gt; (twice (+ 2 2))  ; 求值 (begin (+ 2 2) (+ 2 2))
+4
+scm&gt; (twice (print (+ 2 2)))  ; 求值 (begin (print (+ 2 2)) (print (+ 2 2)))
+4
+4</code></pre>
+
+
+
+</div>
+
+
+<h3 id="q5-repeat">Q5：重复</h3>
+
+
+<p>定义 <code>repeat</code>，它是一个宏，接受一个数字 <code>n</code> 和一个表达式
+<code>expr</code>。调用 <code>repeat</code> 会在一个局部帧中对 <code>expr</code> 求值 <code>n</code> 次，其值为
+最后的结果。你会发现辅助函数 <code>repeated&#x2d;call</code> 很有用，它接受一个数字 <code>n</code> 和一个无参过程 <code>f</code>，并将 <code>f</code> 调用 <code>n</code> 次。</p>
+
+<p>例如，<code>(repeat (+ 2 3) (print 1))</code> 等价于：</p>
+
+<p><code>(repeated&#x2d;call (+ 2 3) (lambda () (print 1)))</code></p>
+
+<p>它应该将 <code>(print 1)</code> 重复求值 5 次。</p>
+
+<p>下面的表达式应该将 <code>four</code> 打印四次：</p>
+
+<p><code>(repeat 2 (repeat 2 (print &#x27;four)))</code></p>
+
+<code-input repeat lang:scheme>
+
+<pre><code>(define&#x2d;macro (repeat n expr)
+  `(repeated&#x2d;call ,n ___))
+
+; 将一个无参过程 f 调用 n 次，并返回最后的结果。
+(define (repeated&#x2d;call n f)
+  (if (= n 1) ___ (begin ___ ___)))
+</code></pre>
+
+</code-input>
+
+<p>使用 Ok 测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q repeat-lambda<button id="copy-code-python3ok-qrepeat-lambda" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qrepeat-lambda").onclick = () => copyCode('python3 ok -q repeat-lambda', "copy-code-python3ok-qrepeat-lambda");
+        </script>
+        <br/>
+
+
+        <button id='toggle-7' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        提示：repeat<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-7">
+
+<p><code>repeated&#x2d;call</code> 过程接受一个无参过程，因此
+<code>(lambda () ___)</code> 必须出现在空白处。该 lambda 的
+函数体是 <code>expr</code>，它必须被反引用（unquote）。</p>
+
+</div>
+
+
+        <button id='toggle-8' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        提示：repeated-call<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-8">
+
+<p>用 <code>(f)</code> 以无参方式调用 <code>f</code>。如果 <code>n</code> 为 1，就直接调用 <code>f</code>。如果 <code>n</code>
+大于 1，先调用 <code>f</code>，然后再调用 <code>(repeated&#x2d;call (&#x2d; n 1) f)</code>。</p>
+
+</div>
+
+<br>
+
+
+<h2 id="tail-calls">尾调用</h2>
+
+
+
+        <button id='toggle-9' class='btn btn-outline btn-lg alwaystoggle toggle'>
+        尾调用复习<noscript> （请启用 JavaScript）</noscript>
+        </button>
+        <div class="solution toggle-9">
+
+
+<h2 id="tail-calls-refresher" class="no-toc">尾调用复习</h2>
+
+
+<p>如果一个递归调用是函数所做的 <strong>最后一件事</strong>，那么它就是尾调用。</p>
+
+<p>尾调用的例子：</p>
+
+<pre><code class="scheme">(define (fact n total)
+  (if (= n 0)
+      total
+      (fact (&#x2d; n 1) (* total n))))</code></pre>
+
+
+<p>如你所见，最后发生的事情是对 <code>fact</code> 的一次调用。这个帧中没有任何剩余工作要做，因此我们可以关闭它并进入下一个。</p>
+
+<p>不带尾调用的函数例子：</p>
+
+<pre><code class="scheme">(define (fact n)
+  (if (= n 0)
+      1
+      (* n (fact (&#x2d; n 1)))))</code></pre>
+
+
+<p>如你所见，<code>(fact (&#x2d; n 1))</code> 调用必须先返回，然后才能与 <code>n</code> 相乘。也就是说，我们必须保持该帧打开，直到调用完成并且我们可以进行乘法运算。</p>
+
+<p>这一点很重要，因为尾递归函数使用 <strong>常数空间</strong>，而非尾递归函数可能使用线性或更多的空间。</p>
+
+<p>在递归调用返回后，还有任何工作要做吗？</p>
+
+<ul>
+  <li>如果有，那么它不是尾调用。</li>
+  <li>如果没有，那么它就是尾调用。</li>
+</ul>
+
+</div>
+
+
+<h3 id="q6-concatenate">Q6：拼接</h3>
+
+
+<p>写一个尾递归函数 <code>concatenate</code>，它接受一个列表的列表 <code>s</code>，并将所有元素拼接成一个列表。</p>
+
+<blockquote><p><strong>提示</strong>：
+回忆一下内置的 <code>append</code> 函数</p></blockquote>
+
+<solution>
+
+<pre><code class="scheme">(define (concatenate s)
+'YOUR-CODE-HERE
+)</code></pre>
+
+
+</solution>
+
+<p>使用 Ok 解锁并测试你的代码：</p><pre style="margin-bottom:0;"><code class="nohighlight">python3 ok -q concatenate -u
+python3 ok -q concatenate<button id="copy-code-python3ok-qconcatenate-upython3ok-qconcatenate" class="inline-copy-button"><div class="copy-tooltip"><span>复制</span></div>✂️</a></code></pre>
+        <script>
+        document.getElementById("copy-code-python3ok-qconcatenate-upython3ok-qconcatenate").onclick = () => copyCode('python3 ok -q concatenate -u\npython3 ok -q concatenate', "copy-code-python3ok-qconcatenate-upython3ok-qconcatenate");
+        </script>
+        <br/>
+
+
+<h2 id="check-your-score-locally">在本地检查你的得分</h2>
+
+<p>你可以通过运行以下命令，在本地检查本次作业每一道题的得分：</p>
+
+<pre><code>python3 ok &#x2d;&#x2d;score</code></pre>
+
+<p><strong>这并不会提交作业！</strong>当你对自己的得分满意后，请将作业提交到 Gradescope 以获得相应学分。</p>
+
+
+<h1 id="submit-assignment">提交作业</h1>
+
+
+<p>请将你修改过的所有文件上传 <strong>到对应的 Gradescope 作业</strong> 来提交本次作业。<a href="../lab00/#submitting-the-assignment">实验 00</a> 中有详细说明。</p>
+
+<p>正确完成所有题目可获得 1 分。
+<!-- If you are in the regular lab, you will need your attendance from your TA to receive that one point. -->
+请确保在离开前你的助教已经为你签到了。</p>
+<script>
+    $('.alwaystoggle').css('display', 'inline-block');
+    $('.alwaystoggle').click(function() {
+      var solution_id = $(this).attr('id');
+      $('div.' + solution_id).slideToggle(600);
+    });
+</script>
+
+  </div>
+
+  <div class='col-md-3 sticky'>
+    <nav class='hidden-print hidden-sm hidden-xs sidebar'>
+      <ul>
+  <li><a href="#lab-checkoff-questions">实验签到题目</a></li>
+  <li><a href="#attendance">签到</a></li>
+  <li><a href="#required-questions">必做题目</a></li>
+  <ul>
+    <li><a href="#quasiquotation">反引号引用</a></li>
+    <ul>
+      <li><a href="#q1-wwsd-quasiquote">Q1：WWSD：反引号引用</a></li>
+    </ul>
+    <li><a href="#interpreters">解释器</a></li>
+    <ul>
+      <li><a href="#q2-using-link">Q2：使用 Link</a></li>
+    </ul>
+    <li><a href="#calculator-evaluation">Calculator 求值</a></li>
+    <ul>
+      <li><a href="#q3-new-procedure">Q3：新过程</a></li>
+      <li><a href="#q4-new-form">Q4：新形式</a></li>
+    </ul>
+    <li><a href="#macros">宏</a></li>
+    <ul>
+      <li><a href="#q5-repeat">Q5：重复</a></li>
+    </ul>
+    <li><a href="#tail-calls">尾调用</a></li>
+    <ul>
+      <li><a href="#q6-concatenate">Q6：拼接</a></li>
+    </ul>
+    <li><a href="#check-your-score-locally">在本地检查你的得分</a></li>
+  </ul>
+  <li><a href="#submit-assignment">提交作业</a></li>
+</ul>
+    </nav>
+  </div>
+</div>
+
+    </main>
+
+    <!-- <footer class="container">
+      <div class="row text-center">
+        <div class="col col-sm-4">
+          <h3><a href="/">CS 61A</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/weekly">Weekly Schedule</a></li>
+            <li><a href="/office-hours">Office Hours</a></li>
+            <li><a href="/staff">Staff</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/resources">Resources</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/studying">Studying Guide</a></li>
+            <li><a href="/articles/debugging">Debugging Guide</a></li>
+            <li><a href="/articles/composition">Composition Guide</a></li>
+            <li><a href="/articles/pair-programming">Pair Programming</a></li>
+          </ul>
+        </div>
+        <div class="col col-sm-4">
+          <h3><a href="/articles/about">Policies</a></h3>
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href="/articles/about#assignments">Assignments</a></li>
+            <li><a href="/articles/about#exams">Exams</a></li>
+            <li><a href="/articles/about#grading">Grading</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer> -->
+
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+  <script>
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+      window.MonacoEnvironment = { getWorkerUrl: () => URL.createObjectURL(new Blob([`
+      self.MonacoEnvironment = {
+          baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min'
+      };
+      importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/base/worker/workerMain.min.js');
+  `], { type: 'text/javascript' }))
+  };
+  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.5/js/jsplumb.min.js"></script>
+    <script src="/assets/js/network_storage.js"></script>
+    <script src="/assets/js/code_tabindex.js"></script>
+    <script src="/assets/js/storable.js"></script>
+    <script src="/assets/js/editor.js"></script>
+    <script src="/assets/js/copy-button.js"></script>
+    <script src="/assets/js/env-diagram.js"></script>
+    
+<!-- <script src="/assets/js/sketchy.js"></script> -->
+<script>
+  $('.sidebar ul').addClass('nav nav-stacked noselect');
+  $('body').scrollspy({
+    target: '.sidebar',
+    offset: 40
+  });
+
+  function goToId(id) {
+    var target = $(id);
+    target.parent().show();
+    $('html,body').animate({
+      scrollTop: target.offset().top,
+    }, 100);
+    $("body").scrollspy('refresh');
+  }
+
+  if (location.hash) {
+    setTimeout(function() {
+      if (location.hash) {
+        goToId(location.hash);
+      }
+    }, 1);
+  }
+
+  $("a").click(function(event) {
+    var urlBeforeHashRegEx = new RegExp("^"+window.location.href.split("#")[0]);
+    if (/^#/.test(this.hash) && urlBeforeHashRegEx.test(this.href)) {
+      event.preventDefault();
+      goToId(this.hash);
+      document.location.hash = this.hash;
+    }
+  });
+</script>
+
+  </body>
+</html>
