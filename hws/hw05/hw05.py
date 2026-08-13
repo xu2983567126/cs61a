@@ -53,6 +53,18 @@ def add_links(link1: Link, link2: Link) -> Link:
     (3 4 5 1 2)
     """
     "*** YOUR CODE HERE ***"
+    link = Link(0)
+    ret = link
+    while link1 is not Link.empty:
+        link.rest = Link(link1.first)
+        link = link.rest
+        link1 = link1.rest
+    while link2 is not Link.empty:
+        link.rest = Link(link2.first)
+        link = link.rest
+        link2 = link2.rest
+    return ret.rest
+    
 
 
 def deep_map_mut(func, s: Link) -> None:
@@ -83,6 +95,13 @@ def deep_map_mut(func, s: Link) -> None:
     (2 ((4 6)) 8)
     """
     "*** YOUR CODE HERE ***"
+    if s is Link.empty:
+        return
+    if type(s.first) == Link:
+        deep_map_mut(func, s.first)
+    else:
+        s.first = func(s.first)
+    deep_map_mut(func, s.rest)
 
 
 from math import sqrt
@@ -109,4 +128,11 @@ def is_prime_sqrt(n: int) -> bool:
     """
     # sqrt(k) will give the square root of k as a floating point (decimal)
     "*** YOUR CODE HERE ***"
+    if n == 1:
+        return False
+    for i in range(2, (int)(sqrt(n)) + 1):
+        if n % i == 0:
+            return False
+    return True
+        
 
