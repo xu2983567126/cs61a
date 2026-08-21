@@ -5,7 +5,7 @@ test = {
     {
       'cases': [
         {
-          'answer': '9c71e25107bcc9b61bd94e1e745321f8',
+          'answer': "Link('+', Link(Link('-', Link(2, Link(4))), Link(6, Link(8))))",
           'choices': [
             "Link('+', Link('-', Link(2, Link(4, Link(6, Link(8))))))",
             "Link('+', Link(Link(-, Link(2, Link(4))), Link(6, Link(8))))",
@@ -14,12 +14,12 @@ test = {
             'None of these'
           ],
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'multiline': False,
           'question': 'Find the Python expression that returns a `Link` representing the given expression: (+ (- 2 4) 6 8)'
         },
         {
-          'answer': '37670e4b00633084aa22d884c6c9326d',
+          'answer': '+',
           'choices': [
             '-',
             '+',
@@ -29,12 +29,12 @@ test = {
             'None of these'
           ],
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'multiline': False,
           'question': "What is the operator of the previous part's call expression?"
         },
         {
-          'answer': 'f691e16231ded18eebfd3f4f5ef545cd',
+          'answer': 'p.first',
           'choices': [
             'p',
             'p.first',
@@ -43,7 +43,7 @@ test = {
             'p.first.rest'
           ],
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'multiline': False,
           'question': r"""
           If the `Link` you constructed in the previous part was bound to the name `p`,
@@ -51,7 +51,7 @@ test = {
           """
         },
         {
-          'answer': 'df97a47b2518e72a265467bdb7e64aff',
+          'answer': 'p.rest',
           'choices': [
             'p',
             'p.first',
@@ -60,7 +60,7 @@ test = {
             'p.first.rest'
           ],
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'multiline': False,
           'question': r"""
           If the `Link` you constructed was bound to the name `p`, 
@@ -68,7 +68,7 @@ test = {
           """
         },
         {
-          'answer': '47cc7a335c0fc0140c6aabcbbdbce2f6',
+          'answer': 'p.rest.first',
           'choices': [
             'p',
             'p.first',
@@ -77,12 +77,12 @@ test = {
             'p.first.rest'
           ],
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'multiline': False,
           'question': 'How would you retrieve only the first operand?'
         },
         {
-          'answer': '804c40b21e1fcae9ab6eb0c65188169d',
+          'answer': "Link('-', Link(2, Link(4)))",
           'choices': [
             "'-'",
             "'+'",
@@ -93,7 +93,7 @@ test = {
             'Link(2, Link(4))'
           ],
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'multiline': False,
           'question': 'What is the first operand of the call expression (+ (- 2 4) 6 8) prior to evaluation?'
         }
