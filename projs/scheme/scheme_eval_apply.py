@@ -10,7 +10,7 @@ from ucb import main, trace
 # 求值/应用（Eval/Apply） #
 ##############
 
-def scheme_eval(expr, env, _=None): # 可选的第三个参数会被忽略
+def scheme_eval(expr, env, tail=False): # 可选的第三个参数会被忽略
     """在 Frame ENV 中对 Scheme 表达式 EXPR 求值。
 
     >>> expr = read_line('(+ 2 2)')
@@ -32,15 +32,18 @@ def scheme_eval(expr, env, _=None): # 可选的第三个参数会被忽略
 
     from scheme_forms import SPECIAL_FORMS # 在此处导入，避免模块加载时的循环依赖
     if scheme_symbolp(first) and first in SPECIAL_FORMS:
-        return SPECIAL_FORMS[first](rest, env)
+        return SPECIAL_FORMS[first](rest, env, tail)
     else:
         # BEGIN PROBLEM 3
         procedure = scheme_eval(first, env)
         args = map_link(lambda x: scheme_eval(x, env), rest)
-        return scheme_apply(procedure, args, env)
+        if tail:
+            return complete_apply(procedure, args, env, tail)
+        else:
+            return scheme_apply(procedure, args, env)
         # END PROBLEM 3
 
-def scheme_apply(procedure, args, env):
+def scheme_apply(procedure, args, env, tail=False):
     """在 Frame ENV（当前环境）中将 Scheme 过程 PROCEDURE 应用于实参值
     ARGS（一个 Scheme 列表），返回运算的结果。
     
@@ -71,18 +74,18 @@ def scheme_apply(procedure, args, env):
         # 执行 lambda 过程
         # 继承定义时的环境
         procedure_frame = procedure.env.make_child_frame(procedure.formals, args)
-        return eval_all(procedure.body, procedure_frame)
+        return eval_all(procedure.body, procedure_frame, tail)
         # END PROBLEM 9
     elif isinstance(procedure, MuProcedure):
         # BEGIN PROBLEM 11
         # 继承调用时的环境
         procedure_frame = env.make_child_frame(procedure.formals, args)
-        return eval_all(procedure.body, procedure_frame)
+        return eval_all(procedure.body, procedure_frame, tail)
         # END PROBLEM 11
     else:
         assert False, "Unexpected procedure: {}".format(procedure)
 
-def eval_all(expressions, env):
+def eval_all(expressions, env, tail=False):
     """在 Frame ENV（当前环境）中依次求值 Scheme 列表 EXPRESSIONS 中的
     每个表达式，并返回最后一个表达式的值。
 
@@ -94,7 +97,7 @@ def eval_all(expressions, env):
     # BEGIN PROBLEM 6
     value = None
     while expressions is not nil:
-        value = scheme_eval(expressions.first, env)
+        value = scheme_eval(expressions.first, env, tail and expressions.rest is nil)
         expressions = expressions.rest
     return value
     # END PROBLEM 6
@@ -111,12 +114,12 @@ class Unevaluated:
         self.expr = expr
         self.env = env
 
-def complete_apply(procedure, args, env):
+def complete_apply(procedure, args, env, tail=False):
     """在 env 中将过程应用于 args；确保返回结果不是 Unevaluated。"""
     validate_procedure(procedure)
-    val = scheme_apply(procedure, args, env)
+    val = scheme_apply(procedure, args, env, tail)
     if isinstance(val, Unevaluated):
-        return scheme_eval(val.expr, val.env)
+        return scheme_eval(val.expr, val.env, tail)
     else:
         return val
 

@@ -11,7 +11,7 @@ from scheme_builtins import *
 # 即不含最前面标识符号（if、lambda、quote 等）的 Scheme 列表。其第二个参数
 # 是该形式被求值所在的环境。
 
-def do_define_form(expressions, env):
+def do_define_form(expressions, env, tail=False):
     """求值一个 define 形式。返回被绑定的符号。
     
     >>> env = create_global_frame()
@@ -53,7 +53,7 @@ def do_define_form(expressions, env):
         bad_signature = signature.first if isinstance(signature, Link) else signature
         raise SchemeError('non-symbol: {0}'.format(bad_signature))
 
-def do_quote_form(expressions, env):
+def do_quote_form(expressions, env, tail=False):
     """求值一个 quote 形式。
 
     >>> env = create_global_frame()
@@ -65,7 +65,7 @@ def do_quote_form(expressions, env):
     return expressions.first
     # END PROBLEM 5
 
-def do_begin_form(expressions, env):
+def do_begin_form(expressions, env, tail=False):
     """求值一个 begin 形式。
 
     >>> env = create_global_frame()
@@ -75,9 +75,9 @@ def do_begin_form(expressions, env):
     3
     """
     validate_form(expressions, 1)
-    return eval_all(expressions, env)
+    return eval_all(expressions, env, tail)
 
-def do_lambda_form(expressions, env):
+def do_lambda_form(expressions, env, tail=False):
     """求值一个 lambda 形式。
     
     formals 定义为一个普通的链表，body 定义为一个嵌套的链表。
@@ -94,7 +94,7 @@ def do_lambda_form(expressions, env):
     return LambdaProcedure(formals, body, env)
     # END PROBLEM 7
 
-def do_if_form(expressions, env):
+def do_if_form(expressions, env, tail=False):
     """求值一个 if 形式。
 
     >>> env = create_global_frame()
@@ -105,11 +105,11 @@ def do_if_form(expressions, env):
     """
     validate_form(expressions, 2, 3)
     if is_scheme_true(scheme_eval(expressions.first, env)):
-        return scheme_eval(expressions.rest.first, env)
+        return scheme_eval(expressions.rest.first, env, tail)
     elif len_link(expressions) == 3:
-        return scheme_eval(expressions.rest.rest.first, env)
+        return scheme_eval(expressions.rest.rest.first, env, tail)
 
-def do_and_form(expressions, env):
+def do_and_form(expressions, env, tail=False):
     """求值一个（短路的）and 形式。
 
     >>> env = create_global_frame()
@@ -126,6 +126,8 @@ def do_and_form(expressions, env):
     # BEGIN PROBLEM 12
     value = True
     while expressions is not nil:
+        if expressions.rest is nil:
+            return scheme_eval(expressions.first, env, tail)
         value = scheme_eval(expressions.first, env)
         if is_scheme_false(value):
             return False
@@ -133,7 +135,7 @@ def do_and_form(expressions, env):
     return value
     # END PROBLEM 12
 
-def do_or_form(expressions, env):
+def do_or_form(expressions, env, tail=False):
     """求值一个（短路的）or 形式。
 
     >>> env = create_global_frame()
@@ -150,6 +152,8 @@ def do_or_form(expressions, env):
     # BEGIN PROBLEM 12
     value = False
     while expressions is not nil:
+        if expressions.rest is nil:
+            return scheme_eval(expressions.first, env, tail)
         value = scheme_eval(expressions.first, env)
         if is_scheme_true(value):
             return value
@@ -157,7 +161,7 @@ def do_or_form(expressions, env):
     return False
     # END PROBLEM 12
 
-def do_cond_form(expressions, env):
+def do_cond_form(expressions, env, tail=False):
     """求值一个 cond 形式。
 
     >>> do_cond_form(read_line("((#f (print 2)) (#t 3))"), create_global_frame())
@@ -176,11 +180,11 @@ def do_cond_form(expressions, env):
             # BEGIN PROBLEM 13
             if clause.rest is nil:
                 return test
-            return eval_all(clause.rest, env)
+            return eval_all(clause.rest, env, tail)
             # END PROBLEM 13
         expressions = expressions.rest
 
-def do_let_form(expressions, env):
+def do_let_form(expressions, env, tail=False):
     """求值一个 let 形式。
 
     >>> env = create_global_frame()
@@ -189,7 +193,7 @@ def do_let_form(expressions, env):
     """
     validate_form(expressions, 2)
     let_env = make_let_frame(expressions.first, env)
-    return eval_all(expressions.rest, let_env)
+    return eval_all(expressions.rest, let_env, tail)
 
 def make_let_frame(bindings, env):
     """创建 Frame ENV 的一个子帧，其中包含 BINDINGS 中给出的定义。
@@ -216,7 +220,7 @@ def make_let_frame(bindings, env):
 
 
 
-def do_quasiquote_form(expressions, env):
+def do_quasiquote_form(expressions, env, tail=False):
     """在 Frame ENV 中对带参数 EXPRESSIONS 的 quasiquote 形式求值。"""
     def quasiquote_item(val, env, level):
         """在 Frame ENV 中，对嵌套在 quasiquote 形式内、深度为 LEVEL 的
@@ -237,7 +241,7 @@ def do_quasiquote_form(expressions, env):
     validate_form(expressions, 1, 1)
     return quasiquote_item(expressions.first, env, 1)
 
-def do_unquote(expressions, env):
+def do_unquote(expressions, env, tail=False):
     raise SchemeError('unquote outside of quasiquote')
 
 
@@ -246,7 +250,7 @@ def do_unquote(expressions, env):
 # 动态作用域 #
 #################
 
-def do_mu_form(expressions, env):
+def do_mu_form(expressions, env, tail=False):
     """求值一个 mu 形式。"""
     validate_form(expressions, 2)
     formals = expressions.first
