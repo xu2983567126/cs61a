@@ -1,4 +1,4 @@
-"""This module implements the built-in procedures of the Scheme language."""
+"""本模块实现了 Scheme 语言的内建过程。"""
 
 import math
 import numbers
@@ -12,15 +12,15 @@ from scheme_utils import *
 
 
 #######################
-# Built-In Procedures #
+# 内建过程 #
 #######################
 
-# A list of triples (NAME, PYTHON-FUNCTION, INTERNAL-NAME).  Added to by
-# builtin and used in create_global_frame.
+# 一组三元组 (NAME, PYTHON-FUNCTION, INTERNAL-NAME)。由 builtin 装饰器添加，
+# 并在 create_global_frame 中使用。
 BUILTINS = []
 
 def builtin(*names, need_env=False):
-    """An annotation to convert a Python function into a BuiltinProcedure."""
+    """一个装饰器，用于将 Python 函数转换为 BuiltinProcedure。"""
     def add(py_func):
         for name in names:
             BUILTINS.append((name, py_func, names[0], need_env))
@@ -67,7 +67,7 @@ def scheme_pairp(x):
 def scheme_valid_cdrp(x):
     return scheme_pairp(x) or scheme_nullp(x) or scheme_promisep(x)
 
-# Streams
+# 流（Streams）
 @builtin("promise?")
 def scheme_promisep(x):
     return type(x).__name__ == 'Promise'
@@ -101,7 +101,7 @@ def scheme_cdr(x):
     validate_type(x, scheme_pairp, 0, 'cdr')
     return x.rest
 
-# Mutation extras
+# 可变操作补充
 @builtin("set-car!")
 def scheme_set_car(x, y):
     validate_type(x, scheme_pairp, 0, 'set-car!')
@@ -143,15 +143,15 @@ def scheme_integerp(x):
     return scheme_numberp(x) and (isinstance(x, numbers.Integral) or int(x) == x)
 
 def _check_nums(*vals):
-    """Check that all arguments in VALS are numbers."""
+    """检查 VALS 中的所有参数都是数字。"""
     for i, v in enumerate(vals):
         if not scheme_numberp(v):
             msg = "operand {0} ({1}) is not a number"
             raise SchemeError(msg.format(i, v))
 
 def _arith(fn, init, vals):
-    """Perform the FN operation on the number values of VALS, with INIT as
-    the value when VALS is empty. Returns the result as a Scheme value."""
+    """对 VALS 中的数值施加 FN 运算，INIT 为 VALS 为空时的初始值。
+    返回结果（以 Scheme 值的形式）。"""
     _check_nums(*vals)
     s = init
     for val in vals:
@@ -170,7 +170,7 @@ def scheme_add(*vals):
 
 @builtin("-")
 def scheme_sub(val0, *vals):
-    _check_nums(val0, *vals) # fixes off-by-one error
+    _check_nums(val0, *vals) # 修复差一（off-by-one）错误
     if len(vals) == 0:
         return _ensure_int(-val0)
     return _arith(operator.sub, val0, vals)
@@ -181,7 +181,7 @@ def scheme_mul(*vals):
 
 @builtin("/")
 def scheme_div(val0, *vals):
-    _check_nums(val0, *vals) # fixes off-by-one error
+    _check_nums(val0, *vals) # 修复差一（off-by-one）错误
     try:
         if len(vals) == 0:
             return _ensure_int(operator.truediv(1, val0))
@@ -226,21 +226,20 @@ def scheme_remainder(val0, val1):
     return result
 
 def number_fn(module, name, fallback=None):
-    """A Scheme built-in procedure that calls the numeric Python function named
-    MODULE.FN."""
+    """一个 Scheme 内建过程，用于调用名为 MODULE.FN 的数值型 Python 函数。"""
     py_fn = getattr(module, name) if fallback is None else getattr(module, name, fallback)
     def scheme_fn(*vals):
         _check_nums(*vals)
         return py_fn(*vals)
     return scheme_fn
 
-# Add number functions in the math module as built-in procedures in Scheme
+# 将 math 模块中的数值函数添加为 Scheme 内建过程
 for _name in ["acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh",
               "ceil", "copysign", "cos", "cosh", "degrees", "floor", "log",
               "log10", "log1p", "radians", "sin", "sinh", "sqrt",
               "tan", "tanh", "trunc"]:
     builtin(_name)(number_fn(math, _name))
-builtin("log2")(number_fn(math, "log2", lambda x: math.log(x, 2)))  # Python 2 compatibility
+builtin("log2")(number_fn(math, "log2", lambda x: math.log(x, 2)))  # Python 2 兼容性
 
 def _numcomp(op, x, y):
     _check_nums(x, y)
@@ -282,7 +281,7 @@ def scheme_zerop(x):
     return x == 0
 
 ##
-## Other operations
+## 其他操作
 ##
 
 @builtin("display")
@@ -352,9 +351,9 @@ def scheme_reduce(fn, s, env):
 
 @builtin("load", need_env=True)
 def scheme_load(*args):
-    """Load a Scheme source file. ARGS should be of the form (SYM, ENV) or
-    (SYM, QUIET, ENV). The file named SYM is loaded into Frame ENV,
-    with verbosity determined by QUIET (default true)."""
+    """加载一个 Scheme 源文件。ARGS 应为 (SYM, ENV) 或 (SYM, QUIET, ENV)
+    的形式。名为 SYM 的文件被加载进 Frame ENV，是否输出详细信息由 QUIET
+    决定（默认为真）。"""
     if not (2 <= len(args) <= 3):
         expressions = args[:-1]
         raise SchemeError('"load" given incorrect number of arguments: '
@@ -377,8 +376,7 @@ def scheme_load(*args):
 @builtin("load-all", need_env=True)
 def scheme_load_all(directory, env):
     """
-    Loads all .scm files in the given directory, alphabetically. Used only
-        in tests/ code.
+    按字母顺序加载给定目录下的所有 .scm 文件。仅用于测试代码。
     """
     assert scheme_stringp(directory)
     directory = directory[1:-1]
@@ -389,8 +387,8 @@ def scheme_load_all(directory, env):
         scheme_load(x, env)
 
 def scheme_open(filename):
-    """If either FILENAME or FILENAME.scm is the name of a valid file,
-    return a Python file opened to it. Otherwise, raise an error."""
+    """若 FILENAME 或 FILENAME.scm 是有效文件名，则返回打开该文件的
+    Python 文件对象；否则抛出错误。"""
     try:
         return open(filename)
     except IOError as exc:
@@ -403,7 +401,7 @@ def scheme_open(filename):
 
 
 ##
-## Turtle graphics (non-standard)
+## Turtle 图形（非标准）
 ##
 
 turtle = CANVAS = None
@@ -465,40 +463,37 @@ def _tscheme_prep():
 
 @builtin("forward", "fd")
 def tscheme_forward(n):
-    """Move the turtle forward a distance N units on the current heading."""
+    """让海龟沿当前朝向前进 N 个单位的距离。"""
     _check_nums(n)
     _tscheme_prep()
     turtle.forward(n)
 
 @builtin("backward", "back", "bk")
 def tscheme_backward(n):
-    """Move the turtle backward a distance N units on the current heading,
-    without changing direction."""
+    """让海龟沿当前朝向后退 N 个单位的距离，不改变方向。"""
     _check_nums(n)
     _tscheme_prep()
     turtle.backward(n)
 
 @builtin("left", "lt")
 def tscheme_left(n):
-    """Rotate the turtle's heading N degrees counterclockwise."""
+    """让海龟的朝向逆时针旋转 N 度。"""
     _check_nums(n)
     _tscheme_prep()
     turtle.left(n)
 
 @builtin("right", "rt")
 def tscheme_right(n):
-    """Rotate the turtle's heading N degrees clockwise."""
+    """让海龟的朝向顺时针旋转 N 度。"""
     _check_nums(n)
     _tscheme_prep()
     turtle.right(n)
 
 @builtin("circle")
 def tscheme_circle(r, extent=None):
-    """Draw a circle with center R units to the left of the turtle (i.e.,
-    right if N is negative.  If EXTENT is not None, then draw EXTENT degrees
-    of the circle only.  Draws in the clockwise direction if R is negative,
-    and otherwise counterclockwise, leaving the turtle facing along the
-    arc at its end."""
+    """以海龟左侧 R 个单位处为圆心画圆（若 R 为负则在右侧）。
+    若 EXTENT 不为 None，则只画该圆的 EXTENT 度弧。当 R 为负时顺时针绘制，
+    否则逆时针绘制；绘制结束后海龟头朝向弧的末端。"""
     if extent is None:
         _check_nums(r)
     else:
@@ -508,59 +503,59 @@ def tscheme_circle(r, extent=None):
 
 @builtin("setposition", "setpos", "goto")
 def tscheme_setposition(x, y):
-    """Set turtle's position to (X,Y), heading unchanged."""
+    """将海龟位置设为 (X,Y)，朝向不变。"""
     _check_nums(x, y)
     _tscheme_prep()
     turtle.setposition(x, y)
 
 @builtin("setheading", "seth")
 def tscheme_setheading(h):
-    """Set the turtle's heading H degrees clockwise from north (up)."""
+    """将海龟朝向设为从正北（上方）顺时针 H 度。"""
     _check_nums(h)
     _tscheme_prep()
     turtle.setheading(h)
 
 @builtin("penup", "pu")
 def tscheme_penup():
-    """Raise the pen, so that the turtle does not draw."""
+    """抬起画笔，使海龟移动时不绘制。"""
     _tscheme_prep()
     turtle.penup()
 
 @builtin("pendown", "pd")
 def tscheme_pendown():
-    """Lower the pen, so that the turtle starts drawing."""
+    """落下画笔，使海龟开始绘制。"""
     _tscheme_prep()
     turtle.pendown()
 
 @builtin("showturtle", "st")
 def tscheme_showturtle():
-    """Make turtle visible."""
+    """使海龟可见。"""
     _tscheme_prep()
     turtle.showturtle()
 
 @builtin("hideturtle", "ht")
 def tscheme_hideturtle():
-    """Make turtle visible."""
+    """隐藏海龟（使其不可见）。"""
     _tscheme_prep()
     turtle.hideturtle()
 
 @builtin("clear")
 def tscheme_clear():
-    """Clear the drawing, leaving the turtle unchanged."""
+    """清除绘图，海龟状态保持不变。"""
     _tscheme_prep()
     turtle.clear()
 
 @builtin("color")
 def tscheme_color(c):
-    """Set the color to C, a string such as '"red"' or '"#ffc0c0"' (representing
-    hexadecimal red, green, and blue values."""
+    """将颜色设为 C，C 为字符串，如 '"red"' 或 '"#ffc0c0"'（表示
+    十六进制的红、绿、蓝分量值）。"""
     _tscheme_prep()
     validate_type(c, scheme_stringp, 0, "color")
     turtle.color(eval(c))
 
 @builtin("rgb")
 def tscheme_rgb(red, green, blue):
-    """Return a color from RED, GREEN, and BLUE values from 0 to 1."""
+    """根据 RED、GREEN、BLUE（取值范围 0 到 1）返回一种颜色。"""
     colors = (red, green, blue)
     for x in colors:
         if x < 0 or x > 1:
@@ -570,13 +565,13 @@ def tscheme_rgb(red, green, blue):
 
 @builtin("begin_fill")
 def tscheme_begin_fill():
-    """Start a sequence of moves that outline a shape to be filled."""
+    """开始一系列移动，勾勒出待填充图形的轮廓。"""
     _tscheme_prep()
     turtle.begin_fill()
 
 @builtin("end_fill")
 def tscheme_end_fill():
-    """Fill in shape drawn since last begin_fill."""
+    """填充自上次 begin_fill 以来所绘图形的内部。"""
     _tscheme_prep()
     turtle.end_fill()
 
@@ -589,7 +584,7 @@ def tscheme_bgcolor(c):
 @builtin("exitonclick")
 def tscheme_exitonclick():
     global turtle
-    """Wait for a click on the turtle window, and then close it."""
+    """等待在海龟窗口上单击，然后关闭窗口。"""
     if turtle is None:
         return
     _tscheme_prep()
@@ -602,16 +597,15 @@ def tscheme_exitonclick():
 
 @builtin("speed")
 def tscheme_speed(s):
-    """Set the turtle's animation speed as indicated by S (an integer in
-    0-10, with 0 indicating no animation (lines draw instantly), and 1-10
-    indicating faster and faster movement."""
+    """根据 S 设置海龟的动画速度（0 到 10 的整数，0 表示无动画、
+    线条立即绘出；1 到 10 表示越来越快）。"""
     validate_type(s, scheme_integerp, 0, "speed")
     _tscheme_prep()
     turtle.speed(s)
 
 @builtin("pixel")
 def tscheme_pixel(x, y, c):
-    """Draw a filled box of pixels (default 1 pixel) at (X, Y) in color C."""
+    """在 (X, Y) 处以颜色 C 绘制一个填充的像素方块（默认 1 像素）。"""
     validate_type(c, scheme_stringp, 0, "pixel")
     color = c[1:-1]
     _tscheme_prep()
@@ -619,20 +613,20 @@ def tscheme_pixel(x, y, c):
 
 @builtin("pixelsize")
 def tscheme_pixelsize(size):
-    """Change pixel size to SIZE."""
+    """将像素大小改为 SIZE。"""
     _check_nums(size)
     _tscheme_prep()
     turtle.pixel_size(size)
 
 @builtin("screen_width")
 def tscheme_screen_width():
-    """Screen width in pixels of the current size (default 1)."""
+    """当前画布的宽度（像素，默认 1）。"""
     _tscheme_prep()
     return turtle.canvas_width()
 
 @builtin("screen_height")
 def tscheme_screen_height():
-    """Screen height in pixels of the current size (default 1)."""
+    """当前画布的高度（像素，默认 1）。"""
     _tscheme_prep()
     return turtle.canvas_height()
 
@@ -656,20 +650,19 @@ def scheme_print_return(val1, val2):
     return val2
 
 def add_builtins(frame, funcs_and_names):
-    """Enter bindings in FUNCS_AND_NAMES into FRAME, an environment frame,
-    as built-in procedures. Each item in FUNCS_AND_NAMES has the form
-    (NAME, PYTHON-FUNCTION, INTERNAL-NAME)."""
+    """将 FUNCS_AND_NAMES 中的绑定作为内建过程写入 FRAME（一个环境帧）。
+    FUNCS_AND_NAMES 中每一项的形式为 (NAME, PYTHON-FUNCTION, INTERNAL-NAME)。"""
     for name, py_func, proc_name, need_env in funcs_and_names:
         frame.define(name, BuiltinProcedure(py_func, name=proc_name, need_env=need_env))
 
 def create_global_frame():
-    """Create a global frame populated by builtins (including eval and apply)."""
+    """创建一个由内建过程（包括 eval 和 apply）填充的全局帧。"""
     env = Frame(None)
     env.define('undefined', None)
     add_builtins(env, BUILTINS)
 
-    # Add eval and apply to the global frame
-    # Import here to avoid circular dependency
+    # 将 eval 和 apply 加入全局帧
+    # 在此处导入，避免循环依赖
     from scheme_eval_apply import scheme_eval, complete_apply
     env.define('eval', BuiltinProcedure(scheme_eval, True, 'eval'))
     env.define('apply', BuiltinProcedure(complete_apply, True, 'apply'))

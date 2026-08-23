@@ -2,17 +2,17 @@
 from link import *
 
 class SchemeError(Exception):
-    """Exception indicating an error in a Scheme program."""
+    """表示 Scheme 程序中出现错误的异常。"""
 
 ################
-# Environments #
+# 环境 #
 ################
 
 class Frame:
-    """An environment frame binds Scheme symbols to Scheme values."""
+    """环境帧（Frame）将 Scheme 符号绑定到 Scheme 值。"""
 
     def __init__(self, parent):
-        """An empty frame with parent frame PARENT (which may be None)."""
+        """一个空的帧，其父帧为 PARENT（可以为 None）。"""
         self.bindings = {}
         self.parent = parent
 
@@ -23,24 +23,27 @@ class Frame:
         return '<{{{0}}} -> {1}>'.format(', '.join(s), repr(self.parent))
 
     def define(self, symbol, value):
-        """Define Scheme SYMBOL to have VALUE."""
+        """将 Scheme 符号 SYMBOL 定义为 VALUE。"""
         # BEGIN PROBLEM 1
-        "*** YOUR CODE HERE ***"
+        self.bindings[symbol] = value
         # END PROBLEM 1
 
     def lookup(self, symbol):
-        """Return the value bound to SYMBOL. Errors if SYMBOL is not found."""
+        """返回绑定到 SYMBOL 的值。若找不到 SYMBOL 则报错。"""
         # BEGIN PROBLEM 1
-        "*** YOUR CODE HERE ***"
+        if symbol in self.bindings:
+            return self.bindings[symbol]
+        # 在当前环境帧查找，如果找不到就在父环境帧查找
+        if self.parent:
+            return self.parent.lookup(symbol)
         # END PROBLEM 1
         raise SchemeError('unknown identifier: {0}'.format(symbol))
 
 
     def make_child_frame(self, formals, vals):
-        """Return a new local frame whose parent is SELF, in which the symbols
-        in a Scheme list of formal parameters FORMALS are bound to the Scheme
-        values in the Scheme list VALS. Both FORMALS and VALS are represented
-        as Links. Raise an error if too many or too few vals are given.
+        """返回一个新的局部帧，其父帧为 SELF；其中由形参列表 FORMALS（一个
+        Scheme 列表）中的符号被绑定到 VALS（一个 Scheme 列表）中的对应值。
+        FORMALS 与 VALS 均以 Link 表示。若给定的值过多或过少则报错。
 
         >>> env = Frame(None)
         >>> from scheme_reader import read_line
@@ -51,18 +54,22 @@ class Frame:
         if len_link(formals) != len_link(vals):
             raise SchemeError('Incorrect number of arguments to function call')
         # BEGIN PROBLEM 8
-        "*** YOUR CODE HERE ***"
+        child_frame = Frame(self)
+        while formals is not nil and vals is not nil:
+            child_frame.define(formals.first, vals.first)
+            formals, vals = formals.rest, vals.rest
+        return child_frame
         # END PROBLEM 8
 
 ##############
-# Procedures #
+# 过程 #
 ##############
 
 class Procedure:
-    """The the base class for all Procedure classes."""
+    """所有 Procedure 类的基类。"""
 
 class BuiltinProcedure(Procedure):
-    """A Scheme procedure defined as a Python function."""
+    """由一个 Python 函数定义的 Scheme 过程。"""
 
     def __init__(self, py_func, need_env=False, name='builtin'):
         self.name = name
@@ -73,12 +80,11 @@ class BuiltinProcedure(Procedure):
         return '#[{0}]'.format(self.name)
 
 class LambdaProcedure(Procedure):
-    """A procedure defined by a lambda expression or a define form."""
+    """由 lambda 表达式或 define 形式定义的过程。"""
 
     def __init__(self, formals, body, env):
-        """A procedure with formal parameter list FORMALS (a Scheme list),
-        whose body is the Scheme list BODY, and whose parent environment
-        starts with Frame ENV."""
+        """一个带有形参列表 FORMALS（Scheme 列表）的过程，其函数体为
+        Scheme 列表 BODY，其父环境起始于 Frame ENV。"""
         assert isinstance(env, Frame), "env must be of type Frame"
 
         from scheme_utils import validate_type, scheme_listp
@@ -96,7 +102,7 @@ class LambdaProcedure(Procedure):
             repr(self.formals), repr(self.body), repr(self.env))
 
 class MuProcedure(Procedure):
-    """A procedure defined by a mu expression, which has dynamic scope.
+    """由 mu 表达式定义的过程，采用动态作用域。
      _________________
     < Scheme is cool! >
      -----------------
@@ -108,8 +114,8 @@ class MuProcedure(Procedure):
     """
 
     def __init__(self, formals, body):
-        """A procedure with formal parameter list FORMALS (a Scheme list) and
-        Scheme list BODY as its definition."""
+        """一个带有形参列表 FORMALS（Scheme 列表）、并以 Scheme 列表 BODY
+        作为其定义的过程。"""
         self.formals = formals
         self.body = body
 

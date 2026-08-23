@@ -1,23 +1,21 @@
-"""The buffer module assists in iterating through lines and tokens."""
+"""buffer 模块用于辅助遍历各行与各个 token。"""
 
 import math
 
 class Buffer:
-    """A Buffer provides a way of accessing a sequence of tokens across lines.
+    """Buffer 提供了一种跨行访问 token 序列的方式。
 
-    Its constructor takes an iterator, called "the source", that returns the
-    next line of tokens as a list each time it is queried, or None to indicate
-    the end of data.
+    其构造函数接受一个迭代器（称为“source”），每次被查询时返回一个 token 列表
+    作为下一行，或返回 None 表示数据结束。
 
-    The Buffer in effect concatenates the sequences returned from its source
-    and then supplies the items from them one at a time through its pop_first()
-    method, calling the source for more sequences of items only when needed.
+    Buffer 实际上将其 source 返回的这些序列拼接起来，然后通过 pop_first()
+    方法每次从中提供一个元素，仅在需要时才会向 source 索取更多序列。
 
-    In addition, Buffer provides a current method to look at the
-    next item to be supplied, without sequencing past it.
+    此外，Buffer 提供一个 current 方法，用于查看下一个将要提供的元素，
+    而不会越过它。
 
-    The __str__ method prints all tokens read so far, up to the end of the
-    current line, and marks the current token with >>.
+    __str__ 方法会打印到目前为止读取到的所有 token（直到当前行末尾），
+    并用 >> 标记当前 token。
 
     >>> buf = Buffer(iter([['(', '+'], [15], [12, ')']]))
     >>> buf.pop_first()
@@ -41,7 +39,7 @@ class Buffer:
 
     def __init__(self, source):
         """
-        Initialize a Buffer instance based on the given source.
+        基于给定的 source 初始化一个 Buffer 实例。
         """
         self.index = 0
         self.source = source
@@ -49,14 +47,13 @@ class Buffer:
         self.current()
 
     def pop_first(self):
-        """Remove the next item from self and return it. If self has
-        exhausted its source, returns None."""
+        """从 self 中移除并返回下一个元素。若 self 已耗尽其 source，则返回 None。"""
         current = self.current()
         self.index += 1
         return current
 
     def current(self):
-        """Return the current element, or None if none exists."""
+        """返回当前元素；若不存在则返回 None。"""
         while not self.more_on_line():
             try:
                 self.index = 0
@@ -73,14 +70,14 @@ class Buffer:
         return self.current() is None
 
 
-# Try to import readline for interactive history
+# 尝试导入 readline 以获得交互式历史记录
 try:
     import readline
 except:
     pass
 
 class InputReader:
-    """An InputReader is an iterable that prompts the user for input."""
+    """InputReader 是一个可迭代对象，用于提示用户输入。"""
     def __init__(self, prompt):
         self.prompt = prompt
 
@@ -90,7 +87,7 @@ class InputReader:
             self.prompt = ' ' * len(self.prompt)
 
 class LineReader:
-    """A LineReader is an iterable that prints lines after a prompt."""
+    """LineReader 是一个可迭代对象，会在提示符之后打印各行。"""
     def __init__(self, lines, prompt, comment=";"):
         self.lines = lines
         self.prompt = prompt

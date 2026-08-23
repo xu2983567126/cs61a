@@ -1,5 +1,5 @@
 class Link:
-    """A linked list.
+    """一个链表。
 
     >>> s = Link(1)
     >>> s.first
@@ -50,7 +50,7 @@ class Link:
         return s + ')'
 
     def __eq__(self, other):
-        """Check structural equality between two Links."""
+        """检查两个 Link 之间的结构相等性。"""
         if not isinstance(other, Link):
             return False
         return self.first == other.first and self.rest == other.rest
@@ -58,7 +58,7 @@ class Link:
 nil = Link.empty
 
 def repl_str(val):
-    """Show the value in the Scheme REPL."""
+    """在 Scheme REPL 中显示该值。"""
     if val is True:
         return "#t"
     if val is False:
@@ -70,7 +70,7 @@ def repl_str(val):
     return str(val)
 
 def len_link(s):
-    """Return the length of a linked list.
+    """返回链表的长度。
 
     >>> len_link(Link(1, Link(2, Link(3))))
     3
@@ -83,7 +83,7 @@ def len_link(s):
     return result
 
 def map_link(f, s):
-    """Map function f over linked list s.
+    """将函数 f 映射到链表 s 上。
 
     >>> square = lambda x: x * x
     >>> map_link(square, Link(1, Link(2, Link(3))))
@@ -92,4 +92,3 @@ def map_link(f, s):
     if s is Link.empty:
         return s
     return Link(f(s.first), map_link(f, s.rest))
-

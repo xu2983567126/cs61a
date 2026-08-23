@@ -1,9 +1,9 @@
-"""Web server for the schememon GUI."""
+"""schememon 图形界面的 Web 服务器。"""
 import os
 
 from gui_files.common_server import route, start
 
-# Import scheme modules directly from student's project
+# 直接从学生的项目中导入 scheme 模块
 from scheme import create_global_frame
 from scheme_eval_apply import scheme_eval
 from scheme_reader import scheme_read, buffer_lines
@@ -17,32 +17,29 @@ GUI_FOLDER = "gui_files/"
 
 class SchemeEvaluator:
     """
-    A python class that uses the interpreter built in the scheme interpreter
-    project to evaluate scheme expressions
+    一个 Python 类，使用 scheme 解释器项目中构建的解释器来求值 scheme 表达式。
 
-    - __init__() creates a new SchemeEvaluator instance
-    - evaluate() evaluates some scheme code along with a list of files
-      containing scheme code
+    - __init__() 创建一个新的 SchemeEvaluator 实例
+    - evaluate() 求值一些 scheme 代码，以及一份包含 scheme 代码的文件列表
     """
 
     def __init__(self):
         """
-        Instantiates a new Scheme Evaluator
-        Initalizes a Scheme environment
-        Creates a global frame
+        实例化一个新的 Scheme Evaluator，
+        初始化一个 Scheme 环境，
+        并创建一个全局帧。
         """
         self.env = create_global_frame()
 
     def evaluate(self, filenames, code):
         """
-        Evaluates scheme code using the python interpreter built from
-        the scheme project. Returns the evaluation of the last line of
-        the scheme code.
+        使用 scheme 项目中构建的 Python 解释器来求值 Scheme 代码。
+        返回 Scheme 代码最后一行的求值结果。
 
-        - filename: the file that contains all of the base code
-        - code: the code that is used to expand off of base code
+        - filename: 包含全部基础代码的文件
+        - code: 基于基础代码进行扩展的代码
 
-        Example file (example.scm):
+        示例文件（example.scm）：
         ===========================
         (define (square n)
             (* n n)
@@ -52,7 +49,7 @@ class SchemeEvaluator:
             (+ x y)
         )
 
-        Then, SchemeEvaluator().evaluate("./example.scm", "(square 7)") would return 49.
+        此时，SchemeEvaluator().evaluate("./example.scm", "(square 7)") 会返回 49。
         """
         try:
             all_code = ""
@@ -81,10 +78,10 @@ class SchemeEvaluator:
 @route
 def verify_scheme_question(scheme_problem, scheme_solution, test_cases, expected_results):
     """
-    Verifies whether your given solution code for a scheme statement question is correct.
+    校验你为某个 scheme 语句题给出的解答代码是否正确。
 
-    For every test case, the API will use SchemeEvaluator to evaluate the statement. If any testcase
-    does not pass, then the API will set correct to False, and True otherwise.
+    对于每个测试用例，该 API 会使用 SchemeEvaluator 来求值该语句。如果有任一
+    测试用例未通过，则 API 会将 correct 设为 False，否则设为 True。
     """
     try:
         evaluator = SchemeEvaluator()
@@ -97,8 +94,8 @@ def verify_scheme_question(scheme_problem, scheme_solution, test_cases, expected
             code = scheme_code + "\n\n" + test_case
             result = evaluator.evaluate([], code)[-1]
 
-            # SPECIAL COMMENT: Python uses "True" and "False", but Scheme uses "#t" and "#f"
-            # This takes care of the "in" procedure case
+            # 特别说明：Python 使用 "True" 和 "False"，而 Scheme 使用 "#t" 和 "#f"
+            # 此处处理 "in" 过程的情况
 
             if str(result) == "True":
                 result = "#t"

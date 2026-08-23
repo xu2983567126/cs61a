@@ -1,19 +1,19 @@
-;;; Test cases for Scheme.
+;;; Scheme 的测试用例。
 ;;;
-;;; In order to run only a prefix of these examples, add the line
+;;; 若只想运行这些示例的前缀部分，请添加如下一行
 ;;;
 ;;; (exit)
 ;;;
-;;; after the last test you wish to run.
+;;; 放在你希望运行的最后一个测试之后。
 
 ;;; ********************************
-;;; *** Add your own tests here! (Optional) ***
+;;; *** 在此添加你自己的测试！（可选）***
 ;;; ********************************
 
-;;; These are examples from several sections of "The Structure
-;;; and Interpretation of Computer Programs" by Abelson and Sussman.
+;;; 以下示例来自 Abelson 与 Sussman 所著的《计算机程序的构造和解释》
+;;; （The Structure and Interpretation of Computer Programs）的部分章节。
 
-;;; License: Creative Commons share alike with attribution
+;;; 许可协议：知识共享 署名-相同方式共享（Creative Commons Share Alike）
 
 ;;; 1.1.1
 
@@ -82,7 +82,7 @@ circumference
 (square 21)
 ; expect 441
 
-(define square (lambda (x) (* x x))) ; See Section 1.3.2
+(define square (lambda (x) (* x x))) ; 参见 1.3.2 节
 (square 21)
 ; expect 441
 
@@ -320,7 +320,7 @@ one-through-four
 (cdr '(a b c))
 ; expect (b c)
 
-;;; Peter Norvig tests (http://norvig.com/lispy2.html)
+;;; Peter Norvig 的测试（http://norvig.com/lispy2.html）
 
 (define double (lambda (x) (* 2 x)))
 (double 5)
@@ -367,7 +367,7 @@ one-through-four
 (riff-shuffle (riff-shuffle (riff-shuffle (list 1 2 3 4 5 6 7 8))))
 ; expect (1 2 3 4 5 6 7 8)
 
-;;; Additional tests
+;;; 附加测试
 
 (apply square '(2))
 ; expect 4
@@ -427,10 +427,10 @@ one-through-four
 ; expect 2 ; 2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Scheme Implementations ;;;
+;;; Scheme 实现 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; len outputs the length of list s
+;; len 输出列表 s 的长度
 (define (len s)
   (if (eq? s '())
     0
@@ -440,7 +440,7 @@ one-through-four
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;; Tests from Doctests ;;;;
+;;;;; 来自 Doctest 的测试 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (begin 1)
@@ -492,7 +492,7 @@ x
 
 (exit)
 
-; Tail call optimization tests
+; 尾调用优化测试
 
 (define (sum n total)
   (if (zero? n) total
@@ -502,7 +502,7 @@ x
 
 (exit)
 
-; macro tests
+; 宏测试
 
 (define (map f lst)
     (if (null? lst)

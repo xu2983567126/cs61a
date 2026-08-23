@@ -4,14 +4,14 @@ from scheme_classes import *
 from scheme_reader import read_line
 
 #################
-# Type Checking #
+# 类型检查 #
 #################
 
 def scheme_procedurep(x):
     return isinstance(x, Procedure)
 
 def scheme_listp(x):
-    """Return whether x is a well-formed list. Assumes no cycles."""
+    """判断 x 是否为结构良好的列表（假定无环）。"""
     while x is not nil:
         if not isinstance(x, Link):
             return False
@@ -25,11 +25,11 @@ def scheme_numberp(x):
     return isinstance(x, numbers.Real) and not scheme_booleanp(x)
 
 def is_scheme_true(val):
-    """All values in Scheme are true except False."""
+    """Scheme 中所有值都为真，只有 False 为假。"""
     return val is not False
 
 def is_scheme_false(val):
-    """Only False is false in scheme_reader."""
+    """在 scheme_reader 中，只有 False 为假。"""
     return val is False
 
 def scheme_stringp(x):
@@ -46,17 +46,17 @@ def scheme_atomp(x):
             scheme_nullp(x) or scheme_stringp(x))
 
 def self_evaluating(expr):
-    """Return whether EXPR evaluates to itself."""
+    """判断 EXPR 是否求值为其自身。"""
     return (scheme_atomp(expr) and not scheme_symbolp(expr)) or expr is None
 
 
 #######################
-# Argument Validation #
+# 参数校验 #
 #######################
 
 def validate_type(val, predicate, k, name):
-    """Returns VAL.  Raises a SchemeError if not PREDICATE(VAL)
-    using "argument K of NAME" to describe the offending value."""
+    """返回 VAL。若不满足 PREDICATE(VAL)，则抛出 SchemeError，
+    并用 "argument K of NAME" 来描述出错的值。"""
     if not predicate(val):
         msg = "argument {0} of {1} has wrong type ({2})"
         type_name = type(val).__name__
@@ -66,15 +66,14 @@ def validate_type(val, predicate, k, name):
     return val
 
 def validate_procedure(procedure):
-    """Check that PROCEDURE is a valid Scheme procedure."""
+    """检查 PROCEDURE 是否为合法的 Scheme 过程。"""
     if not scheme_procedurep(procedure):
         raise SchemeError('{0} is not callable: {1}'.format(
             type(procedure).__name__.lower(), repl_str(procedure)))
 
 def validate_form(expr, min, max=float('inf')):
-    """Check EXPR is a proper list whose length is at least MIN and no more
-    than MAX (default: no maximum). Raises a SchemeError if this is not the
-    case.
+    """检查 EXPR 是否为一个合法的列表，其长度至少为 MIN、至多为
+    MAX（默认值：无上限）。若不满足则抛出 SchemeError。
 
     >>> validate_form(read_line('(a b)'), 2)
     """
@@ -87,9 +86,8 @@ def validate_form(expr, min, max=float('inf')):
         raise SchemeError('too many operands in form')
 
 def validate_formals(formals):
-    """Check that FORMALS is a valid parameter list, a Scheme list of symbols
-    in which each symbol is distinct. Raise a SchemeError if the list of
-    formals is not a list of symbols or if any symbol is repeated.
+    """检查 FORMALS 是否为合法的形参列表——即由互不相同的符号组成的
+    Scheme 列表。若形参列表不是符号列表，或存在重复符号，则抛出 SchemeError。
 
     >>> validate_formals(read_line('(a b c)'))
     """

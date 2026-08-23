@@ -1,4 +1,4 @@
-"""A Scheme interpreter and its read-eval-print loop."""
+"""Scheme 解释器及其读-求值-打印循环（REPL）。"""
 
 import sys
 import os
@@ -13,12 +13,12 @@ from ucb import main, trace
 
 
 ################
-# Input/Output #
+# 输入/输出 #
 ################
 
 def read_eval_print_loop(next_line, env, interactive=False, quiet=False,
                          startup=False, load_files=(), report_errors=False):
-    """Read and evaluate input until an end of file or keyboard interrupt."""
+    """读取并求值输入，直到遇到文件结束（EOF）或键盘中断（Ctrl+C）。"""
     if startup:
         for filename in load_files:
             scheme_load(filename, True, env)
@@ -42,21 +42,21 @@ def read_eval_print_loop(next_line, env, interactive=False, quiet=False,
                 print('Error: maximum recursion depth exceeded')
             else:
                 print('Error:', err)
-        except KeyboardInterrupt:  # <Control>-C
+        except KeyboardInterrupt:  # <Control>-C（Ctrl+C 中断）
             if not startup:
                 raise
             print()
             print('KeyboardInterrupt')
             if not interactive:
                 return
-        except EOFError:  # <Control>-D, etc.
+        except EOFError:  # <Control>-D 等（Ctrl+D，文件结束）
             print()
             return
 
 
 
 def create_global_frame_with_eval_apply():
-    """Initialize and return a single-frame environment with built-in names."""
+    """初始化并返回一个包含内建名称的单层环境（Frame）。"""
     env = create_global_frame()
     env.define('eval',
                BuiltinProcedure(scheme_eval, True, 'eval'))

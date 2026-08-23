@@ -1,4 +1,4 @@
-"""The UCB module contains functions specific to projects at UC Berkeley."""
+"""UCB 模块包含加州大学伯克利分校（UC Berkeley）课程项目专用的函数。"""
 
 import code
 import functools
@@ -9,29 +9,28 @@ import sys
 
 
 def main(fn):
-    """Call fn with command line arguments.  Used as a decorator.
+    """使用命令行参数调用 fn。用作装饰器。
 
-    The main decorator marks the function that starts a program. For example,
+    该 main 装饰器用于标记启动程序的函数。例如，
 
     @main
     def my_run_function():
-        # function body
+        # 函数体
 
-    Use this instead of the typical __name__ == "__main__" predicate.
+    用它来替代典型的 __name__ == "__main__" 判断。
     """
     if inspect.stack()[1][0].f_locals['__name__'] == '__main__':
-        args = sys.argv[1:] # Discard the script name from command line
-        fn(*args) # Call the main function
+        args = sys.argv[1:] # 从命令行中丢弃脚本名
+        fn(*args) # 调用主函数
     return fn
 
 _PREFIX = ''
 def trace(fn):
-    """A decorator that prints a function's name, its arguments, and its return
-    values each time the function is called. For example,
+    """一个装饰器，在每次调用函数时打印其名称、参数与返回值。例如，
 
     @trace
     def compute_something(x, y):
-        # function body
+        # 函数体
     """
     @functools.wraps(fn)
     def wrapped(*args, **kwds):
@@ -47,38 +46,37 @@ def trace(fn):
             log(fn.__name__ + ' exited via exception')
             _PREFIX = _PREFIX[:-4]
             raise
-        # Here, print out the return value.
+        # 在此处打印返回值
         log('{0}({1}) -> {2}'.format(fn.__name__, ', '.join(reprs), result))
         return result
     return wrapped
 
 
 def log(message):
-    """Print an indented message (used with trace)."""
+    """打印一条带缩进的消息（与 trace 配合使用）。"""
     print(_PREFIX + re.sub('\n', '\n' + _PREFIX, str(message)))
 
 
 def log_current_line():
-    """Print information about the current line of code."""
+    """打印关于当前代码行的信息。"""
     frame = inspect.stack()[1]
     log('Current line: File "{f[1]}", line {f[2]}, in {f[3]}'.format(f=frame))
 
 
 def interact(msg=None):
-    """Start an interactive interpreter session in the current environment.
+    """在当前环境中启动一个交互式解释器会话。
 
-    On Unix:
-      <Control>-D exits the interactive session and returns to normal execution.
-    In Windows:
-      <Control>-Z <Enter> exits the interactive session and returns to normal
-      execution.
+    在 Unix 上：
+      <Control>-D 退出交互式会话并返回正常执行。
+    在 Windows 上：
+      <Control>-Z <Enter> 退出交互式会话并返回正常执行。
     """
-    # evaluate commands in current namespace
+    # 在当前命名空间中执行命令
     frame = inspect.currentframe().f_back
     namespace = frame.f_globals.copy()
     namespace.update(frame.f_locals)
 
-    # exit on interrupt
+    # 在中断时退出
     def handler(signum, frame):
         print()
         exit(0)

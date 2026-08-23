@@ -4,36 +4,58 @@
 (define (cdar x) (cdr (car x)))
 (define (cddr x) (cdr (cdr x)))
 
-;; Problem 14
-;; Returns a list of two-element lists
+;; 问题 14
+;; 返回一个由二元组构成的列表
 (define (enumerate s)
   ; BEGIN PROBLEM 14
-  'replace-this-line
+  (define (helper i s)
+    (if (null? s)
+      '()
+      (cons (cons i
+                  (cons (car s) '())) 
+            (helper (+ i 1) (cdr s))))
+    )
+  (helper 0 s)
   ; END PROBLEM 14
   )
 
 
-;; Problem 15
+;; 问题 15
 
-;; Return the value for a key in a dictionary list
+;; 在字典列表中查找某个键对应的值
 (define (get dict key)
   ; BEGIN PROBLEM 15
-  'replace-this-line
+  (cond 
+    ((null? dict) #f)
+    ((eq? (caar dict) key) (cadar dict))
+    (else (get (cdr dict) key))
+    )
   ; END PROBLEM 15
   )
 
-;; Return a dictionary list with a (key value) pair
+;; 返回一个带有 (键 值) 对的字典列表
 (define (set dict key val)
   ; BEGIN PROBLEM 15
-  'replace-this-line
+  (cond 
+    ((null? dict) (list (list key val)))
+    ((eq? (caar dict) key) (cons (list key val) (cdr dict)))
+    (else (cons (car dict) (set (cdr dict) key val)))
+    )
   ; END PROBLEM 15
   )
 
-;; Problem 16
+;; 问题 16
 
-;; implement solution-code
+;; 实现 solution-code
 (define (solution-code problem solution)
   ; BEGIN PROBLEM 16
-  'replace-this-line
+  (cond
+    ((eq? problem '_____) solution)
+    ((pair? problem)
+      (cons
+        (solution-code (car problem) solution)
+        (solution-code (cdr problem) solution)))
+    (else problem)
+    )
   ; END PROBLEM 16
   )
