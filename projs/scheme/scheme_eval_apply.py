@@ -134,7 +134,9 @@ def optimize_tail_calls(unoptimized_scheme_eval):
 
         result = Unevaluated(expr, env)
         # BEGIN OPTIONAL PROBLEM 2
-        "*** YOUR CODE HERE ***"
+        while isinstance(result, Unevaluated):
+            result = unoptimized_scheme_eval(result.expr, result.env, True)
+        return result
         # END OPTIONAL PROBLEM 2
     return optimized_eval
 
@@ -147,4 +149,4 @@ def optimize_tail_calls(unoptimized_scheme_eval):
 # 取消下面一行的注释即可启用尾调用优化 #
 ################################################################
 
-# scheme_eval = optimize_tail_calls(scheme_eval)
+scheme_eval = optimize_tail_calls(scheme_eval)
