@@ -125,3 +125,35 @@ class MuProcedure(Procedure):
     def __repr__(self):
         return 'MuProcedure({0}, {1})'.format(
             repr(self.formals), repr(self.body))
+
+class MacroProcedure(Procedure):
+    """由 define-macro 定义的宏过程。
+
+    宏与 lambda 的区别（也是宏的核心）：
+    - 调用宏时，传入的是「未求值的操作数表达式」（即源代码树本身），
+      而不是先把操作数求值后的值；
+    - 宏过程返回一个「展开式」（一段新的 Scheme 表达式），由解释器在
+      「调用环境」中再对它求值一次，其结果才是宏调用的结果。
+    因此宏可以像特殊形式一样，对源代码做重写，实现新的控制结构。
+
+    >>> env = create_global_frame()
+    >>> m = MacroProcedure(read_line("(x)"), read_line("(car x)"), env)
+    >>> m.formals
+    Link('x')
+    >>> m.body
+    Link('car', Link('x'))
+    """
+    def __init__(self, formals, body, env):
+        """形参列表 FORMALS（宏被调用时，未求值的操作数将绑定到这些符号）、
+        宏体 BODY（一个 Scheme 列表，求值后得到展开式）、以及定义时所在的
+        环境 ENV（词法作用域，与 lambda 类似）。"""
+        from scheme_utils import validate_type, scheme_listp
+        validate_type(formals, scheme_listp, 0, 'MacroProcedure')
+        validate_type(body, scheme_listp, 1, 'MacroProcedure')
+        self.formals = formals
+        self.body = body
+        self.env = env
+
+    def __repr__(self):
+        return 'MacroProcedure({0}, {1}, {2})'.format(
+            repr(self.formals), repr(self.body), repr(self.env))

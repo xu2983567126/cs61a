@@ -546,3 +546,31 @@ x
 ; expect f
 (f (1 2))
 ; expect 1
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Macro 用例（手动验证用） ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; 宏拿到的是「未求值的操作数」，返回一段展开式后再被求值一次
+(define-macro (f2 x) (car x))
+(f2 (1 2))
+; expect 1
+
+;; unless：条件为假时才执行 body（宏体里 condition/body 是源码树，不是值）
+(define-macro (unless condition body)
+  (list 'if condition #f body))
+(unless (= 1 2) 'ok)
+; expect ok
+
+;; 宏体在「宏定义环境」里求值，展开式在「调用环境」里再求值一次；
+;; 下面 show 把操作数原样（不求值）作为展开式返回，所以用 quote 包住
+(define x 5)
+(define-macro (show expr) (list 'quote expr))
+(show (+ x 1))
+; expect (+ x 1)
+
+;; 用宏重组参数：把 a、b 两个操作数的位置对调
+(define-macro (swap a b) (list 'list b a))
+(swap 1 2)
+; expect (2 1)

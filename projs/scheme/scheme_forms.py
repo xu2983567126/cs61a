@@ -43,11 +43,12 @@ def do_define_form(expressions, env, tail=False):
     elif isinstance(signature, Link) and scheme_symbolp(signature.first):
         # 定义一个具名过程，例如 (define (f x y) (+ x y))
         # BEGIN PROBLEM 10
+        name = signature.first
         formals = signature.rest
         validate_formals(formals)
         body =  expressions.rest
-        env.define(signature.first, LambdaProcedure(formals, body, env))
-        return signature.first
+        env.define(name, LambdaProcedure(formals, body, env))
+        return name
         # END PROBLEM 10
     else:
         bad_signature = signature.first if isinstance(signature, Link) else signature
@@ -258,8 +259,39 @@ def do_mu_form(expressions, env, tail=False):
     # BEGIN PROBLEM 11
     body = expressions.rest
     return MuProcedure(formals, body)
-    # END PROBLEM 11
+        # END PROBLEM 11
 
+
+def do_macro_form(expressions, env, tail=False):
+    """求值一个 define-macro 形式，定义一个新的宏过程。
+
+    (define-macro (NAME FORMAL ...) BODY ...) 会创建一个 MacroProcedure，
+    并把 NAME 绑定到该宏上，最后返回 NAME（方便在 REPL 里打印确认）。
+
+    宏调用的完整求值流程（真正在 scheme_eval 里实现，见下方注释）：
+      1. 先对运算符求值，得到 procedure；若它不是 MacroProcedure，按普通调用处理；
+      2. 把「未求值的操作数 rest」作为实参，在 procedure.env 的子帧中绑定到
+         procedure.formals；
+      3. 对 procedure.body 求值（在宏自己的环境里），得到的返回值就是「展开式」；
+      4. 再把这段展开式在「宏被调用的环境 env」中 scheme_eval 一次，作为结果。
+
+    用例（实现后可用）:
+    >>> env = create_global_frame()
+    >>> do_macro_form(read_line("((f x) (car x))"), env)
+    'f'
+    >>> scheme_eval(read_line("(f (1 2))"), env)
+    1
+    """
+    # BEGIN MACRO
+    validate_form(expressions, 2)
+    signature = expressions.first
+    name = signature.first
+    formals = signature.rest
+    body = expressions.rest
+    validate_formals(formals)
+    env.define(name, MacroProcedure(formals, body, env))
+    return name
+    # END MACRO
 
 
 SPECIAL_FORMS = {
@@ -267,6 +299,7 @@ SPECIAL_FORMS = {
     'begin': do_begin_form,
     'cond': do_cond_form,
     'define': do_define_form,
+    'define-macro': do_macro_form,
     'if': do_if_form,
     'lambda': do_lambda_form,
     'let': do_let_form,

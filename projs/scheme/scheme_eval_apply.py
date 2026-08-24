@@ -10,7 +10,7 @@ from ucb import main, trace
 # 求值/应用（Eval/Apply） #
 ##############
 
-def scheme_eval(expr, env, tail=False): # 可选的第三个参数会被忽略
+def scheme_eval(expr, env: Frame, tail=False): # 可选的第三个参数会被忽略
     """在 Frame ENV 中对 Scheme 表达式 EXPR 求值。
 
     >>> expr = read_line('(+ 2 2)')
@@ -28,7 +28,7 @@ def scheme_eval(expr, env, tail=False): # 可选的第三个参数会被忽略
     # 所有非原子表达式都是列表（组合式）
     if not scheme_listp(expr):
         raise SchemeError('malformed list: {0}'.format(repl_str(expr)))
-    first, rest = expr.first, expr.rest
+    first, rest = expr.first, expr.rest # 操作符和操作数
 
     from scheme_forms import SPECIAL_FORMS # 在此处导入，避免模块加载时的循环依赖
     if scheme_symbolp(first) and first in SPECIAL_FORMS:
@@ -36,6 +36,12 @@ def scheme_eval(expr, env, tail=False): # 可选的第三个参数会被忽略
     else:
         # BEGIN PROBLEM 3
         procedure = scheme_eval(first, env)
+        # 宏
+        if isinstance(procedure, MacroProcedure):
+            macro_frame = procedure.env.make_child_frame(procedure.formals, rest)
+            expansion = scheme_eval(procedure.body, macro_frame)
+            return scheme_eval(expansion, env, tail)
+        # 普通表达式
         args = map_link(lambda x: scheme_eval(x, env), rest)
         if tail:
             return complete_apply(procedure, args, env, tail)
