@@ -1,4 +1,4 @@
-def delete(t, x):
+def delete(t: Tree, x):
     """Remove all nodes labeled x below the root within Tree t. When a non-leaf
     node is deleted, the deleted node's children become children of its parent.
 
@@ -18,13 +18,13 @@ def delete(t, x):
     Tree(1, [Tree(4), Tree(5), Tree(3, [Tree(6)]), Tree(6), Tree(7), Tree(8), Tree(4)])
     """
     new_branches = []
-    for _________ in ________________:
-        _______________________
+    for b in t.branches:
+        delete(b, x)
         if b.label == x:
-            __________________________________
+            new_branches.extend(b.branches)
         else:
-            __________________________________
-    t.branches = ___________________
+            new_branches.append(b)
+    t.branches = new_branches
 
 
 def insert_into_all(item, nested_list):
@@ -36,7 +36,7 @@ def insert_into_all(item, nested_list):
     >>> insert_into_all(0, nl)
     [[0], [0, 1, 2], [0, 3]]
     """
-    "*** YOUR CODE HERE ***"
+    return [[item] + lst for lst in nested_list]
 
 def subseqs(s):
     """Return a nested list (a list of lists) of all subsequences of S.
@@ -48,11 +48,11 @@ def subseqs(s):
     >>> subseqs([])
     [[]]
     """
-    if ________________:
-        ________________
+    if not s:
+        return [[]]
     else:
-        ________________
-        ________________
+        sub = subseqs(s[1:])
+        return insert_into_all(s[0], sub) + sub
 
 
 def non_decrease_subseqs(s):
@@ -71,14 +71,14 @@ def non_decrease_subseqs(s):
     """
     def subseq_helper(s, prev):
         if not s:
-            return ____________________
+            return [[]]
         elif s[0] < prev:
-            return ____________________
+            return subseq_helper(s[1:], prev)
         else:
-            a = ______________________
-            b = ______________________
-            return insert_into_all(________, ______________) + ________________
-    return subseq_helper(____, ____)
+            a = subseq_helper(s[1:], s[0])
+            b = subseq_helper(s[1:], prev)
+            return insert_into_all(s[0], a) + b
+    return subseq_helper(s, 0)
 
 
 
@@ -106,7 +106,13 @@ def common_players(roster):
     Team C ['beatrice']
     Team D ['ben']
     """
-    "*** YOUR CODE HERE ***"
+    dict: dict = {}
+    for key, value in roster.items():
+        if value in dict:
+            dict[value].append(key)
+        else:
+            dict[value] = [key]
+    return dict;
     
 
 
@@ -123,7 +129,16 @@ def stair_ways(n):
     >>> list(s_w) # Ensure you're not yielding extra
     []
     """
-    "*** YOUR CODE HERE ***"
+    if n == 0:
+        yield []
+        return
+    if n == 1:
+        yield [1]
+        return
+    for way in stair_ways(n - 1):
+        yield [1] + way
+    for way in stair_ways(n - 2):
+        yield [2] + way
 
 
 # You do not need to understand what this function does. It is used for testing.
@@ -194,10 +209,18 @@ class Player:
         self.random_func = random_func
 
     def debate(self, other):
-        "*** YOUR CODE HERE ***"
+        p1, p2 = self.popularity, other.popularity
+        prob = max(0.1, p1 / (p1 + p2))
+        if self.random_func() < prob:
+            self.popularity += 50
+        else:
+            self.popularity = max(0, self.popularity - 50)
 
     def speech(self, other):
-        "*** YOUR CODE HERE ***"
+        add_pop = self.popularity // 10
+        self.popularity += add_pop
+        self.votes += add_pop
+        other.popularity -= other.popularity // 10
 
     def choose(self, other):
         return self.speech
@@ -221,21 +244,31 @@ class Game:
     >>> print(g.winner())
     None
     """
-    def __init__(self, player1, player2):
+    def __init__(self, player1: Player, player2: Player):
         self.p1 = player1
         self.p2 = player2
         self.turn = 0
 
     def play(self):
         while not self.game_over():
-            "*** YOUR CODE HERE ***"
+            if self.turn % 2 == 0:
+                curr, other = self.p1, self.p2
+            else:
+                curr, other = self.p2, self.p1
+            curr.choose(other)(other)
+            self.turn += 1
         return self.winner()
 
     def game_over(self):
         return max(self.p1.votes, self.p2.votes) >= 50 or self.turn >= 10
 
     def winner(self):
-        "*** YOUR CODE HERE ***"
+        if self.p1.votes > self.p2.votes:
+            return self.p1
+        elif self.p1.votes < self.p2.votes:
+            return self.p2
+        else:
+            return None
 
 
 ### Phase 3: New Players
@@ -258,7 +291,10 @@ class AggressivePlayer(Player):
     True
     """
     def choose(self, other):
-        "*** YOUR CODE HERE ***"
+        if self.popularity <= other.popularity:
+            return self.debate
+        else:
+            return self.speech
 
 class CautiousPlayer(Player):
     """
@@ -275,7 +311,10 @@ class CautiousPlayer(Player):
     True
     """
     def choose(self, other):
-        "*** YOUR CODE HERE ***"
+        if self.popularity == 0:
+            return self.debate
+        else:
+            return self.speech
 
 
 def two_list(vals, counts):
@@ -296,7 +335,23 @@ def two_list(vals, counts):
     >>> c
     Link(1, Link(1, Link(3, Link(3, Link(2)))))
     """
-    "*** YOUR CODE HERE ***"
+    def helper(count, index):
+        if count == 0:
+            if index + 1 == len(vals):
+                return Link.empty
+            return Link(vals[index + 1], helper(counts[index + 1] - 1, index + 1))
+        return Link(vals[index], helper(count - 1, index))
+    return helper(counts[0], 0)
+    
+    # lst = Link(0)
+    # curr = lst
+    # for i in range(len(counts)):
+    #     for _ in range(counts[i]):
+    #         new_node = Link(vals[i])
+    #         curr.rest = new_node
+    #         curr = curr.rest
+    # return lst.rest
+
 
 
 

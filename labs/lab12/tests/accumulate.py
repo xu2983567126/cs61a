@@ -7,14 +7,12 @@ test = {
         {
           'code': r"""
           scm> (accumulate * 1 5 identity)
-          8a65148020e6949b5f51ce1565d3a472
-          # locked
+          120
           scm> (accumulate * 2 4 identity)
-          f842757563357c52762061ee1f54f51c
-          # locked
+          48
           """,
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'multiline': False
         }
       ],
@@ -31,20 +29,16 @@ test = {
         {
           'code': r"""
           scm> (define (square x) (* x x))
-          cc5843273602621c15b3b18274a0dbb3
-          # locked
+          square
           scm> (accumulate + 0 5 square)
-          3ddbc76ef86b6916e795c81705899c13
-          # locked
+          55
           scm> (accumulate + 5 5 square)
-          0af3e7a1212cd17f3179f57324330bca
-          # locked
+          60
           scm> (accumulate + 2 3 square)
-          cd59f3362ef5418f3c213379f16cf8dc
-          # locked
+          16
           """,
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'multiline': False
         }
       ],
